@@ -38,7 +38,7 @@ Tengeneza secrets mbili tofauti, kwa mfano `openssl rand -hex 32`. `.env.example
 ## Vercel deployment
 
 1. Vercel dashboard → Add New → Project → import `MOMO47-tech/MOMO-MOVIES-BANK`.
-2. Chagua branch ya production `main`. Project ni static + serverless; hakuna build command au dependency ya frontend inayohitajika. Vercel itatengeneza domain ya `*.vercel.app` (jina la project linaweza kuchaguliwa ikiwa halijachukuliwa).
+2. Branch ya production ya project hii ni `feature/momo-movies-bank`. Project ni static + serverless; hakuna build command au dependency ya frontend inayohitajika. Vercel itatengeneza domain ya `*.vercel.app` (jina la project linaweza kuchaguliwa ikiwa halijachukuliwa).
 3. Weka environment variables zilizo juu, redeploy, kisha hakiki `/api/session`, `/api/member-count` na login.
 
 Push mpya kwenye branch ya production itasababisha Vercel kujenga deployment mpya ikiwa repository imeunganishwa.
