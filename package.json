@@ -1,0 +1,14 @@
+{
+  "name": "momo-movies-bank",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "packageManager": "pnpm@10.18.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node dev-server.js",
+    "check": "node --check app.js && node --check dev-server.js && node --check api/enter.js && node --check api/session.js && node --check api/logout.js && node --check api/member-count.js && node --check api/movies.js && node --check lib/security.js && node --check lib/supabase.js"
+  }
+}
