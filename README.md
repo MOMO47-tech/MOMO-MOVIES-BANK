@@ -35,7 +35,7 @@ Weka variables hizi katika Vercel Project Settings → Environment Variables kwa
 - `SESSION_SECRET`: siri random ya angalau herufi 32.
 - `PHONE_HASH_SECRET`: siri tofauti ya random yenye angalau herufi 24; hutumika kutengeneza HMAC ya namba.
 - `SUPABASE_URL`: URL ya project.
-- `SUPABASE_ANON_KEY`: Supabase anon/publishable key; API ya admin huitumia upande wa server kuingia kwenye Supabase Auth.
+- `SUPABASE_ANON_KEY`: hiari; ikiwekwa, API ya admin huitumia. Isipokuwepo, login hutumia `SUPABASE_SERVICE_ROLE_KEY` iliyopo kwa Supabase Auth upande wa server pekee.
 - `SUPABASE_SERVICE_ROLE_KEY`: key ya upande wa server tu.
 - `TMDB_API_KEY`: API key ya TMDB; bila hii site huonyesha catalog ndogo ya mfano.
 - `TMDB_WATCH_REGION`: hiari; default ni `TZ`.
