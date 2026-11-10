@@ -15,12 +15,18 @@ const server = http.createServer((req, res) => {
   if (url.pathname === "/api/enter") return send(res, 503, { error: "Preview pekee: weka secrets na Supabase kwenye Vercel ili kuwezesha kuingia." });
   if (url.pathname === "/api/movies") {
     const query = (url.searchParams.get("search") || "").toLowerCase();
+    const category = url.searchParams.get("category") || "trending";
     const detail = url.searchParams.get("detail");
     if (detail) {
       const movie = movies.find(item => String(item.id) === detail);
       return movie ? send(res, 200, { movie, source: "sample" }) : send(res, 404, { error: "Maelezo hayapatikani." });
     }
-    const results = (url.searchParams.get("category") === "tv" ? [] : movies).filter(movie => !query || `${movie.title} ${movie.overview}`.toLowerCase().includes(query));
+    let catalogue = movies;
+    if (category === "tv") catalogue = movies.filter(movie => movie.media_type === "tv");
+    if (category === "horror") catalogue = movies.filter(movie => /horror|kutisha/i.test(movie.genre || ""));
+    if (category === "action") catalogue = movies.filter(movie => /action|fight|combat|mapigano/i.test(movie.genre || ""));
+    if (category === "animation") catalogue = movies.filter(movie => /animation|cartoon|katuni/i.test(movie.genre || ""));
+    const results = catalogue.filter(movie => !query || `${movie.title} ${movie.overview} ${movie.genre || ""}`.toLowerCase().includes(query));
     return send(res, 200, { results, page: 1, hasMore: false, source: "sample", error: "TMDB_API_KEY_MISSING" });
   }
   let pathname = decodeURIComponent(url.pathname);

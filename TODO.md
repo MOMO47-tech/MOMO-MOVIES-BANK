@@ -11,7 +11,7 @@
 
 - [x] **Utafutaji wa movies na series:** Marekebisha utafutaji usionyeshe matokeo tupu kwa sababu ya request race; tumia TMDB kupata movies na series za sasa, na onyesha maelekezo yaliyo wazi ikiwa `TMDB_API_KEY` haijawekwa au haifanyi kazi.
 - [x] **Tafsiri za DJ wa Tanzania:** Ongeza sehemu inayoonyesha filamu zilizotafsiriwa na DJ maarufu wa Tanzania Ommy DJ, zikionyesha jina la DJ na viungo vya video vilivyochapishwa kwenye channel yake ya YouTube. Viungo viandikwe wazi kuwa ni vipande/trela fupi, si filamu nzima; usiweke full movie au download bila ruhusa ya mwenye haki.
-- [ ] **Download:** Ongeza sehemu ya download kwa mfano wa tovuti iliyotumwa, lakini onyesha au fungua downloads tu kupitia link rasmi iliyoidhinishwa na mwenye haki; usi-host wala kuunganisha nakala zisizoidhinishwa.
+- [x] **Download:** Ongeza sehemu ya Download inayoonekana wazi; direct download itumike tu kwa link rasmi iliyoidhinishwa na mwenye haki, vinginevyo elekeza kwenye app/platform rasmi kwa offline save ikiwa inaruhusu. Sehemu inaeleza kwamba hakuna direct file iliyothibitishwa na inaelekeza offline save kwenye app yenye haki.
 
 ## Ombi la sasa
 
@@ -25,3 +25,12 @@
 - [x] **Katalogi ya DJs:** Kagua na uweke sehemu za DJ Mack, Babu DJ, DJ Prabhat, Remmy DJ, Murphy DJ, DJ Mjukuu, DJ Bryton, Juma Khan, DJ Skills na DJ Six Fingers. Onyesha jina la DJ na links za chanzo cha DJ au platform rasmi tu; ikiwa utambulisho/channel haujathibitishwa, eleza hilo badala ya kubuni film au link.
 - [x] **Full movies, seasons, playback na download:** Onyesha full film/season, player au download tu pale jukwaa rasmi la distributor/rights-holder au leseni iliyo wazi imethibitishwa. YouTube upload, paywall, app listing au malipo peke yake si uthibitisho wa haki. Isipokuwa hivyo, usihosti/kuunganisha full movie au download; tumia profile au clips fupi zilizochapishwa kwenye channel ya DJ na uziweke lebo wazi kuwa si filamu nzima.
 - [x] **Hacker-style MOMO MOVIES branding:** Andika “MOMO MOVIES” kwa wordmark ya ki-hacker/neon yenye urembo unaosomeka, nafasi/typography zilizopangwa vizuri na animation ya maandishi; nyota za nyuma ziendelee kusogea na radi/flash za neon zipige nyuma ya maandishi bila kufunika content. Hifadhi usomaji kwenye simu na uzingatie reduced-motion.
+
+
+## Ombi la sasa — Termux style na genre filters
+
+- [x] **Maandishi ya Termux yenye rangi:** Panga maandishi kwa font ya monospace ya terminal, rangi za neon na accents zinazoonekana kwa utaratibu; neno MOMO MOVIES libaki linasomeka.
+- [x] **Aina za filamu:** Tenganisha na weka filters zinazofanya kazi kwa Horror, Action/Mapigano, na Animation/Cartoon.
+- [x] **List ya DJs wenye content:** Orodha ionyeshe tu DJ ambaye ana clip au title inayoonekana kwenye catalog; ondoa profile ya DJ ambaye content yake haionekani.
+- [x] **Sehemu ya download:** Ongeza sehemu ya Download inayoonekana wazi; direct download itumike tu kwa link rasmi iliyoidhinishwa na mwenye haki, vinginevyo elekeza kwenye app/platform rasmi kwa offline save ikiwa inaruhusu.
+- [x] **Radi na nyota:** Radi za neon zionekane wazi zaidi nyuma ya nyota zinazosogea, bila kufunika text au kuharibu usomaji kwenye simu.

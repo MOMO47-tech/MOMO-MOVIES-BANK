@@ -26,6 +26,33 @@
     return new Intl.DateTimeFormat("en", { timeZone: "Africa/Dar_es_Salaam", year: "numeric" }).format(new Date());
   }
   function titleOf(movie) { return movie.title || movie.name || "Untitled"; }
+  function categoryTitle(category) {
+    return {
+      trending: "Filamu na series zinazotrend",
+      popular: "Movies na series zinazotrend",
+      top_rated: "Zilizokadiriwa",
+      now_playing: `Movies mpya za ${currentTanzaniaYear()}`,
+      tv: "Series maarufu",
+      watchlist: "Orodha yangu",
+      horror: "Horror · za kutisha",
+      action: "Action · mapigano",
+      animation: "Animation · cartoon"
+    }[category] || "Filamu";
+  }
+  function activateCategory(category) {
+    state.category = category;
+    state.query = "";
+    state.page = 1;
+    $("#search-input").value = "";
+    $$(".nav-link").forEach(link => link.classList.toggle("is-active", link.dataset.category === category));
+    $$(".genre-chip").forEach(chip => {
+      const active = chip.dataset.category === category;
+      chip.classList.toggle("is-active", active);
+      chip.setAttribute("aria-pressed", String(active));
+    });
+    $("#section-title").textContent = categoryTitle(category);
+    loadCatalog();
+  }
   function watchlist() {
     try { return JSON.parse(localStorage.getItem("momo-watchlist") || "[]"); } catch { return []; }
   }
@@ -96,8 +123,11 @@
     } catch (error) {
       if (controller.signal.aborted || requestId !== state.requestId) return;
       const needle = state.query.toLocaleLowerCase();
-      const samples = fallbackMovies.filter(item => {
+      const samples = state.category === "watchlist" ? watchlist() : fallbackMovies.filter(item => {
         if (state.category === "tv") return item.media_type === "tv";
+        if (state.category === "horror") return (item.genre_ids || []).includes(27) || /horror|kutisha/i.test(item.genre || "");
+        if (state.category === "action") return (item.genre_ids || []).includes(28) || /action|fight|combat|mapigano/i.test(item.genre || "");
+        if (state.category === "animation") return (item.genre_ids || []).includes(16) || /animation|cartoon|katuni/i.test(item.genre || "");
         return !needle || `${titleOf(item)} ${item.overview} ${item.genre || ""}`.toLocaleLowerCase().includes(needle);
       });
       state.movies = samples;
@@ -192,8 +222,11 @@
       const response = await fetch("/data/tanzania-translations.json", { headers: { Accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error("TRANSLATIONS_UNAVAILABLE");
       const data = await response.json();
-      renderDjDirectory(data.djs);
-      renderTranslations(data.items);
+      const items = Array.isArray(data.items) ? data.items : [];
+      const visible = new Set(items.map(item => String(item.dj || "").trim().toLocaleLowerCase()));
+      const djs = (Array.isArray(data.djs) ? data.djs : []).filter(item => visible.has(String(item.name || "").trim().toLocaleLowerCase()));
+      renderDjDirectory(djs);
+      renderTranslations(items);
     } catch { renderDjDirectory([]); renderTranslations([]); }
   }
   function trailerSearch(movie) {
@@ -271,25 +304,27 @@
       showGate("Umetoka kwenye akaunti.", true);
     });
     $$(".nav-link").forEach(link => link.addEventListener("click", () => {
-      $$(".nav-link").forEach(item => item.classList.toggle("is-active", item === link));
       if (link.dataset.section) {
         document.getElementById(link.dataset.section)?.scrollIntoView({ behavior: "smooth" });
         return;
       }
-      state.category = link.dataset.category;
-      state.query = ""; state.page = 1; $("#search-input").value = "";
-      const labels = { trending: "Filamu zinazotrend", popular: "Movies na series zinazotrend", top_rated: "Zilizokadiriwa", now_playing: `Movies mpya za ${currentTanzaniaYear()}`, tv: "Series maarufu", watchlist: "Orodha yangu" };
-      $("#section-title").textContent = labels[state.category] || "Filamu";
-      loadCatalog();
+      activateCategory(link.dataset.category);
     }));
+    $$(".genre-chip").forEach(chip => chip.addEventListener("click", () => activateCategory(chip.dataset.category)));
     let searchTimer;
     $("#search-input").addEventListener("input", event => {
       clearTimeout(searchTimer);
       state.activeController?.abort();
       state.requestId++;
       state.query = event.target.value.trim(); state.page = 1;
-      if (state.query) { state.category = "trending"; $$(".nav-link").forEach(item => item.classList.remove("is-active")); $("#section-title").textContent = `Matokeo ya “${state.query}”`; }
-      else $("#section-title").textContent = "Inavuma sasa";
+      if (state.query) state.category = "trending";
+      $$(".nav-link").forEach(item => item.classList.toggle("is-active", !state.query && item.dataset.category === state.category));
+      $$(".genre-chip").forEach(item => {
+        const active = !state.query && item.dataset.category === state.category;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+      $("#section-title").textContent = state.query ? `Matokeo ya “${state.query}”` : categoryTitle(state.category);
       searchTimer = setTimeout(loadCatalog, 300);
     });
     $("#load-more").addEventListener("click", () => { state.page += 1; loadCatalog(); });

@@ -21,6 +21,7 @@ function normalize(item) {
     poster_path: image(item.poster_path),
     backdrop_path: image(item.backdrop_path, "w1280"),
     vote_average: Number(item.vote_average) || null,
+    popularity: Number(item.popularity) || 0,
     genre_ids: item.genre_ids || [],
     runtime: item.runtime || null
   };
@@ -34,6 +35,9 @@ function sendJson(res, status, body) {
 function fallbackResults(query, category) {
   let results = fallback;
   if (category === "tv") results = fallback.filter(item => item.media_type === "tv");
+  if (category === "horror") results = fallback.filter(item => (item.genre_ids || []).includes(27) || /horror|kutisha/i.test(item.genre || ""));
+  if (category === "action") results = fallback.filter(item => (item.genre_ids || []).includes(28) || /action|fight|combat|mapigano/i.test(item.genre || ""));
+  if (category === "animation") results = fallback.filter(item => (item.genre_ids || []).includes(16) || /animation|cartoon|katuni/i.test(item.genre || ""));
   if (query) {
     const needle = query.toLocaleLowerCase();
     results = results.filter(item => `${item.title} ${item.name || ""} ${item.overview} ${item.genre || ""}`.toLocaleLowerCase().includes(needle));
@@ -122,6 +126,30 @@ module.exports = async function handler(req, res) {
     }
     let payload;
     if (query) payload = await tmdb("/search/multi", { query, include_adult: "false", page });
+    else if (category === "animation") {
+      const [movieData, tvData] = await Promise.all([
+        tmdb("/discover/movie", { with_genres: 16, sort_by: "popularity.desc", include_adult: "false", page }),
+        tmdb("/discover/tv", { with_genres: 16, sort_by: "popularity.desc", page })
+      ]);
+      const results = [
+        ...(movieData.results || []).map(item => normalize({ ...item, media_type: "movie" })),
+        ...(tvData.results || []).map(item => normalize({ ...item, media_type: "tv" }))
+      ].sort((a, b) => b.popularity - a.popularity);
+      return sendJson(res, 200, {
+        results,
+        page,
+        hasMore: Number(movieData.total_pages) > page || Number(tvData.total_pages) > page,
+        source: "tmdb"
+      });
+    }
+    else if (category === "horror" || category === "action") {
+      payload = await tmdb("/discover/movie", {
+        with_genres: category === "horror" ? 27 : 28,
+        sort_by: "popularity.desc",
+        include_adult: "false",
+        page
+      });
+    }
     else if (category === "now_playing") {
       const { year, today } = tanzaniaDateParts();
       payload = await tmdb("/discover/movie", {
