@@ -16,38 +16,44 @@
   <canvas id="starfield" aria-hidden="true"></canvas>
   <div class="ambient ambient--one" aria-hidden="true"></div>
   <div class="ambient ambient--two" aria-hidden="true"></div>
-  <div class="lightning-layer" aria-hidden="true"><span class="lightning-bolt lightning-bolt--one"></span><span class="lightning-bolt lightning-bolt--two"></span></div>
+  <div class="lightning-layer" aria-hidden="true"><span class="lightning-bolt lightning-bolt--one"></span><span class="lightning-bolt lightning-bolt--two"></span><span class="lightning-bolt lightning-bolt--three"></span><span class="lightning-bolt lightning-bolt--four"></span></div>
 
-  <main id="gate-view" class="gate-view">
+  <main id="gate-view" class="gate-view" lang="en">
     <div class="gate-brand">
       <div class="brand-orbit" aria-hidden="true"><span class="brand-hex">⬡</span></div>
-      <p class="eyebrow">MOMO • CINEMA DISCOVERY</p>
+      <p class="eyebrow">MOMO // CINEMA DISCOVERY</p>
       <h1 class="hacker-wordmark" data-text="MOMO MOVIES">MOMO <span>MOVIES</span></h1>
-      <p class="gate-subtitle">Filamu nzuri. Trela rasmi. Safari inaanza hapa.</p>
+      <p class="gate-subtitle">PRIVATE CINEMA • SECURE ACCESS • MOVIE DISCOVERY</p>
     </div>
 
     <section class="gate-card" aria-labelledby="gate-title">
-      <div class="card-symbol" aria-hidden="true"><span>↗</span></div>
-      <p class="eyebrow eyebrow--muted">PRIVATE MOVIE LOUNGE</p>
-      <h2 id="gate-title">Ingia kwenye ulimwengu wa filamu</h2>
-      <p class="gate-copy">Weka namba yako na nenosiri ili kufungua katalogi ya MOMO MOVIES.</p>
+      <div class="gate-terminal-bar" aria-hidden="true"><span class="terminal-lights"><i></i><i></i><i></i></span><span class="gate-terminal-location">momo@movies:~</span><span class="terminal-secure">AUTH://LOCKED</span></div>
+      <div class="card-symbol" aria-hidden="true"><span>$_</span></div>
+      <p class="eyebrow eyebrow--muted">PRIVATE ACCESS NODE // 01</p>
+      <h2 id="gate-title" class="gate-title"><span class="gate-title__lead">WELCOME TO</span><strong class="gate-title__name">MOMO MOVIES</strong></h2>
+      <p class="gate-copy">ENTER YOUR PHONE NUMBER AND UNLOCK CODE TO ACCESS THE PRIVATE MOVIE NETWORK.</p>
+      <p class="gate-terminal-command" aria-hidden="true"><span>momo@movies</span><b>:~$</b><code> auth --secure --movie-access</code><i></i></p>
 
       <form id="login-form" novalidate>
-        <label for="phone-input">Namba ya simu</label>
+        <label for="phone-input">PHONE NUMBER</label>
         <div class="input-wrap"><span aria-hidden="true">+</span><input id="phone-input" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="255 7XX XXX XXX" required></div>
-        <label for="password-input">Nenosiri</label>
-        <div class="input-wrap input-wrap--password"><input id="password-input" name="password" type="password" autocomplete="current-password" placeholder="Weka nenosiri la pamoja" required><button id="toggle-password" class="eye-button" type="button" aria-label="Onyesha nenosiri">◉</button></div>
-        <p class="privacy-note">Namba yako haitachapishwa. Mfumo huhifadhi alama fiche tu kwa kuzuia usajili unaojirudia.</p>
+        <label for="password-input">UNLOCK CODE</label>
+        <div class="input-wrap input-wrap--password"><input id="password-input" name="password" type="password" autocomplete="current-password" placeholder="Enter unlock code" required><button id="toggle-password" class="eye-button" type="button" aria-label="Show unlock code">◉</button></div>
+        <p class="privacy-note">Your number stays private. Only a hashed fingerprint is stored to prevent duplicate joins.</p>
         <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
-        <button id="login-button" class="button button--primary" type="submit"><span>INGIA KWENYE TOVUTI</span><b aria-hidden="true">→</b></button>
+        <button id="login-button" class="button button--primary" type="submit"><span>ENTER SITE</span><b aria-hidden="true">→</b></button>
       </form>
-      <button id="demo-button" class="demo-button" type="button" hidden>Angalia mwonekano wa demo</button>
+      <button id="demo-button" class="demo-button" type="button" hidden>Open demo preview</button>
 
-      <div class="member-count"><span class="pulse-dot" aria-hidden="true"></span><span id="member-count-value">—</span><span>wamejiunga na lounge</span></div>
-      <p class="gate-footnote">Passcode ni ya pamoja; namba haitathibitishwa kwa SMS.</p>
-      <a class="gate-admin-link" href="/admin">Dashibodi ya admin ↗</a>
+      <div id="member-count" class="member-count" data-state="pending" role="status" aria-live="polite" aria-atomic="true">
+        <span class="member-count__icon" aria-hidden="true">#</span>
+        <div class="member-count__copy"><span class="member-count__label">COMMUNITY MEMBERS</span><div class="member-count__total"><strong id="member-count-value">—</strong><span>members joined</span></div></div>
+        <span id="member-count-status" class="member-count__status">SYNCING</span>
+      </div>
+      <p class="gate-footnote">Shared unlock code • SMS verification is not enabled.</p>
+      <a class="gate-admin-link" href="/admin">ADMIN CONSOLE ↗</a>
     </section>
-    <p class="gate-footer">PRIVATE LOUNGE <span>•</span> MOVIE DISCOVERY, DONE RIGHT</p>
+    <p class="gate-footer">PRIVATE CINEMA NODE <span>•</span> MOVIE DISCOVERY, DONE RIGHT</p>
   </main>
 
   <div id="catalog-view" class="catalog-view" hidden>

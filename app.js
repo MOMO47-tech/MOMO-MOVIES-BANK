@@ -82,11 +82,27 @@
   }
   async function renderCount() {
     const label = $("#member-count-value");
+    const panel = $("#member-count");
+    const status = $("#member-count-status");
     try {
       const data = await request("/api/member-count");
-      label.textContent = Number.isInteger(data.count) ? new Intl.NumberFormat("sw-TZ").format(data.count) : "—";
-      if (data.count === null) label.title = "Kaunta itaonekana baada ya kuunganisha Supabase kwenye Vercel.";
-    } catch { label.textContent = "—"; }
+      if (Number.isInteger(data.count)) {
+        label.textContent = new Intl.NumberFormat("en-US").format(data.count);
+        panel.dataset.state = "live";
+        status.textContent = "LIVE";
+        label.removeAttribute("title");
+      } else {
+        label.textContent = "—";
+        panel.dataset.state = "pending";
+        status.textContent = "SYNCING";
+        label.title = "Member count is not available yet.";
+      }
+    } catch {
+      label.textContent = "—";
+      panel.dataset.state = "offline";
+      status.textContent = "OFFLINE";
+      label.title = "Member count could not be loaded.";
+    }
   }
 
   async function loadCatalog() {
@@ -354,30 +370,31 @@
       const password = $("#password-input").value;
       const message = $("#login-message");
       message.textContent = "";
-      if (!phone || !password) { message.textContent = "Jaza namba ya simu na nenosiri."; return; }
+      message.classList.remove("is-success");
+      if (!phone || !password) { message.textContent = "Enter your phone number and unlock code."; return; }
       button.disabled = true;
-      button.querySelector("span").textContent = "INAHAKIKI…";
+      button.querySelector("span").textContent = "VERIFYING ACCESS…";
       try {
         await request("/api/enter", { method: "POST", body: JSON.stringify({ phone, password }) });
-        message.textContent = "Umeingia. Karibu kwenye lounge.";
+        message.textContent = "Access granted. Opening the movie network…";
         message.classList.add("is-success");
         await renderCount();
         showCatalog();
       } catch (error) {
-        message.textContent = error.status === 503 ? "Huduma ya kuingia bado haijaunganishwa kikamilifu. Mmiliki aweke secrets na Supabase kwenye Vercel." : (error.message || "Namba au nenosiri si sahihi.");
+        message.textContent = error.status === 503 ? "Access service is offline. The site owner must configure Supabase on Vercel." : (error.message || "ACCESS DENIED. Check your phone number and unlock code.");
       } finally {
         button.disabled = false;
-        button.querySelector("span").textContent = "INGIA KWENYE TOVUTI";
+        button.querySelector("span").textContent = "ENTER SITE";
       }
     });
     $("#toggle-password").addEventListener("click", () => {
       const input = $("#password-input");
       input.type = input.type === "password" ? "text" : "password";
-      $("#toggle-password").setAttribute("aria-label", input.type === "password" ? "Onyesha nenosiri" : "Ficha nenosiri");
+      $("#toggle-password").setAttribute("aria-label", input.type === "password" ? "Show unlock code" : "Hide unlock code");
     });
     $("#logout-button").addEventListener("click", async () => {
       try { await request("/api/logout", { method: "POST", body: "{}" }); } catch { /* clear the local view anyway */ }
-      showGate("Umetoka kwenye akaunti.", true);
+      showGate("Session closed successfully.", true);
     });
     $$(".nav-link").forEach(link => link.addEventListener("click", () => {
       if (link.dataset.section) {
@@ -431,7 +448,7 @@
       canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       stars.length = 0;
-      const count = Math.min(130, Math.max(45, Math.floor(width * height / 10500)));
+      const count = Math.min(240, Math.max(70, Math.floor(width * height / 7500)));
       for (let i = 0; i < count; i++) stars.push({ x: Math.random() * width, y: Math.random() * height, r: Math.random() * 1.25 + .25, v: Math.random() * .34 + .08, a: Math.random() * .65 + .15, phase: Math.random() * Math.PI * 2 });
     }
     function draw(time = 0) {

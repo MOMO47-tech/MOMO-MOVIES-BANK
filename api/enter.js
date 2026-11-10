@@ -20,9 +20,9 @@ module.exports = async function handler(req, res) {
   const { phone, password } = parseBody(req.body);
   const normalized = normalizePhone(phone);
   if (!normalized || typeof password !== "string" || password.length < 1 || password.length > 160) {
-    return sendJson(res, 400, { error: "Weka namba halali ya simu na nenosiri." });
+    return sendJson(res, 400, { error: "Enter a valid phone number and unlock code." });
   }
-  if (!secureEqual(password, gatePassword)) return sendJson(res, 401, { error: "Namba au nenosiri si sahihi." });
+  if (!secureEqual(password, gatePassword)) return sendJson(res, 401, { error: "ACCESS DENIED. Check your phone number and unlock code." });
   try {
     const memberHash = hashPhone(normalized);
     await addMember(memberHash);

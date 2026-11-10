@@ -39,3 +39,10 @@
 
 - [ ] **Playback ndani ya tovuti:** Mtu akiplay movie, ijiplay palepale na isimpeleke kwenye ukurasa wa matokeo ya YouTube. Trela inaweza ku-embed ndani ya MOMO; filamu nzima huchezwa tu ikiwa admin ameweka chanzo cha player na kuthibitisha ruhusa za kusambaza.
 - [ ] **Dashibodi ya admin:** Weka admin dashboard ya kuongeza, kuhariri, kuchapisha/kuficha na kufuta movie au series. Linda dashboard na Supabase Auth pamoja na allow-list ya admin; passcode ya pamoja ya wageni isitumike kama role ya admin. Rekodi ya kuchapishwa lazima iwe na kiungo cha player, chanzo cha uthibitisho wa haki, maelezo ya ruhusa na uthibitisho wa admin; wageni waone na kucheze ndani ya ukurasa rekodi zilizochapishwa na kuthibitishwa pekee.
+
+
+## Ombi jipya — English terminal gate na community counter
+
+- [x] **Join/access copy ya Termux kwa Kiingereza:** Gate ya kuingia ionyeshe lugha ya Kiingereza kwa PHONE NUMBER, UNLOCK CODE, maelezo, ujumbe na kitufe; iwe na maandishi ya kipekee ya terminal/hacker huku MOMO MOVIES ikibaki wazi na inasomeka.
+- [x] **Kaunta ya waliojiunga:** Onyesha jumla ya members kwa namba iliyopangwa kwa koma na lebo ya Kiingereza inayoeleweka; ibaki dark-web/terminal style, ionyeshe hali ya kaunta inapopatikana au isipopatikana, na isitoe namba za simu.
+- [x] **Nyota na radi zaidi:** Ongeza msongamano wa nyota na idadi ya radi zinazo-flash kwa nyuma; zisifunike wala kuzuia usomaji, ziwe nyepesi kwa simu, na heshimu `prefers-reduced-motion`.
