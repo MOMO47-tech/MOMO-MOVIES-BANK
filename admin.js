@@ -3,7 +3,10 @@
   const loginPanel = $("#login-panel");
   const dashboardPanel = $("#dashboard-panel");
   const form = $("#library-form");
+  const setupPanel = $("#setup-panel");
+  const setupForm = $("#admin-setup-form");
   const state = { items: [] };
+  const inviteContext = { accessToken: null };
 
   function escapeHtml(value = "") {
     return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
@@ -25,8 +28,34 @@
     element.classList.toggle("is-success", success);
   }
   function setAuthenticated(value) {
-    loginPanel.hidden = value;
+    loginPanel.hidden = value || Boolean(inviteContext.accessToken);
+    setupPanel.hidden = value || !inviteContext.accessToken;
     dashboardPanel.hidden = !value;
+  }
+  function clearAuthUrl(url) {
+    url.hash = "";
+    ["access_token", "refresh_token", "expires_in", "expires_at", "token_type", "type", "error", "error_description", "error_code"].forEach(key => url.searchParams.delete(key));
+    window.history.replaceState(null, document.title, `${url.pathname}${url.search}`);
+  }
+  function readInviteLink() {
+    const url = new URL(window.location.href);
+    const fragment = new URLSearchParams(url.hash.replace(/^#/, ""));
+    const get = key => url.searchParams.get(key) || fragment.get(key);
+    const accessToken = get("access_token");
+    const type = get("type");
+    const error = get("error_description") || get("error");
+    if (accessToken && type === "invite") {
+      inviteContext.accessToken = accessToken;
+      clearAuthUrl(url);
+      setAuthenticated(false);
+      setMessage("#setup-message", "Mwaliko umethibitishwa. Chagua nenosiri lako.", true);
+      return true;
+    }
+    if (error && type === "invite") {
+      clearAuthUrl(url);
+      setMessage("#login-message", "Kiungo cha mwaliko kimekwisha muda au hakikukamilika. Omba mwaliko mpya.");
+    }
+    return false;
   }
   function renderItems() {
     const list = $("#entry-list");
@@ -137,6 +166,42 @@
     }
   }
 
+  setupForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = $("#setup-button");
+    const password = $("#setup-password").value;
+    const confirmation = $("#setup-password-confirm").value;
+    if (!inviteContext.accessToken) {
+      setMessage("#setup-message", "Kiungo cha mwaliko hakipo. Fungua tena link uliyopokea.");
+      return;
+    }
+    if (password.length < 12 || password.length > 256) {
+      setMessage("#setup-message", "Nenosiri liwe na angalau herufi 12.");
+      return;
+    }
+    if (password !== confirmation) {
+      setMessage("#setup-message", "Nenosiri halilingani.");
+      return;
+    }
+    button.disabled = true;
+    setMessage("#setup-message", "Inahifadhi nenosiri...");
+    try {
+      await api("/api/admin-auth", {
+        method: "POST",
+        body: JSON.stringify({ access_token: inviteContext.accessToken, new_password: password })
+      });
+      inviteContext.accessToken = null;
+      setupForm.reset();
+      setMessage("#setup-message", "Nenosiri limehifadhiwa.", true);
+      setAuthenticated(true);
+      await loadItems();
+    } catch (error) {
+      setMessage("#setup-message", error.message || "Imeshindikana kuweka nenosiri.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
   $("#admin-login-form").addEventListener("submit", async event => {
     event.preventDefault();
     const button = $("#login-button");
@@ -171,5 +236,5 @@
     if (edit) editItem(edit.dataset.edit);
     if (remove) deleteItem(remove.dataset.delete);
   });
-  checkSession();
+  if (!readInviteLink()) checkSession();
 })();

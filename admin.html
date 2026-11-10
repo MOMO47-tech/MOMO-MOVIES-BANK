@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#03100b">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
   <title>Admin · MOMO MOVIES</title>
   <link rel="icon" type="image/svg+xml" href="/assets/momo-mark.svg">
   <link rel="stylesheet" href="/admin.css">
@@ -32,6 +33,18 @@
           <input id="admin-password" name="password" type="password" autocomplete="current-password" required maxlength="256" placeholder="Nenosiri la akaunti yako">
           <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
           <button id="login-button" class="button button--primary" type="submit">INGIA KWENYE DASHIBODI <span>→</span></button>
+        </form>
+      </section>
+      <section id="setup-panel" class="panel login-panel" hidden aria-labelledby="setup-title">
+        <div class="panel-heading"><div><p class="eyebrow">SECURE ACCOUNT SETUP</p><h2 id="setup-title">Tengeneza nenosiri la admin</h2></div><span class="access-lock">INVITED</span></div>
+        <p class="panel-note">Weka nenosiri jipya la angalau herufi 12. Kiungo hiki hutumika kukamilisha mwaliko wako pekee.</p>
+        <form id="admin-setup-form" class="admin-form" novalidate>
+          <label for="setup-password">Nenosiri jipya</label>
+          <input id="setup-password" name="new_password" type="password" autocomplete="new-password" required minlength="12" maxlength="256">
+          <label for="setup-password-confirm">Rudia nenosiri jipya</label>
+          <input id="setup-password-confirm" name="password_confirm" type="password" autocomplete="new-password" required minlength="12" maxlength="256">
+          <p id="setup-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="setup-button" class="button button--primary" type="submit">WEKA NENOSIRI <span>→</span></button>
         </form>
       </section>
       <section id="dashboard-panel" hidden>

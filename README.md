@@ -17,7 +17,8 @@ Kwenye local preview, kitufe cha “Angalia mwonekano wa demo” hufungua catalo
 
 1. Fungua Supabase SQL editor kwenye project unayotumia na utekeleze `supabase/schema.sql`. Inaunda jedwali la uanachama, orodha ya admin, na library ya video yenye RLS.
 2. `momo_movie_members`, `momo_movie_admins`, na `momo_movie_library` hazisomeki moja kwa moja na `anon` au `authenticated`; API ya server pekee hutumia service-role key. Kaunta ya tovuti hurudisha jumla ya wanachama tu.
-3. Katika Supabase → Authentication → Users, tengeneza akaunti ya admin yenye email na nenosiri. Kisha tekeleza SQL hii ukibadilisha email:
+3. Katika Supabase → Authentication → Users, tuma invitation kwa email ya admin na uweke redirect ya `https://momo-movies-peach.vercel.app/admin`. Mwalikwa huchagua nenosiri lake kwenye ukurasa wa `/admin` baada ya kufungua link.
+4. Invite inapounda Auth user, ongeza email hiyo kwenye allow-list kabla hajafungua link ya mwaliko. Tumia SQL hii ukibadilisha email:
 
    ```sql
    insert into public.momo_movie_admins (user_id)
@@ -25,7 +26,7 @@ Kwenye local preview, kitufe cha “Angalia mwonekano wa demo” hufungua catalo
    on conflict (user_id) do nothing;
    ```
 
-4. Unda service-role key kwa matumizi ya upande wa server tu. Usiweke key hii kwenye `app.js`, `admin.js`, `index.html`, GitHub, au env vars zenye prefix ya public.
+5. Unda service-role key kwa matumizi ya upande wa server tu. Usiweke key hii kwenye `app.js`, `admin.js`, `index.html`, GitHub, au env vars zenye prefix ya public.
 
 ## Vercel environment variables
 
