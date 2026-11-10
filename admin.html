@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="sw">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#03100b">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin · MOMO MOVIES</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/momo-mark.svg">
+  <link rel="stylesheet" href="/admin.css">
+  <script src="/admin.js" defer></script>
+</head>
+<body>
+  <div class="admin-shell">
+    <header class="admin-topbar">
+      <a class="admin-brand" href="/" aria-label="Rudi MOMO MOVIES"><span>⬡</span> MOMO <b>MOVIES</b></a>
+      <a class="back-link" href="/">← Rudi kwenye tovuti</a>
+    </header>
+    <main>
+      <section class="admin-intro">
+        <p class="eyebrow">MOMO • CONTROL ROOM</p>
+        <h1>Dashibodi ya <span>Admin</span></h1>
+        <p>Simamia makala za MOMO Movie Library. Full video huchapishwa tu baada ya kuthibitisha ruhusa na chanzo chake.</p>
+      </section>
+      <section id="login-panel" class="panel login-panel" aria-labelledby="login-title">
+        <div class="panel-heading"><div><p class="eyebrow">ADMIN ACCESS</p><h2 id="login-title">Ingia kwa Supabase Auth</h2></div><span class="access-lock">LOCKED</span></div>
+        <p class="panel-note">Tumia email na nenosiri la akaunti ya Supabase Auth ambayo mmiliki ameongeza kwenye orodha ya admin. Passcode ya pamoja ya wanachama haitoi ruhusa ya admin.</p>
+        <form id="admin-login-form" class="admin-form" novalidate>
+          <label for="admin-email">Email ya admin</label>
+          <input id="admin-email" name="email" type="email" autocomplete="username" required maxlength="254" placeholder="admin@example.com">
+          <label for="admin-password">Nenosiri la Supabase Auth</label>
+          <input id="admin-password" name="password" type="password" autocomplete="current-password" required maxlength="256" placeholder="Nenosiri la akaunti yako">
+          <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="login-button" class="button button--primary" type="submit">INGIA KWENYE DASHIBODI <span>→</span></button>
+        </form>
+      </section>
+      <section id="dashboard-panel" hidden>
+        <div class="panel dashboard-heading">
+          <div><p class="eyebrow">LIBRARY MANAGER</p><h2>Maudhui yaliyoidhinishwa</h2><p class="panel-note">Unganisha tu video unazoruhusiwa kusambaza. Admin huthibitisha haki kabla ya kuchapisha.</p></div>
+          <button id="admin-logout" class="button button--ghost" type="button">TOKA</button>
+        </div>
+        <div class="dashboard-layout">
+          <section class="panel editor-panel" aria-labelledby="editor-title">
+            <div class="panel-heading"><h2 id="editor-title">Ongeza maudhui</h2><button id="reset-form" class="text-button" type="button">Futa fomu</button></div>
+            <form id="library-form" class="admin-form" novalidate>
+              <input id="item-id" name="id" type="hidden">
+              <label for="item-title">Jina la filamu/series <span>*</span></label>
+              <input id="item-title" name="title" required maxlength="160" placeholder="Mfano: Jina la filamu">
+              <div class="field-row">
+                <div><label for="item-type">Aina</label><select id="item-type" name="media_type"><option value="movie">Filamu</option><option value="series">Series</option></select></div>
+                <div><label for="item-date">Tarehe/mwaka</label><input id="item-date" name="release_date" placeholder="2026 au 2026-05-17" maxlength="10"></div>
+              </div>
+              <label for="item-synopsis">Maelezo</label>
+              <textarea id="item-synopsis" name="synopsis" rows="4" maxlength="4000" placeholder="Maelezo mafupi ya filamu..."></textarea>
+              <label for="item-poster">Kiungo cha poster (HTTPS)</label>
+              <input id="item-poster" name="poster_url" type="url" inputmode="url" placeholder="https://...">
+              <label for="item-playback-type">Aina ya player</label>
+              <select id="item-playback-type" name="playback_type"><option value="file">Faili ya video (MP4, WebM au HLS)</option><option value="embed">Player ya embed (Vimeo au YouTube no-cookie)</option></select>
+              <label for="item-playback">Kiungo cha video/player</label>
+              <input id="item-playback" name="playback_url" type="url" inputmode="url" placeholder="https://...mp4 au embed rasmi">
+              <p class="field-help">Hiki huchezwa ndani ya ukurasa. Faili: HTTPS .mp4/.webm/.m3u8; embed: player.vimeo.com/video/… au www.youtube-nocookie.com/embed/…</p>
+              <label for="item-rights-url">Chanzo cha uthibitisho wa haki <span>* kwa kuchapisha</span></label>
+              <input id="item-rights-url" name="rights_url" type="url" inputmode="url" placeholder="https://kiungo-cha-mwenye-haki...">
+              <label for="item-rights-notes">Maelezo ya ruhusa <span>* kwa kuchapisha</span></label>
+              <textarea id="item-rights-notes" name="rights_notes" rows="3" maxlength="1200" placeholder="Eleza leseni/ruhusa na chanzo chake."></textarea>
+              <label class="check-row"><input id="item-rights-verified" name="rights_verified" type="checkbox"><span>Nimethibitisha kuwa tuna haki/ruhusa ya kuchezesha maudhui haya.</span></label>
+              <label class="check-row"><input id="item-published" name="is_published" type="checkbox"><span>Chapisha kwenye MOMO Movie Library</span></label>
+              <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+              <button id="save-item" class="button button--primary" type="submit">HIFADHI MAUDHUI <span>→</span></button>
+            </form>
+          </section>
+          <section class="panel list-panel" aria-labelledby="list-title">
+            <div class="panel-heading"><div><p class="eyebrow">MOMO MOVIE LIBRARY</p><h2 id="list-title">Rekodi</h2></div><button id="refresh-list" class="text-button" type="button">Sasisha</button></div>
+            <p id="list-message" class="form-message" role="status" aria-live="polite"></p>
+            <div id="entry-list" class="entry-list"><div class="empty-state">Inapakia rekodi...</div></div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer class="admin-footer"><span>ADMIN ONLY • MOMO MOVIES</span><span>Vitu vilivyochapishwa vinaonekana kwa wageni.</span></footer>
+  </div>
+</body>
+</html>

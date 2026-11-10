@@ -9,6 +9,6 @@
   },
   "scripts": {
     "dev": "node dev-server.js",
-    "check": "node --check app.js && node --check dev-server.js && node --check api/enter.js && node --check api/session.js && node --check api/logout.js && node --check api/member-count.js && node --check api/movies.js && node --check lib/security.js && node --check lib/supabase.js"
+    "check": "node --check app.js && node --check admin.js && node --check dev-server.js && node --check api/enter.js && node --check api/session.js && node --check api/logout.js && node --check api/member-count.js && node --check api/movies.js && node --check api/admin-auth.js && node --check api/admin-library.js && node --check api/library.js && node --check lib/security.js && node --check lib/supabase.js && node --check lib/movie-library.js"
   }
 }

@@ -45,6 +45,7 @@
 
       <div class="member-count"><span class="pulse-dot" aria-hidden="true"></span><span id="member-count-value">—</span><span>wamejiunga na lounge</span></div>
       <p class="gate-footnote">Passcode ni ya pamoja; namba haitathibitishwa kwa SMS.</p>
+      <a class="gate-admin-link" href="/admin">Dashibodi ya admin ↗</a>
     </section>
     <p class="gate-footer">PRIVATE LOUNGE <span>•</span> MOVIE DISCOVERY, DONE RIGHT</p>
   </main>
@@ -64,6 +65,7 @@
       </nav>
       <div class="topbar-actions">
         <label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Tafuta movies na series..." aria-label="Tafuta movies na series"></label>
+        <a class="admin-dashboard-link" href="/admin">ADMIN ↗</a>
         <button id="logout-button" class="icon-button" type="button" aria-label="Toka" title="Toka">↪</button>
       </div>
     </header>
@@ -75,7 +77,7 @@
           <p class="eyebrow"><span class="live-dot"></span> MOMO PICK • MOVIE DISCOVERY</p>
           <h1 id="hero-title">Gundua filamu<br><span>zinazokufaa.</span></h1>
           <p id="hero-overview" class="hero-overview">Tafuta filamu, chunguza maelezo na ufungue trela au huduma rasmi za kutazama.</p>
-          <div class="hero-actions"><button id="hero-details" class="button button--primary" type="button">MAELEZO <b aria-hidden="true">→</b></button><a id="hero-trailer" class="button button--ghost" href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">▶ TAZAMA TRELA</a></div>
+          <div class="hero-actions"><button id="hero-details" class="button button--primary" type="button">MAELEZO <b aria-hidden="true">→</b></button><button id="hero-trailer" class="button button--ghost" type="button">▶ CHEZA TRELA HAPA</button></div>
           <p class="hero-caption">DISCOVER MORE. WATCH LEGALLY.</p>
         </div>
         <div id="hero-art" class="hero-art" aria-hidden="true"><div class="hero-art-ring"></div><div class="hero-art-core">M</div><span class="hero-art-label">MOMO<br>SELECT</span></div>
@@ -96,6 +98,10 @@
       </section>
       <div id="catalog-message" class="catalog-message" role="status" aria-live="polite"></div>
       <section id="movie-grid" class="movie-grid" aria-label="Filamu"></section>
+      <section class="approved-library" aria-labelledby="approved-library-title">
+        <div class="approved-library__heading"><div><p class="eyebrow eyebrow--muted">MOMO MOVIE LIBRARY</p><h2 id="approved-library-title">Cheza maudhui yaliyoidhinishwa</h2><p>Video zilizo hapa zimeongezwa na admin aliyeidhinishwa pamoja na chanzo cha haki. Zinacheza ndani ya ukurasa.</p></div><span class="download-lock">[ RIGHTS CHECK: ON ]</span></div>
+        <div id="library-grid" class="library-grid" aria-live="polite"><div class="empty-state">Inakagua maudhui yaliyoidhinishwa...</div></div>
+      </section>
       <button id="load-more" class="button button--load" type="button" hidden>ONYESHA ZAIDI <span aria-hidden="true">↓</span></button>
 
       <section id="official-downloads" class="download-station" aria-labelledby="download-title">

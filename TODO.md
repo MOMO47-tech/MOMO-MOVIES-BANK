@@ -34,3 +34,8 @@
 - [x] **List ya DJs wenye content:** Orodha ionyeshe tu DJ ambaye ana clip au title inayoonekana kwenye catalog; ondoa profile ya DJ ambaye content yake haionekani.
 - [x] **Sehemu ya download:** Ongeza sehemu ya Download inayoonekana wazi; direct download itumike tu kwa link rasmi iliyoidhinishwa na mwenye haki, vinginevyo elekeza kwenye app/platform rasmi kwa offline save ikiwa inaruhusu.
 - [x] **Radi na nyota:** Radi za neon zionekane wazi zaidi nyuma ya nyota zinazosogea, bila kufunika text au kuharibu usomaji kwenye simu.
+
+## Ombi jipya — Player ya ndani na admin dashboard
+
+- [ ] **Playback ndani ya tovuti:** Mtu akiplay movie, ijiplay palepale na isimpeleke kwenye ukurasa wa matokeo ya YouTube. Trela inaweza ku-embed ndani ya MOMO; filamu nzima huchezwa tu ikiwa admin ameweka chanzo cha player na kuthibitisha ruhusa za kusambaza.
+- [ ] **Dashibodi ya admin:** Weka admin dashboard ya kuongeza, kuhariri, kuchapisha/kuficha na kufuta movie au series. Linda dashboard na Supabase Auth pamoja na allow-list ya admin; passcode ya pamoja ya wageni isitumike kama role ya admin. Rekodi ya kuchapishwa lazima iwe na kiungo cha player, chanzo cha uthibitisho wa haki, maelezo ya ruhusa na uthibitisho wa admin; wageni waone na kucheze ndani ya ukurasa rekodi zilizochapishwa na kuthibitishwa pekee.

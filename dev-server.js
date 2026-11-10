@@ -11,6 +11,11 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   if (url.pathname === "/api/session") return send(res, 200, { authenticated: false });
   if (url.pathname === "/api/member-count") return send(res, 200, { count: null });
+  if (url.pathname === "/api/admin-auth" && req.method === "GET") return send(res, 200, { authenticated: false });
+  if (url.pathname === "/api/admin-auth" && req.method === "DELETE") return send(res, 200, { ok: true });
+  if (url.pathname === "/api/admin-auth") return send(res, 503, { error: "Preview pekee: admin Auth huhitaji Supabase iliyosanidiwa." });
+  if (url.pathname === "/api/library") return send(res, 200, { items: [] });
+  if (url.pathname === "/api/admin-library") return send(res, 503, { error: "Preview pekee: hifadhidata ya admin huhitaji Supabase iliyosanidiwa." });
   if (url.pathname === "/api/logout" && req.method === "POST") { res.setHeader("Set-Cookie", "momo_session=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0"); return send(res, 200, { ok: true }); }
   if (url.pathname === "/api/enter") return send(res, 503, { error: "Preview pekee: weka secrets na Supabase kwenye Vercel ili kuwezesha kuingia." });
   if (url.pathname === "/api/movies") {
@@ -30,6 +35,7 @@ const server = http.createServer((req, res) => {
     return send(res, 200, { results, page: 1, hasMore: false, source: "sample", error: "TMDB_API_KEY_MISSING" });
   }
   let pathname = decodeURIComponent(url.pathname);
+  if (pathname === "/admin" || pathname === "/admin/") pathname = "/admin.html";
   if (pathname === "/") pathname = "/index.html";
   const target = path.resolve(ROOT, `.${pathname}`);
   if (!target.startsWith(`${ROOT}${path.sep}`)) return send(res, 403, "Forbidden", "text/plain; charset=utf-8");
