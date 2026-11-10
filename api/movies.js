@@ -34,10 +34,10 @@ function sendJson(res, status, body) {
 }
 function fallbackResults(query, category) {
   let results = fallback;
-  if (category === "tv") results = [];
+  if (category === "tv") results = fallback.filter(item => item.media_type === "tv");
   if (query) {
     const needle = query.toLocaleLowerCase();
-    results = results.filter(item => `${item.title} ${item.overview} ${item.genre}`.toLocaleLowerCase().includes(needle));
+    results = results.filter(item => `${item.title} ${item.name || ""} ${item.overview} ${item.genre || ""}`.toLocaleLowerCase().includes(needle));
   }
   return results;
 }
@@ -80,7 +80,7 @@ module.exports = async function handler(req, res) {
       return movie ? sendJson(res, 200, { movie, source: "sample" }) : sendJson(res, 404, { error: "Maelezo hayapatikani." });
     }
     const results = fallbackResults(query, category);
-    return sendJson(res, 200, { results, page: 1, hasMore: false, source: "sample" });
+    return sendJson(res, 200, { results, page: 1, hasMore: false, source: "sample", error: "TMDB_API_KEY_MISSING" });
   }
   try {
     if (detailId) {
@@ -97,7 +97,7 @@ module.exports = async function handler(req, res) {
     const rows = (payload.results || []).filter(item => item.media_type !== "person").map(normalize);
     return sendJson(res, 200, { results: rows, page, hasMore: Number(payload.total_pages) > page, source: "tmdb" });
   } catch {
-    if (detailId) return sendJson(res, 502, { error: "Maelezo ya filamu hayapatikani kwa sasa." });
-    return sendJson(res, 502, { results: [], page, hasMore: false, error: "Movie service haipatikani kwa sasa." });
+    if (detailId) return sendJson(res, 502, { error: "TMDB_UNAVAILABLE", message: "Maelezo ya filamu hayapatikani kwa sasa." });
+    return sendJson(res, 502, { results: [], page, hasMore: false, error: "TMDB_UNAVAILABLE", message: "Movie service haipatikani kwa sasa." });
   }
 };

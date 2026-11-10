@@ -1061,3 +1061,143 @@ a {
     display: none;
   }
 }
+
+.translations-section {
+  margin: 72px 0 8px;
+  padding: 28px;
+  border: 1px solid rgba(73, 235, 159, 0.16);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(7, 25, 16, 0.88), rgba(4, 15, 9, 0.74));
+}
+.translations-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.translations-heading h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  letter-spacing: -0.03em;
+}
+.translation-badge {
+  flex: none;
+  border: 1px solid rgba(54, 232, 154, 0.25);
+  border-radius: 999px;
+  padding: 8px 11px;
+  color: var(--green-2);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.translations-intro {
+  max-width: 760px;
+  margin: 12px 0 20px;
+  color: #91ad9c;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+.translation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 12px;
+}
+.translation-card {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(73, 235, 159, 0.14);
+  border-radius: 18px;
+  background: rgba(2, 12, 7, 0.62);
+}
+.translation-card__mark {
+  flex: none;
+  width: 64px;
+  height: 82px;
+  border: 1px solid rgba(54, 232, 154, 0.3);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  font-size: 1.25rem;
+  font-weight: 900;
+  background: radial-gradient(circle at 50% 35%, rgba(54, 232, 154, 0.2), transparent 47%), linear-gradient(145deg, #123523, #040c07);
+}
+.translation-card__copy {
+  min-width: 0;
+}
+.translation-card__copy .eyebrow {
+  margin-bottom: 6px;
+  font-size: 0.58rem;
+}
+.translation-card__copy h3 {
+  margin: 0 0 5px;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+.translation-card__copy > p:not(.eyebrow) {
+  margin: 0;
+  color: #8dac99;
+  font-size: 0.74rem;
+}
+.translation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.translation-actions .button {
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+}
+.download-pending {
+  color: #718d7d;
+  font-size: 0.69rem;
+}
+.translation-empty {
+  width: 100%;
+  padding: 24px 18px;
+}
+.download-policy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(73, 235, 159, 0.12);
+  font-size: 0.73rem;
+  color: #789886;
+}
+.download-policy strong {
+  color: #a7d7ba;
+}
+@media (max-width: 700px) {
+  .translations-section {
+    margin-top: 48px;
+    padding: 20px 16px;
+    border-radius: 19px;
+  }
+  .translations-heading {
+    align-items: flex-start;
+  }
+  .translation-badge {
+    font-size: 0.54rem;
+    padding: 7px 9px;
+  }
+  .translation-card {
+    padding: 14px;
+    gap: 12px;
+  }
+  .translation-card__mark {
+    width: 54px;
+    height: 72px;
+  }
+  .translation-actions .button {
+    min-height: 36px;
+  }
+}

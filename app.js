@@ -1,7 +1,7 @@
 (() => {
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { category: "trending", query: "", movies: [], selected: null, page: 1, busy: false };
+  const state = { category: "trending", query: "", movies: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
   const localPreview = Boolean(window.MOMO_LOCAL_PREVIEW);
 
   const fallbackMovies = [
@@ -46,6 +46,7 @@
     $("#catalog-view").hidden = false;
     renderCount();
     loadCatalog();
+    loadTranslations();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   async function renderCount() {
@@ -58,16 +59,20 @@
   }
 
   async function loadCatalog() {
-    if (state.busy) return;
+    const requestId = ++state.requestId;
+    state.activeController?.abort();
+    const controller = new AbortController();
+    state.activeController = controller;
     state.busy = true;
     $("#catalog-message").textContent = "";
-    $("#catalog-count").textContent = "Inapakia katalogi…";
+    $("#catalog-count").textContent = state.query ? "Inatafuta…" : "Inapakia katalogi…";
     try {
       const params = new URLSearchParams();
       if (state.query) params.set("search", state.query);
       else params.set("category", state.category === "watchlist" ? "popular" : state.category);
       params.set("page", String(state.page));
-      const data = await request(`/api/movies?${params.toString()}`);
+      const data = await request(`/api/movies?${params.toString()}`, { signal: controller.signal });
+      if (controller.signal.aborted || requestId !== state.requestId) return;
       let movies = Array.isArray(data.results) ? data.results : [];
       if (state.category === "watchlist") {
         const saved = new Set(watchlist().map(item => String(item.id)));
@@ -79,14 +84,27 @@
       renderMovies(movies);
       $("#catalog-count").textContent = movies.length ? `${movies.length} matokeo` : "Hakuna matokeo";
       $("#load-more").hidden = !data.hasMore || Boolean(state.query) || state.category === "watchlist";
-      if (data.source === "sample") $("#catalog-message").textContent = "Unaona katalogi ya mfano. Weka TMDB_API_KEY kwenye Vercel ili kupata filamu za sasa, posters na taarifa za huduma za kutazama.";
-      if (!movies.length) $("#catalog-message").textContent = state.category === "watchlist" ? "Bado hujaongeza filamu kwenye orodha yako." : "Hakuna filamu zinazolingana na utafutaji huo.";
+      const needsTmdbKey = data.error === "TMDB_API_KEY_MISSING" || data.source === "sample";
+      if (needsTmdbKey) {
+        $("#catalog-message").textContent = "Utafutaji wa movies na series za sasa unahitaji TMDB_API_KEY. Iongeze kwenye Vercel → Project Settings → Environment Variables, kisha redeploy.";
+      } else if (!movies.length) {
+        $("#catalog-message").textContent = state.category === "watchlist" ? "Bado hujaongeza filamu kwenye orodha yako." : "Hakuna filamu au series zinazolingana na utafutaji huo.";
+      }
     } catch (error) {
-      state.movies = fallbackMovies;
-      renderMovies(fallbackMovies);
-      $("#catalog-count").textContent = `${fallbackMovies.length} filamu za mfano`;
-      $("#catalog-message").textContent = "Katalogi ya moja kwa moja haijapatikana. Unaona mifano; angalia TMDB_API_KEY kwenye Vercel.";
-    } finally { state.busy = false; }
+      if (controller.signal.aborted || requestId !== state.requestId) return;
+      const needle = state.query.toLocaleLowerCase();
+      const samples = fallbackMovies.filter(item => {
+        if (state.category === "tv") return item.media_type === "tv";
+        return !needle || `${titleOf(item)} ${item.overview} ${item.genre || ""}`.toLocaleLowerCase().includes(needle);
+      });
+      state.movies = samples;
+      renderMovies(samples);
+      $("#catalog-count").textContent = samples.length ? `${samples.length} filamu za mfano` : "Hakuna matokeo";
+      $("#load-more").hidden = true;
+      $("#catalog-message").textContent = "Huduma ya movies haijajibu. Kagua TMDB_API_KEY na hali ya deployment ya Vercel.";
+    } finally {
+      if (state.activeController === controller) state.busy = false;
+    }
   }
 
   function movieCard(movie, index) {
@@ -113,6 +131,39 @@
       const backdrop = lead.backdrop_path || lead.backdrop;
       if (backdrop) $("#hero-art").style.backgroundImage = `linear-gradient(90deg,rgba(5,18,12,.12),rgba(5,18,12,.48)),url("${backdrop.replace(/["\\]/g, "")}")`;
     }
+  }
+  function safeExternalLink(value) {
+    try {
+      const url = new URL(String(value || ""));
+      return url.protocol === "https:" && !url.username && !url.password ? url.href : "";
+    } catch { return ""; }
+  }
+  function renderTranslations(items) {
+    const grid = $("#translation-grid");
+    if (!grid) return;
+    const rows = Array.isArray(items) ? items : [];
+    if (!rows.length) {
+      grid.innerHTML = `<div class="empty-state translation-empty">Orodha ya tafsiri za DJ wa Tanzania itaonekana hapa baada ya kuthibitisha majina na chanzo rasmi.</div>`;
+      return;
+    }
+    grid.innerHTML = rows.map(item => {
+      const title = escapeHtml(item.title || "Filamu");
+      const dj = escapeHtml(item.dj || "DJ wa Tanzania");
+      const year = item.year ? `<span>${escapeHtml(item.year)}</span>` : "";
+      const watchUrl = safeExternalLink(item.official_watch_url);
+      const downloadUrl = item.download_authorized === true ? safeExternalLink(item.official_download_url) : "";
+      const watchAction = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA RASMI ↗</a>` : "";
+      const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PAKUA RASMI ↗</a>` : `<span class="download-pending">Download rasmi bado haijathibitishwa</span>`;
+      return `<article class="translation-card"><div class="translation-card__mark" aria-hidden="true">TZ</div><div class="translation-card__copy"><p class="eyebrow eyebrow--muted">TAFSIRI YA DJ</p><h3>${title}</h3><p>${dj}${year ? ` · ${year}` : ""}</p><div class="translation-actions">${watchAction}${downloadAction}</div></div></article>`;
+    }).join("");
+  }
+  async function loadTranslations() {
+    try {
+      const response = await fetch("/data/tanzania-translations.json", { headers: { Accept: "application/json" }, cache: "no-store" });
+      if (!response.ok) throw new Error("TRANSLATIONS_UNAVAILABLE");
+      const data = await response.json();
+      renderTranslations(data.items);
+    } catch { renderTranslations([]); }
   }
   function trailerSearch(movie) {
     if (movie.trailer_url) return movie.trailer_url;
@@ -191,6 +242,8 @@
     let searchTimer;
     $("#search-input").addEventListener("input", event => {
       clearTimeout(searchTimer);
+      state.activeController?.abort();
+      state.requestId++;
       state.query = event.target.value.trim(); state.page = 1;
       if (state.query) { state.category = "trending"; $$(".nav-link").forEach(item => item.classList.remove("is-active")); $("#section-title").textContent = `Matokeo ya “${state.query}”`; }
       else $("#section-title").textContent = "Inavuma sasa";

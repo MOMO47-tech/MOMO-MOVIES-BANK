@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
       return movie ? send(res, 200, { movie, source: "sample" }) : send(res, 404, { error: "Maelezo hayapatikani." });
     }
     const results = (url.searchParams.get("category") === "tv" ? [] : movies).filter(movie => !query || `${movie.title} ${movie.overview}`.toLowerCase().includes(query));
-    return send(res, 200, { results, page: 1, hasMore: false, source: "sample" });
+    return send(res, 200, { results, page: 1, hasMore: false, source: "sample", error: "TMDB_API_KEY_MISSING" });
   }
   let pathname = decodeURIComponent(url.pathname);
   if (pathname === "/") pathname = "/index.html";
