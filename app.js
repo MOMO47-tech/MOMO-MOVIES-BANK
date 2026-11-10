@@ -146,18 +146,23 @@
     if (!grid) return;
     const rows = Array.isArray(items) ? items : [];
     if (!rows.length) {
-      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Bado hakuna tafsiri yenye chanzo rasmi kilichothibitishwa.</strong><span>Majina na viungo vitaonekana hapa baada ya kuthibitisha channel ya DJ au ruhusa ya mwenye haki. Hatuweki video au downloads zisizoidhinishwa.</span></div>`;
+      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Bado hakuna vipande vya tafsiri vilivyoongezwa.</strong><span>Vipande vitaonekana baada ya kuthibitisha channel ya DJ au chanzo cha mwenye haki. Hatuweki filamu nzima au downloads zisizo na ruhusa.</span></div>`;
       return;
     }
     grid.innerHTML = rows.map(item => {
       const title = escapeHtml(item.title || "Filamu");
       const dj = escapeHtml(item.dj || "DJ wa Tanzania");
       const year = item.year ? `<span>${escapeHtml(item.year)}</span>` : "";
-      const watchUrl = safeExternalLink(item.official_watch_url);
+      const previewUrl = safeExternalLink(item.preview_url || item.official_watch_url);
+      const sourceUrl = safeExternalLink(item.source_url);
       const downloadUrl = item.download_authorized === true ? safeExternalLink(item.official_download_url) : "";
-      const watchAction = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA RASMI ↗</a>` : "";
-      const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PAKUA RASMI ↗</a>` : `<span class="download-pending">Download rasmi bado haijathibitishwa</span>`;
-      return `<article class="translation-card"><div class="translation-card__mark" aria-hidden="true">TZ</div><div class="translation-card__copy"><p class="eyebrow eyebrow--muted">TAFSIRI YA DJ</p><h3>${title}</h3><p>${dj}${year ? ` · ${year}` : ""}</p><div class="translation-actions">${watchAction}${downloadAction}</div></div></article>`;
+      const watchLabel = escapeHtml(item.watch_label || "TAZAMA RASMI ↗");
+      const sourceNote = escapeHtml(item.source_note || "Chanzo cha DJ.");
+      const sourceLabel = escapeHtml(item.source_label || "CHANZO ↗");
+      const watchAction = previewUrl ? `<a class="button button--ghost" href="${escapeHtml(previewUrl)}" target="_blank" rel="noopener noreferrer">${watchLabel}</a>` : "";
+      const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PAKUA RASMI ↗</a>` : "";
+      const sourceMarkup = sourceUrl ? `<a class="translation-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : "";
+      return `<article class="translation-card"><div class="translation-card__mark" aria-hidden="true">TZ</div><div class="translation-card__copy"><p class="eyebrow eyebrow--muted">TAFSIRI YA DJ</p><h3>${title}</h3><p>${dj}${year ? ` · ${year}` : ""}</p><p class="translation-source-note">${sourceNote}</p>${sourceMarkup}<div class="translation-actions">${watchAction}${downloadAction}</div></div></article>`;
     }).join("");
   }
   async function loadTranslations() {

@@ -1284,3 +1284,23 @@ a {
   margin: 0 auto;
   line-height: 1.7;
 }
+
+
+.translation-source-note {
+  margin: 6px 0 4px !important;
+  color: #799684 !important;
+  font-size: 0.68rem !important;
+  line-height: 1.5;
+}
+.translation-source-link {
+  color: #9bd8b3;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+.translation-source-link:hover,
+.translation-source-link:focus-visible {
+  color: var(--green);
+  text-decoration: underline;
+}
