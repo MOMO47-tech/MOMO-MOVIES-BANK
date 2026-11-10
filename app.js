@@ -141,6 +141,28 @@
       return url.protocol === "https:" && !url.username && !url.password ? url.href : "";
     } catch { return ""; }
   }
+  function renderDjDirectory(djs) {
+    const grid = $("#dj-directory");
+    if (!grid) return;
+    const rows = Array.isArray(djs) ? djs : [];
+    if (!rows.length) {
+      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Orodha ya DJs haipatikani kwa sasa.</strong><span>Hakuna full translation au download itakayoongezwa bila chanzo na haki kuthibitishwa.</span></div>`;
+      return;
+    }
+    grid.innerHTML = rows.map(item => {
+      const name = escapeHtml(item.name || "DJ");
+      const status = escapeHtml(item.status_note || "Chanzo cha DJ kinahitaji kuthibitishwa.");
+      const profileUrl = safeExternalLink(item.profile_url);
+      const profileLabel = escapeHtml(item.profile_label || "FUNGUA CHANZO ↗");
+      const originalUrl = safeExternalLink(item.original_url);
+      const originalTitle = escapeHtml(item.original_title || "Toleo la asili");
+      const originalNote = escapeHtml(item.original_note || "Kiungo hiki ni cha original version, si tafsiri ya DJ; upatikanaji hutegemea eneo.");
+      const originalCta = escapeHtml(item.original_cta || "TAZAMA TOLEO LA ASILI ↗");
+      const profileAction = profileUrl ? `<a class="translation-source-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noopener noreferrer">${profileLabel}</a>` : "";
+      const originalAction = originalUrl ? `<div class="dj-original"><p class="dj-original-label">TOLEO LA ASILI · SI TAFSIRI YA DJ</p><strong>${originalTitle}</strong><p>${originalNote}</p><a class="button button--ghost" href="${escapeHtml(originalUrl)}" target="_blank" rel="noopener noreferrer">${originalCta}</a></div>` : "";
+      return `<article class="dj-profile-card"><div class="dj-profile-head"><h3>${name}</h3><span>DJ</span></div><p class="dj-profile-status">${status}</p>${profileAction ? `<div class="dj-profile-links">${profileAction}</div>` : ""}${originalAction}</article>`;
+    }).join("");
+  }
   function renderTranslations(items) {
     const grid = $("#translation-grid");
     if (!grid) return;
@@ -170,8 +192,9 @@
       const response = await fetch("/data/tanzania-translations.json", { headers: { Accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error("TRANSLATIONS_UNAVAILABLE");
       const data = await response.json();
+      renderDjDirectory(data.djs);
       renderTranslations(data.items);
-    } catch { renderTranslations([]); }
+    } catch { renderDjDirectory([]); renderTranslations([]); }
   }
   function trailerSearch(movie) {
     if (movie.trailer_url) return movie.trailer_url;

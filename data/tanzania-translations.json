@@ -1,4 +1,78 @@
 {
+  "djs": [
+    {
+      "name": "DJ Mack",
+      "status_note": "Channel inayojitambulisha kama Dj mack Mashine ina video ndefu zilizotafsiriwa. Haki za full movie/dub hazijathibitishwa; hatuunganishi uploads ndefu."
+    },
+    {
+      "name": "Babu DJ",
+      "profile_url": "https://www.youtube.com/watch?v=1W8baZ5heY8",
+      "profile_label": "MAHOJIANO YA DJ ↗",
+      "status_note": "Mahojiano yanamtaja kama mtafsiri wa filamu. Channel inayoitwa BABU DJ MOVIES ONLINE haijathibitishwa kuwa inaendeshwa naye; haki za tafsiri hazijathibitishwa.",
+      "original_title": "Mutiny · toleo la asili",
+      "original_url": "https://www.amazon.com/gp/video/detail/B0HC48NNR4",
+      "original_cta": "TAZAMA KWENYE PRIME VIDEO ↗",
+      "original_note": "Prime Video ina listing ya filamu asilia; si dub ya Babu DJ. Listing hii ni ya Amazon Marekani na upatikanaji hutegemea eneo."
+    },
+    {
+      "name": "DJ Prabhat",
+      "status_note": "Jina DJ Prabhat lina channels tofauti. Hakuna chanzo cha msingi kilichothibitisha kuwa huyu ndiye mtafsiri wa movie za Kiswahili/Tanzania; hatujaunganisha film."
+    },
+    {
+      "name": "Remmy DJ",
+      "status_note": "SwaMedia inamhusisha na baadhi ya series, lakini listing au malipo si uthibitisho wa leseni ya dub. Link hapa ni kwa original version pekee.",
+      "original_title": "Narco-Saints · toleo la asili",
+      "original_url": "https://www.netflix.com/title/81343748",
+      "original_cta": "TAZAMA KWENYE NETFLIX ↗",
+      "original_note": "Netflix ina listing ya original series; haionyeshi dub ya Remmy DJ. Upatikanaji na lugha hutegemea eneo."
+    },
+    {
+      "name": "Murphy DJ",
+      "status_note": "Channel inayojitambulisha kama DJ Murphy Movie Swahili ina clips fupi. Haki za full translation hazijathibitishwa; tunaonyesha kipande kifupi tu, si season nzima.",
+      "original_title": "Merlin · toleo la asili",
+      "original_url": "https://www.bbc.co.uk/iplayer/episodes/b00mjlxv/merlin",
+      "original_cta": "TAZAMA KWENYE BBC iPLAYER ↗",
+      "original_note": "BBC iPlayer ina vipindi vya original Merlin; si tafsiri ya Kiswahili ya DJ Murphy. Upatikanaji hutegemea nchi."
+    },
+    {
+      "name": "DJ Mjukuu",
+      "status_note": "Channel inayojitambulisha kama Dj mjukuu Og ina vipande/episodes za Kiswahili. Haki za full movie au season ya dub hazijathibitishwa; full uploads hazijaunganishwa.",
+      "original_title": "Ghost Ship · toleo la asili",
+      "original_url": "https://www.warnerbros.com/movies/ghost-ship",
+      "original_cta": "UKURASA RASMI WA WARNER BROS ↗",
+      "original_note": "Ukurasa huu ni wa filamu asilia na wauzaji rasmi, si tafsiri ya DJ Mjukuu; upatikanaji hutegemea eneo."
+    },
+    {
+      "name": "DJ Bryton",
+      "status_note": "Baadhi ya catalog pages na captions zinamtaja Bryton, lakini hakuna channel rasmi inayoweza kuthibitishwa wala leseni ya dub. Link hapa ni kwa original version pekee.",
+      "original_title": "The Brothers Sun · toleo la asili",
+      "original_url": "https://www.netflix.com/title/81389634",
+      "original_cta": "TAZAMA KWENYE NETFLIX ↗",
+      "original_note": "Netflix ina original series; si dub ya DJ Bryton. Attribution ya Bryton kwenye catalog nyingine haithibitishi haki; upatikanaji hutegemea eneo."
+    },
+    {
+      "name": "Juma Khan",
+      "status_note": "Channel inayojitambulisha kama DJ Juma Khan Movies TZ inasema haimiliki filamu asilia. Haki za voice-over/dub hazijathibitishwa; full-dub link haijaunganishwa.",
+      "original_title": "Kavach · toleo la asili",
+      "original_url": "https://www.hotstar.com/in/shows/kavach/1971002747",
+      "original_cta": "TAZAMA KWENYE JIOHOTSTAR ↗",
+      "original_note": "JioHotstar ina ukurasa wa original Kavach; si tafsiri ya Juma Khan. Upatikanaji hutegemea eneo."
+    },
+    {
+      "name": "DJ Skills",
+      "profile_url": "https://www.youtube.com/watch?v=fKEEQvb-4Kk",
+      "profile_label": "MAHOJIANO YA DJ ↗",
+      "status_note": "Mahojiano yanamtaja kama mtafsiri wa movies Tanzania, lakini channel rasmi ya filamu zake na leseni za full works hazijathibitishwa."
+    },
+    {
+      "name": "DJ Six Fingers",
+      "status_note": "Channel inayojitambulisha kama ya DJ Six Fingers ina uploads ndefu za tafsiri. Haki za dub hazijathibitishwa; full episodes/seasons hazijaunganishwa.",
+      "original_title": "The Legends · toleo la asili",
+      "original_url": "https://www.iq.com/album/the-legends-2019-19rrhxoou9?lang=en_us",
+      "original_cta": "TAZAMA KWENYE iQIYI ↗",
+      "original_note": "iQIYI ina listing ya original series; si tafsiri ya DJ Six Fingers. Upatikanaji hutegemea eneo."
+    }
+  ],
   "items": [
     {
       "title": "INFILTRATION",
@@ -42,6 +116,30 @@
       "source_url": "https://www.youtube.com/@OmmyDjOfficial",
       "source_label": "OMMY DJ PRODUCTION ↗",
       "source_note": "Kipande kifupi cha tafsiri; si filamu nzima.",
+      "download_authorized": false
+    },
+    {
+      "title": "MERLIN EP 01 · CLIP",
+      "dj": "Murphy DJ",
+      "preview_url": "https://www.youtube.com/watch?v=CXkB3LinAHA",
+      "watch_label": "TAZAMA CLIP (8 SEK) ↗",
+      "source_note": "Kipande cha sekunde 8 kilichowekwa na channel inayojitambulisha kama DJ Murphy Movie Swahili; si episode nzima. Haki za tafsiri hazijathibitishwa.",
+      "download_authorized": false
+    },
+    {
+      "title": "MUTINY · CLIP",
+      "dj": "Babu DJ",
+      "preview_url": "https://www.youtube.com/watch?v=Abup03qneSA",
+      "watch_label": "TAZAMA CLIP (1:11) ↗",
+      "source_note": "Kipande kifupi kilichowekwa kwenye channel inayojiita BABU DJ MOVIES ONLINE; hatujathibitisha kuwa DJ Babu ndiye mmiliki wala ruhusa za tafsiri. Si filamu nzima.",
+      "download_authorized": false
+    },
+    {
+      "title": "CHARGING 01 · CLIP",
+      "dj": "DJ Mjukuu",
+      "preview_url": "https://www.youtube.com/watch?v=gGmUo-EnrOM",
+      "watch_label": "TAZAMA KIPANDE (3:22) ↗",
+      "source_note": "Kipande kifupi kinachohusishwa na channel inayojitambulisha kama DJ Mjukuu; aina yake halisi haijabainika. Si movie/season nzima; haki za dub hazijathibitishwa.",
       "download_authorized": false
     }
   ]

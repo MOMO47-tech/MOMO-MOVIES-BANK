@@ -16,12 +16,13 @@
   <canvas id="starfield" aria-hidden="true"></canvas>
   <div class="ambient ambient--one" aria-hidden="true"></div>
   <div class="ambient ambient--two" aria-hidden="true"></div>
+  <div class="lightning-layer" aria-hidden="true"><span class="lightning-bolt lightning-bolt--one"></span><span class="lightning-bolt lightning-bolt--two"></span></div>
 
   <main id="gate-view" class="gate-view">
     <div class="gate-brand">
       <div class="brand-orbit" aria-hidden="true"><span class="brand-hex">⬡</span></div>
       <p class="eyebrow">MOMO • CINEMA DISCOVERY</p>
-      <h1>MOMO <span>MOVIES</span></h1>
+      <h1 class="hacker-wordmark" data-text="MOMO MOVIES">MOMO <span>MOVIES</span></h1>
       <p class="gate-subtitle">Filamu nzuri. Trela rasmi. Safari inaanza hapa.</p>
     </div>
 
@@ -50,7 +51,7 @@
 
   <div id="catalog-view" class="catalog-view" hidden>
     <header class="topbar">
-      <a class="wordmark" href="#home" aria-label="MOMO Movies home"><span class="wordmark-icon">⬡</span><span>MOMO<span class="wordmark-accent">MOVIES</span></span></a>
+      <a class="wordmark" href="#home" aria-label="MOMO Movies home"><span class="wordmark-icon">⬡</span><span class="wordmark-text hacker-wordmark" data-text="MOMO MOVIES">MOMO <span class="wordmark-accent">MOVIES</span></span></a>
       <nav class="main-nav" aria-label="Main navigation">
         <button class="nav-link is-active" data-category="trending">Nyumbani</button>
         <button class="nav-link" data-category="popular">Maarufu</button>
@@ -89,18 +90,23 @@
       <section id="tz-translations" class="translations-section" aria-labelledby="translations-title">
         <div class="translations-heading">
           <div><p class="eyebrow eyebrow--muted">TAFSIRI ZA BONGO</p><h2 id="translations-title">Movies za DJ wa Tanzania</h2></div>
-          <span class="translation-badge">CHANNEL ZA DJ</span>
+          <span class="translation-badge">DJ ARCHIVE</span>
         </div>
-        <p class="translations-intro">Sehemu hii ina vipande/trela fupi zilizowekwa kwenye channel za DJs wa Tanzania. Viungo hufungua channel au kipande hicho; si filamu nzima. Full movie na download zitaongezwa tu kupitia chanzo kilichoidhinishwa na mwenye haki.</p>
+        <p class="translations-intro">Hapa kuna majina na vyanzo vya DJs ulivyotaja. Viungo vya vipande ni clips tu; sehemu ya “toleo la asili” hufungua huduma rasmi ya filamu/series isiyotafsiriwa na DJ. Full dub na download zitaonekana tu kama haki za mwenye maudhui zimethibitishwa.</p>
+        <div class="dj-directory-heading"><h3>DJ waliotajwa</h3><p>Original links si tafsiri za Kiswahili.</p></div>
+        <div id="dj-directory" class="dj-directory" aria-live="polite">
+          <div class="empty-state translation-empty">Inapakia orodha ya DJs…</div>
+        </div>
+        <div class="translation-clips-heading"><p class="eyebrow eyebrow--muted">VIPANDE VILIVYOPO</p><h3>Clips fupi kutoka kwenye vyanzo vya umma</h3></div>
         <div id="translation-grid" class="translation-grid" aria-live="polite">
           <div class="empty-state translation-empty">Inapakia katalogi ya tafsiri…</div>
         </div>
-        <aside class="download-policy"><strong>Downloads rasmi</strong><span>Hatu-hosti wala kuunganisha nakala zisizoidhinishwa za filamu.</span></aside>
+        <aside class="download-policy"><strong>Downloads rasmi tu</strong><span>Hatu-hosti wala kuunganisha nakala zisizoidhinishwa. Offline download itumike ndani ya app rasmi tu ikiwa huduma inaruhusu.</span></aside>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div><a class="wordmark wordmark--small" href="#home"><span class="wordmark-icon">⬡</span><span>MOMO<span class="wordmark-accent">MOVIES</span></span></a><p class="footer-copy">Gundua kinachofuata kutazama kupitia trela na huduma rasmi.</p></div>
+      <div><a class="wordmark wordmark--small" href="#home"><span class="wordmark-icon">⬡</span><span class="wordmark-text hacker-wordmark" data-text="MOMO MOVIES">MOMO <span class="wordmark-accent">MOVIES</span></span></a><p class="footer-copy">Gundua kinachofuata kutazama kupitia trela na huduma rasmi.</p></div>
       <div class="credits"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" aria-label="The Movie Database"><img src="https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" alt="TMDB logo"></a><p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p></div>
       <p class="copyright">© <span id="year"></span> MOMO MOVIES BANK</p>
     </footer>

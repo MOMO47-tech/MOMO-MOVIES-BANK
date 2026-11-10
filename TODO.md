@@ -17,5 +17,11 @@
 
 - [x] **Movies mpya za mwaka huu:** Kitufe cha “Mpya” kionyeshe movies zilizotolewa ndani ya mwaka wa sasa, mwaka ukihesabiwa kwa saa za Tanzania na movies zikiwa zimepangwa kutoka zilizotoka karibuni kwenda zamani.
 - [x] **Maarufu zinazo-trend:** Kitufe cha “Maarufu” kionyeshe movies na series zote zinazotrend, si movies pekee.
-- [ ] **Kutazama movie nzima na downloads:** Maelezo ya movie yaonyeshe huduma rasmi za kutazama inapopatikana; download ionekane tu ikiwa mwenye haki ametoa download rasmi. Site isihosti wala kuunganisha nakala zisizoidhinishwa.
+- [x] **Kutazama movie nzima na downloads:** Maelezo ya movie yaonyeshe huduma rasmi za kutazama inapopatikana; download ionekane tu ikiwa mwenye haki ametoa download rasmi. Site isihosti wala kuunganisha nakala zisizoidhinishwa.
 - [x] **Tafsiri za DJ wa Tanzania:** Sehemu inaonyesha filamu nne zilizotafsiriwa na Ommy DJ (INFILTRATION, WOLF WARRIOR, LAND OF BAD na BLACK SITE) kupitia vipande fupi vilivyowekwa kwenye channel ya Ommy Dj Production. Viungo vifungue vipande hivyo kwenye YouTube; site ieleze kuwa si filamu nzima, na isiweke link ya download au kudai kuwa haki za filamu nzima zimethibitishwa.
+
+## Ombi jipya — DJ catalog na hacker branding
+
+- [x] **Katalogi ya DJs:** Kagua na uweke sehemu za DJ Mack, Babu DJ, DJ Prabhat, Remmy DJ, Murphy DJ, DJ Mjukuu, DJ Bryton, Juma Khan, DJ Skills na DJ Six Fingers. Onyesha jina la DJ na links za chanzo cha DJ au platform rasmi tu; ikiwa utambulisho/channel haujathibitishwa, eleza hilo badala ya kubuni film au link.
+- [x] **Full movies, seasons, playback na download:** Onyesha full film/season, player au download tu pale jukwaa rasmi la distributor/rights-holder au leseni iliyo wazi imethibitishwa. YouTube upload, paywall, app listing au malipo peke yake si uthibitisho wa haki. Isipokuwa hivyo, usihosti/kuunganisha full movie au download; tumia profile au clips fupi zilizochapishwa kwenye channel ya DJ na uziweke lebo wazi kuwa si filamu nzima.
+- [x] **Hacker-style MOMO MOVIES branding:** Andika “MOMO MOVIES” kwa wordmark ya ki-hacker/neon yenye urembo unaosomeka, nafasi/typography zilizopangwa vizuri na animation ya maandishi; nyota za nyuma ziendelee kusogea na radi/flash za neon zipige nyuma ya maandishi bila kufunika content. Hifadhi usomaji kwenye simu na uzingatie reduced-motion.
