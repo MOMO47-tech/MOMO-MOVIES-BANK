@@ -22,6 +22,9 @@
     const date = movie.release_date || movie.first_air_date || "";
     return date ? date.slice(0, 4) : "—";
   }
+  function currentTanzaniaYear() {
+    return new Intl.DateTimeFormat("en", { timeZone: "Africa/Dar_es_Salaam", year: "numeric" }).format(new Date());
+  }
   function titleOf(movie) { return movie.title || movie.name || "Untitled"; }
   function watchlist() {
     try { return JSON.parse(localStorage.getItem("momo-watchlist") || "[]"); } catch { return []; }
@@ -113,7 +116,7 @@
     const isTv = movie.media_type === "tv" || movie.type === "tv";
     const rating = Number(movie.vote_average) > 0 ? `★ ${Number(movie.vote_average).toFixed(1)}` : (movie.genre || (isTv ? "SERIES" : "DISCOVER"));
     return `<button class="movie-card" type="button" data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-label="Maelezo ya ${escapeHtml(title)}">
-      <div class="poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster ya ${escapeHtml(title)}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${escapeHtml(title)}</span></span>`}<span class="poster-number">M • ${String(index + 1).padStart(2, "0")}</span></div>
+      <div class="poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster ya ${escapeHtml(title)}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${escapeHtml(title)}</span></span>`}<span class="poster-number">M • ${String(index + 1).padStart(2, "0")}</span><span class="poster-kind">${isTv ? "SERIES" : "FILAMU"}</span></div>
       <h3>${escapeHtml(title)}</h3><p class="movie-meta"><span>${escapeHtml(yearOf(movie))}</span><span class="movie-rating">${escapeHtml(rating)}</span></p>
     </button>`;
   }
@@ -143,7 +146,7 @@
     if (!grid) return;
     const rows = Array.isArray(items) ? items : [];
     if (!rows.length) {
-      grid.innerHTML = `<div class="empty-state translation-empty">Orodha ya tafsiri za DJ wa Tanzania itaonekana hapa baada ya kuthibitisha majina na chanzo rasmi.</div>`;
+      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Bado hakuna tafsiri yenye chanzo rasmi kilichothibitishwa.</strong><span>Majina na viungo vitaonekana hapa baada ya kuthibitisha channel ya DJ au ruhusa ya mwenye haki. Hatuweki video au downloads zisizoidhinishwa.</span></div>`;
       return;
     }
     grid.innerHTML = rows.map(item => {
@@ -186,7 +189,15 @@
     const trailer = movie.trailer_url || trailerSearch(movie);
     const providers = Array.isArray(movie.providers) ? movie.providers : [];
     const backdrop = movie.backdrop_path || movie.backdrop || "";
-    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">MOMO MOVIE FILE • ${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FEATURE"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "Maelezo hayajapatikana.")}</p>${providers.length ? `<p class="dialog-kicker">HUDUMA ZA KUTAZAMA</p><div class="provider-list">${providers.map(item => `<a class="provider-chip" href="${escapeHtml(item.link || "https://www.themoviedb.org/")}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.name)} ↗</a>`).join("")}</div>` : `<p class="privacy-note">Huduma zinazopatikana zinaweza kutofautiana kwa nchi. Hakuna faili za filamu zinazopangishwa hapa.</p>`}<div class="dialog-actions"><a class="button button--primary" href="${escapeHtml(trailer)}" target="_blank" rel="noopener noreferrer">▶ TAZAMA/Tafuta TRELA</a><button class="button button--ghost" id="save-movie" type="button">♡ HIFADHI KWENYE ORODHA</button></div></div>`;
+    const watchUrl = safeExternalLink(movie.watch_url) || `https://www.themoviedb.org/search?query=${encodeURIComponent(title)}`;
+    const providerMarkup = providers.length
+      ? `<p class="dialog-kicker">HUDUMA RASMI ZA KUTAZAMA • TANZANIA</p><div class="provider-list">${providers.map(item => `<a class="provider-chip" href="${escapeHtml(safeExternalLink(item.link) || watchUrl)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml((item.access || []).join(" · "))}</small></a>`).join("")}</div>`
+      : `<div class="watch-empty"><p>TMDB haijaorodhesha huduma ya kutazama Tanzania kwa filamu hii kwa sasa.</p><a href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">ANGALIA UPATIKANAJI RASMI ↗</a></div>`;
+    const downloadUrl = movie.download_authorized === true ? safeExternalLink(movie.download_url) : "";
+    const downloadMarkup = downloadUrl
+      ? `<a class="button button--ghost" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PAKUA RASMI ↗</a>`
+      : `<div class="download-note"><strong>Download rasmi</strong><span>Pakua/offline tu kupitia app ya huduma rasmi ikiwa inaruhusu; MOMO haihosti faili za filamu.</span></div>`;
+    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">MOMO MOVIE FILE • ${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FEATURE"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "Maelezo hayajapatikana.")}</p>${providerMarkup}<div class="dialog-actions"><a class="button button--primary" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">${providers.length ? "ANGALIA HUDUMA ZA KUTAZAMA ↗" : "ANGALIA UPATIKANAJI RASMI ↗"}</a>${downloadMarkup}<a class="button button--ghost" href="${escapeHtml(trailer)}" target="_blank" rel="noopener noreferrer">▶ TRELA RASMI</a><button class="button button--ghost" id="save-movie" type="button">♡ HIFADHI KWENYE ORODHA</button></div></div>`;
     $("#save-movie", content).addEventListener("click", () => toggleWatchlist(movie));
   }
   function toggleWatchlist(movie) {
@@ -233,9 +244,13 @@
     });
     $$(".nav-link").forEach(link => link.addEventListener("click", () => {
       $$(".nav-link").forEach(item => item.classList.toggle("is-active", item === link));
+      if (link.dataset.section) {
+        document.getElementById(link.dataset.section)?.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
       state.category = link.dataset.category;
       state.query = ""; state.page = 1; $("#search-input").value = "";
-      const labels = { trending: "Inavuma sasa", popular: "Filamu maarufu", top_rated: "Zilizokadiriwa", now_playing: "Mpya kwenye sinema", tv: "Series maarufu", watchlist: "Orodha yangu" };
+      const labels = { trending: "Filamu zinazotrend", popular: "Movies na series zinazotrend", top_rated: "Zilizokadiriwa", now_playing: `Movies mpya za ${currentTanzaniaYear()}`, tv: "Series maarufu", watchlist: "Orodha yangu" };
       $("#section-title").textContent = labels[state.category] || "Filamu";
       loadCatalog();
     }));
@@ -254,6 +269,8 @@
     $("#dialog-close").addEventListener("click", () => $("#movie-dialog").close());
     $("#movie-dialog").addEventListener("click", event => { if (event.target === $("#movie-dialog")) $("#movie-dialog").close(); });
     $("#year").textContent = new Date().getFullYear();
+    const newReleasesLabel = $("#new-releases-label");
+    if (newReleasesLabel) newReleasesLabel.textContent = `Mpya ${currentTanzaniaYear()}`;
     if (localPreview) {
       const demo = $("#demo-button");
       demo.hidden = false;

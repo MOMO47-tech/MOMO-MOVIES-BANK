@@ -5,9 +5,8 @@ const API_BASE = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p";
 const ROUTES = {
   trending: "/trending/movie/week",
-  popular: "/movie/popular",
+  popular: "/trending/all/week",
   top_rated: "/movie/top_rated",
-  now_playing: "/movie/now_playing",
   tv: "/tv/popular"
 };
 
@@ -51,19 +50,44 @@ async function tmdb(path, params = {}) {
   if (!response.ok) throw new Error("TMDB_REQUEST_FAILED");
   return response.json();
 }
-function pickProviders(detail) {
+function pickProviders(watchData) {
   const region = (process.env.TMDB_WATCH_REGION || "TZ").toUpperCase();
-  const regional = detail["watch/providers"]?.results?.[region];
+  const regional = watchData?.results?.[region];
   if (!regional) return [];
-  const rows = [...(regional.flatrate || []), ...(regional.free || []), ...(regional.ads || []), ...(regional.rent || []), ...(regional.buy || [])];
+  const groups = [
+    ["flatrate", "Streaming"],
+    ["free", "Bure"],
+    ["ads", "Bure kwa matangazo"],
+    ["rent", "Kodi"],
+    ["buy", "Nunua"]
+  ];
   const unique = new Map();
-  rows.forEach(provider => unique.set(provider.provider_id, { name: provider.provider_name, link: regional.link || "https://www.themoviedb.org/" }));
+  for (const [key, label] of groups) {
+    for (const provider of regional[key] || []) {
+      const entry = unique.get(provider.provider_id) || {
+        name: provider.provider_name,
+        link: regional.link || "https://www.themoviedb.org/",
+        access: []
+      };
+      entry.access.push(label);
+      unique.set(provider.provider_id, entry);
+    }
+  }
   return [...unique.values()];
 }
 function pickTrailer(detail) {
   const videos = detail.videos?.results || [];
   const video = videos.find(item => item.site === "YouTube" && item.type === "Trailer" && item.official) || videos.find(item => item.site === "YouTube" && item.type === "Trailer");
   return video ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(video.key)}` : null;
+}
+function tanzaniaDateParts(date = new Date()) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Dar_es_Salaam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date).map(part => [part.type, part.value]));
+  return { year: Number(parts.year), today: `${parts.year}-${parts.month}-${parts.day}` };
 }
 
 module.exports = async function handler(req, res) {
@@ -85,15 +109,30 @@ module.exports = async function handler(req, res) {
   try {
     if (detailId) {
       if (!/^\d{1,12}$/.test(detailId)) return sendJson(res, 400, { error: "ID ya filamu si sahihi." });
-      const detail = await tmdb(`/${type}/${detailId}`, { append_to_response: "videos,watch/providers" });
+      const [detail, watchData] = await Promise.all([
+        tmdb(`/${type}/${detailId}`, { append_to_response: "videos" }),
+        tmdb(`/${type}/${detailId}/watch/providers`).catch(() => ({ results: {} }))
+      ]);
       const movie = normalize({ ...detail, media_type: type });
       movie.trailer_url = pickTrailer(detail);
-      movie.providers = pickProviders(detail);
+      movie.providers = pickProviders(watchData);
+      const region = (process.env.TMDB_WATCH_REGION || "TZ").toUpperCase();
+      movie.watch_url = watchData.results?.[region]?.link || `https://www.themoviedb.org/${type}/${detailId}`;
       return sendJson(res, 200, { movie, source: "tmdb" });
     }
     let payload;
     if (query) payload = await tmdb("/search/multi", { query, include_adult: "false", page });
-    else payload = await tmdb(ROUTES[category] || ROUTES.trending, { page, region: process.env.TMDB_WATCH_REGION || "TZ" });
+    else if (category === "now_playing") {
+      const { year, today } = tanzaniaDateParts();
+      payload = await tmdb("/discover/movie", {
+        primary_release_year: year,
+        "release_date.lte": today,
+        sort_by: "primary_release_date.desc",
+        include_adult: "false",
+        region: process.env.TMDB_WATCH_REGION || "TZ",
+        page
+      });
+    } else payload = await tmdb(ROUTES[category] || ROUTES.trending, { page, region: process.env.TMDB_WATCH_REGION || "TZ" });
     const rows = (payload.results || []).filter(item => item.media_type !== "person").map(normalize);
     return sendJson(res, 200, { results: rows, page, hasMore: Number(payload.total_pages) > page, source: "tmdb" });
   } catch {
