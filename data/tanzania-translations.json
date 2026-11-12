@@ -27,6 +27,34 @@
       "original_note": "Ukurasa huu ni wa filamu asilia na wauzaji rasmi, si tafsiri ya DJ Mjukuu; upatikanaji hutegemea eneo."
     },
     {
+      "name": "DJ Mack",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
+      "name": "DJ Prabhat",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
+      "name": "Remmy DJ",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
+      "name": "DJ Bryton",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
+      "name": "Juma Khan",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
+      "name": "DJ Skills",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
+      "name": "DJ Six Fingers",
+      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
+    },
+    {
       "name": "Ommy DJ",
       "profile_url": "https://www.youtube.com/@OmmyDjOfficial",
       "profile_label": "CHANNEL YA OMMY DJ ↗",
@@ -82,24 +110,27 @@
       "title": "MERLIN EP 01 · CLIP",
       "dj": "Murphy DJ",
       "preview_url": "https://www.youtube.com/watch?v=CXkB3LinAHA",
+      "official_watch_url": "https://www.bbc.co.uk/iplayer/episodes/b00mjlxv/merlin",
       "watch_label": "TAZAMA CLIP (8 SEK) ↗",
-      "source_note": "Kipande cha sekunde 8 tu; si episode nzima. Haki za tafsiri hazijathibitishwa.",
+      "source_note": "Kipande cha sekunde 8 tu. DOWNLOAD hufungua BBC iPlayer ya toleo la asili, si dub ya DJ; haki za full dub hazijathibitishwa.",
       "download_authorized": false
     },
     {
       "title": "MUTINY · CLIP",
       "dj": "Babu DJ",
       "preview_url": "https://www.youtube.com/watch?v=Abup03qneSA",
+      "official_watch_url": "https://www.amazon.com/gp/video/detail/B0HC48NNR4",
       "watch_label": "TAZAMA CLIP (1:11) ↗",
-      "source_note": "Kipande cha 1:11; channel na ruhusa za full film/dub hazijathibitishwa. Si filamu nzima.",
+      "source_note": "Kipande cha 1:11 tu. DOWNLOAD hufungua Prime Video ya toleo la asili, si dub ya DJ; haki za full dub hazijathibitishwa.",
       "download_authorized": false
     },
     {
       "title": "CHARGING 01 · CLIP",
       "dj": "DJ Mjukuu",
       "preview_url": "https://www.youtube.com/watch?v=gGmUo-EnrOM",
+      "official_watch_url": "https://www.warnerbros.com/movies/ghost-ship",
       "watch_label": "TAZAMA KIPANDE (3:22) ↗",
-      "source_note": "Kipande cha 3:22 kinachohusishwa na channel inayojitambulisha kama DJ Mjukuu; si movie/season nzima.",
+      "source_note": "Kipande cha 3:22 tu. DOWNLOAD hufungua ukurasa wa Warner Bros wa toleo la asili, si dub ya DJ; haki za full dub hazijathibitishwa.",
       "download_authorized": false
     }
   ]

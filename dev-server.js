@@ -33,6 +33,10 @@ const server = http.createServer((req, res) => {
     if (category === "horror") catalogue = movies.filter(movie => /horror|kutisha/i.test(movie.genre || ""));
     if (category === "action") catalogue = movies.filter(movie => /action|fight|combat|mapigano/i.test(movie.genre || ""));
     if (category === "animation") catalogue = movies.filter(movie => /animation|cartoon|katuni/i.test(movie.genre || ""));
+    if (category === "now_playing") {
+      const year = new Intl.DateTimeFormat("en", { timeZone: "Africa/Dar_es_Salaam", year: "numeric" }).format(new Date());
+      catalogue = movies.filter(movie => String(movie.release_date || movie.first_air_date || "").startsWith(`${year}-`));
+    }
     const results = catalogue.filter(movie => !query || `${movie.title} ${movie.overview} ${movie.genre || ""}`.toLowerCase().includes(query));
     return send(res, 200, { results, page: 1, hasMore: false, source: "sample", error: "TMDB_API_KEY_MISSING" });
   }

@@ -4,7 +4,7 @@ const fallback = require("../data/fallback-movies.json");
 const API_BASE = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p";
 const ROUTES = {
-  trending: "/trending/movie/week",
+  trending: "/trending/all/week",
   popular: "/trending/all/week",
   top_rated: "/movie/top_rated",
   tv: "/tv/popular"
@@ -38,6 +38,10 @@ function fallbackResults(query, category) {
   if (category === "horror") results = fallback.filter(item => (item.genre_ids || []).includes(27) || /horror|kutisha/i.test(item.genre || ""));
   if (category === "action") results = fallback.filter(item => (item.genre_ids || []).includes(28) || /action|fight|combat|mapigano/i.test(item.genre || ""));
   if (category === "animation") results = fallback.filter(item => (item.genre_ids || []).includes(16) || /animation|cartoon|katuni/i.test(item.genre || ""));
+  if (category === "now_playing") {
+    const { year } = tanzaniaDateParts();
+    results = fallback.filter(item => String(item.release_date || item.first_air_date || "").startsWith(`${year}-`));
+  }
   if (query) {
     const needle = query.toLocaleLowerCase();
     results = results.filter(item => `${item.title} ${item.name || ""} ${item.overview} ${item.genre || ""}`.toLocaleLowerCase().includes(needle));
