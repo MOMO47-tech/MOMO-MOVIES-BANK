@@ -10,13 +10,13 @@
 - [x] **Mwaka wa kutolewa:** Kila movie/series ionyeshe mwaka kutoka release date yake halisi; usiweke mwaka wa sasa kwa titles zote.
 - [x] **Kategorii:** Weka Trending, Mpya, Horror, Action/Mapigano na Animation/Cartoon; Horror, Action na Animation/Cartoon zionyeshwe bila namba/counts na filters zake zionyeshe matokeo yanayolingana.
 - [x] **PLAY ndani ya MOMO:** Kubonyeza movie card au PLAY ya hero kufungue trela/player ndani ya MOMO; DJ clips pia zicheze ndani ya modal bila kumpeleka mtumiaji moja kwa moja YouTube.
-- [x] **DOWNLOAD rasmi:** Kitufe kiandikwe “DOWNLOAD” na kifanye kazi. Tumia direct file tu ikiwa URL rasmi na ruhusa ya mwenye haki vimehakikiwa; vinginevyo fungua chanzo/provider rasmi cha kutazama, na eleza kuwa offline download hutegemea huduma na eneo. Usionyeshe “LOCKED” isiyoeleweka wala kuunganisha nakala zisizoidhinishwa.
+- [x] **Pakua au tazama kwa lebo sahihi:** “PAKUA FAILI” ionekane na ianzishe upakuaji tu pale direct file URL, ruhusa ya kupakua na haki za mwenye maudhui vimethibitishwa. Katalogi ya TMDB, YouTube, BBC iPlayer, Prime Video, au ukurasa mwingine wa kutazama usipewe button ya DOWNLOAD; uonyeshwe kama “TAZAMA CHANZO RASMI” tofauti. Download station isi-open provider page ikibonyezwa ikiwa hakuna faili lililoidhinishwa; izime kitufe na ieleze sababu.
 
 ## Tafsiri za DJs wa Tanzania
 
 - [x] **Majina na sources:** Jumuisha DJ Mack, Babu DJ, DJ Prabhat, Remmy DJ, Murphy DJ, DJ Mjukuu, DJ Bryton, Juma Khan, DJ Skills na DJ Six Fingers; tumia links za profile/chanzo rasmi tu, na onyesha wazi ikiwa clip au source bado haijathibitishwa.
 - [x] **Clips na full movies:** Cheza clips fupi zilizowekwa hadharani ndani ya MOMO na ziweke lebo kuwa si movie nzima. Full movie/season au download huongezwa tu pale embedding/distribution permission imethibitishwa na admin; YouTube upload, paywall au app listing peke yake si uthibitisho wa haki.
-- [x] **Mpangilio wa clips:** Panga clips za DJ zilizopo kwa shelves zenye poster/cover, jina, DJ, maelezo ya chanzo, kitufe cha PLAY na kitufe cha DOWNLOAD kinachoelekeza kwenye chanzo rasmi; usinakili files, images au links zisizo na ruhusa.
+- [x] **Mpangilio wa clips:** Panga clips za DJ zilizopo kwa shelves zenye poster/cover, jina, DJ, maelezo ya chanzo na kitufe cha PLAY ndani ya ukurasa. Tumia “PAKUA FAILI” kwa file iliyoidhinishwa tu; links za kutazama channel/provider ziandikwe “TAZAMA CHANZO RASMI” na ziwe tofauti. Usinakili files, images au links zisizo na ruhusa.
 
 ## Usimamizi, comments na muonekano
 

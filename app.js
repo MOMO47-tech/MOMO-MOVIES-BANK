@@ -187,6 +187,26 @@
     }).join("");
     select.innerHTML = `<option value="">Chagua movie</option>${options}`;
     if (previous && [...select.options].some(option => option.value === previous)) select.value = previous;
+    updateDownloadButton();
+  }
+  function selectedDownloadMovie() {
+    const value = $("#download-movie")?.value || "";
+    const [type, id] = value.split(":");
+    return state.movies.find(item => String(item.id) === id && (item.media_type || "movie") === type) || null;
+  }
+  function updateDownloadButton() {
+    const button = $("#download-current");
+    const note = $("#download-current-note");
+    if (!button) return;
+    const movie = selectedDownloadMovie();
+    const downloadUrl = movie && authorizedMovieDownload(movie);
+    button.disabled = !downloadUrl;
+    button.textContent = !movie ? "CHAGUA FILAMU" : downloadUrl ? "PAKUA FAILI ↓" : "HAKUNA FAILI";
+    if (note) note.textContent = !movie
+      ? "Chagua filamu; DOWNLOAD itawezeshwa tu ikiwa faili la moja kwa moja limeidhinishwa."
+      : downloadUrl
+        ? "Faili la moja kwa moja limeidhinishwa kwa kupakuliwa."
+        : "Hakuna faili la kupakua lililoidhinishwa kwa filamu hii. Tumia kitufe tofauti cha kutazama chanzo rasmi kwenye maelezo.";
   }
   function renderMovies(movies) {
     const grid = $("#movie-grid");
@@ -211,10 +231,6 @@
     } catch { return ""; }
   }
   function officialSourceUrl(movie) {
-    if (movie?.download_authorized === true && movie?.rights_verified === true && safeExternalLink(movie?.rights_url) && typeof movie?.rights_notes === "string" && movie.rights_notes.trim()) {
-      const direct = safeExternalLink(movie.download_url);
-      if (direct) return direct;
-    }
     const watchUrl = safeExternalLink(movie?.watch_url);
     if (watchUrl) return watchUrl;
     const type = movie?.media_type === "tv" || movie?.type === "tv" ? "tv" : "movie";
@@ -222,8 +238,13 @@
     if (/^\d{1,12}$/.test(id)) return `https://www.themoviedb.org/${type}/${encodeURIComponent(id)}`;
     return `https://www.themoviedb.org/search?query=${encodeURIComponent(titleOf(movie || {}))}`;
   }
+  function authorizedMovieDownload(movie) {
+    if (movie?.download_authorized !== true || movie?.rights_verified !== true) return "";
+    if (!safeExternalLink(movie?.rights_url) || typeof movie?.rights_notes !== "string" || !movie.rights_notes.trim()) return "";
+    return safeExternalLink(movie?.download_url);
+  }
   function translationSourceUrl(item) {
-    return authorizedTranslationDownload(item) || safeExternalLink(item?.official_watch_url || item?.source_url);
+    return safeExternalLink(item?.official_watch_url || item?.source_url);
   }
   function renderDjDirectory(djs) {
     const grid = $("#dj-directory");
@@ -275,15 +296,15 @@
         const videoId = youtubeVideoId(item.preview_url || item.official_watch_url);
         const thumbnail = videoId ? `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : "";
         const sourceUrl = safeExternalLink(item.source_url);
-        const downloadUrl = translationSourceUrl(item);
+        const downloadUrl = authorizedTranslationDownload(item);
+        const watchUrl = translationSourceUrl(item);
         const note = escapeHtml(item.source_note || "Clip fupi ya creator; si movie nzima.");
         const sourceLabel = escapeHtml(item.source_label || "CHANZO RASMI ↗");
         const playAction = videoId ? `<button class="button button--ghost" type="button" data-dj-play="${index}">▶ CHEZA HAPA</button>` : `<button class="button button--ghost" type="button" disabled aria-disabled="true">PLAYER HAIPATIKANI</button>`;
-        const downloadAction = downloadUrl
-          ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" title="Fungua chanzo rasmi; offline download hutegemea huduma">DOWNLOAD ↗</a>`
-          : "";
-        const sourceAction = sourceUrl && sourceUrl !== downloadUrl ? `<a class="dj-movie-source" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : "";
-        return `<article class="dj-movie-card"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${thumbnail}" alt="${title} clip thumbnail" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">PUBLIC CLIP</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><p class="dj-movie-note">${note}</p>${sourceAction}<div class="dj-movie-actions">${playAction}${downloadAction}</div></div></article>`;
+        const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" download title="Pakua faili iliyoidhinishwa">PAKUA FAILI ↓</a>` : "";
+        const sourceAction = sourceUrl ? `<a class="dj-movie-source" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : "";
+        const watchAction = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA CHANZO RASMI ↗</a>` : "";
+        return `<article class="dj-movie-card"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${thumbnail}" alt="${title} clip thumbnail" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">PUBLIC CLIP</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><p class="dj-movie-note">${note}</p>${sourceAction}<div class="dj-movie-actions">${playAction}${downloadAction}${watchAction}</div></div></article>`;
       }).join("");
       return `<section class="dj-movie-shelf" aria-labelledby="${shelfTitleId}"><header class="dj-movie-shelf__heading"><h3 id="${shelfTitleId}">${escapeHtml(dj)}</h3></header><div class="dj-movie-shelf__track">${cards}</div></section>`;
     }).join("");
@@ -313,14 +334,14 @@
     const dj = String(item.dj || "DJ Creator").slice(0, 100);
     const key = `sample:dj-${videoId.toLowerCase()}`;
     const sourceUrl = safeExternalLink(item.source_url);
-    const downloadUrl = translationSourceUrl(item);
-    const downloadMarkup = downloadUrl
-      ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">DOWNLOAD ↗</a>`
-      : "";
-    const sourceMarkup = sourceUrl && sourceUrl !== downloadUrl ? `<a class="translation-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">FUNGUA CHANZO ↗</a>` : "";
+    const downloadUrl = authorizedTranslationDownload(item);
+    const watchUrl = translationSourceUrl(item);
+    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>PAKUA FAILI ↓</a>` : "";
+    const sourceMarkup = sourceUrl ? `<a class="translation-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">FUNGUA CHANZO ↗</a>` : "";
+    const watchMarkup = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA CHANZO RASMI ↗</a>` : "";
     const dialog = $("#movie-dialog");
     const content = $("#dialog-content");
-    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">CLIP YA DJ</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div><p class="dialog-overview">${escapeHtml(item.source_note || "Hiki ni kipande kifupi, si movie nzima.")}</p><section class="inline-player" aria-label="Kicheza clip ya DJ"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}${sourceMarkup}</div><p class="download-note">DOWNLOAD hufungua chanzo rasmi kilichoainishwa; offline access hutegemea huduma.</p>${commentsMarkup(key)}</div>`;
+    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">CLIP YA DJ</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div><p class="dialog-overview">${escapeHtml(item.source_note || "Hiki ni kipande kifupi, si movie nzima.")}</p><section class="inline-player" aria-label="Kicheza clip ya DJ"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}${watchMarkup}${sourceMarkup}</div>${downloadUrl ? `<p class="download-note">Faili iliyoidhinishwa imeunganishwa kwa upakuaji wa moja kwa moja.</p>` : `<p class="download-note">Hakuna faili la kupakua lililoidhinishwa kwa clip hii. Tumia player ya hapa au fungua chanzo rasmi kwa kitendo chake tofauti.</p>`}${commentsMarkup(key)}</div>`;
     const iframe = document.createElement("iframe");
     iframe.title = `In-page DJ clip player: ${title}`;
     iframe.src = safeEmbedUrl(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`);
@@ -434,10 +455,12 @@
     const trailerMarkup = trailer
       ? `<section class="inline-player" aria-label="Trailer player for ${escapeHtml(title)}"><div class="inline-player__frame"><iframe title="Trailer player for ${escapeHtml(title)}" src="${escapeHtml(trailer)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div></section>`
       : `<section class="inline-player" aria-label="Trela"><div class="movie-player-empty"><span>TRELA HAIJAPATIKANA KWA SASA</span></div></section>`;
-    const downloadUrl = officialSourceUrl(movie);
-    const downloadMarkup = `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">DOWNLOAD ↗</a>`;
+    const downloadUrl = authorizedMovieDownload(movie);
+    const watchUrl = officialSourceUrl(movie);
+    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>PAKUA FAILI ↓</a>` : "";
+    const watchMarkup = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA CHANZO RASMI ↗</a>` : "";
     const key = commentKey(movie, id, type);
-    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FILAMU"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p>${trailerMarkup}<div class="dialog-actions">${downloadMarkup}</div><p class="download-note">Kitufe hiki kinafungua chanzo rasmi; offline download hutegemea huduma na eneo.</p>${commentsMarkup(key)}</div>`;
+    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FILAMU"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p>${trailerMarkup}<div class="dialog-actions">${downloadMarkup}${watchMarkup}</div>${downloadUrl ? `<p class="download-note">Faili iliyoidhinishwa imeunganishwa kwa upakuaji wa moja kwa moja.</p>` : `<p class="download-note">Katalogi ina kiungo cha kutazama rasmi, si faili la movie la kupakua. Huduma husika inaweza kutoa offline download ndani ya app yake.</p>`}${commentsMarkup(key)}</div>`;
     const comments = $(".movie-comments", content);
     setupMovieComments(comments, key, title);
   }
@@ -485,8 +508,8 @@
     const content = $("#dialog-content");
     const key = `library:${item.id}`;
     const downloadAllowed = item.download_authorized === true && item.rights_verified === true && safeExternalLink(item.rights_url) && typeof item.rights_notes === "string" && item.rights_notes.trim();
-    const downloadUrl = (downloadAllowed ? safeExternalLink(item.download_url) : "") || safeExternalLink(item.official_watch_url || item.source_url);
-    const downloadMarkup = downloadUrl ? `<div class="dialog-actions"><a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">DOWNLOAD ↗</a></div><p class="download-note">Chanzo rasmi; offline download hutegemea huduma.</p>` : "";
+    const downloadUrl = downloadAllowed ? safeExternalLink(item.download_url) : "";
+    const downloadMarkup = downloadUrl ? `<div class="dialog-actions"><a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>PAKUA FAILI ↓</a></div><p class="download-note">Faili iliyoidhinishwa imeunganishwa kwa upakuaji wa moja kwa moja.</p>` : "";
     content.innerHTML = `<div class="dialog-body library-player-dialog"><p class="dialog-kicker">VIDEO ILIYOIDHINISHWA</p><h2 id="dialog-title">${escapeHtml(item.title)}</h2><p class="dialog-overview">${escapeHtml(item.synopsis || "")}</p><div id="library-player-mount" class="inline-player__frame"></div>${downloadMarkup}${commentsMarkup(key)}</div>`;
     const mount = $("#library-player-mount", content);
     if (item.playback_type === "embed") {
@@ -590,14 +613,19 @@
     $("#movie-dialog").addEventListener("click", event => { if (event.target === $("#movie-dialog")) $("#movie-dialog").close(); });
     $("#movie-dialog").addEventListener("close", () => { $("#dialog-content").replaceChildren(); });
     $("#year").textContent = new Date().getFullYear();
+    $("#download-movie")?.addEventListener("change", updateDownloadButton);
     $("#download-current")?.addEventListener("click", () => {
-      const value = $("#download-movie")?.value || "";
-      const [type, id] = value.split(":");
-      const movie = state.movies.find(item => String(item.id) === id && (item.media_type || "movie") === type);
-      if (!movie) { $("#download-current-note").textContent = "Chagua movie kwanza."; return; }
-      const url = officialSourceUrl(movie);
-      $("#download-current-note").textContent = movie.download_authorized === true ? "Inafungua faili rasmi iliyoidhinishwa." : "Inafungua chanzo rasmi; upakuaji wa offline hutegemea huduma.";
-      window.open(url, "_blank", "noopener,noreferrer");
+      const movie = selectedDownloadMovie();
+      const url = movie && authorizedMovieDownload(movie);
+      if (!url) { updateDownloadButton(); return; }
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "";
+      link.rel = "noopener noreferrer";
+      document.body.append(link);
+      link.click();
+      link.remove();
+      $("#download-current-note").textContent = "Upakuaji umeanzishwa. Ikiwa seva ya faili inazuia download, wasiliana na msimamizi wa chanzo.";
     });
     if (localPreview) {
       const demo = $("#demo-button");
