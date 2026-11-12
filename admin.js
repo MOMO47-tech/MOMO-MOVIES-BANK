@@ -5,7 +5,8 @@
   const form = $("#library-form");
   const setupPanel = $("#setup-panel");
   const setupForm = $("#admin-setup-form");
-  const state = { items: [] };
+  const state = { items: [], comments: [], commentsHasMore: false };
+  let commentsLoading = false;
   const inviteContext = { accessToken: null };
 
   function escapeHtml(value = "") {
@@ -80,6 +81,60 @@
       setMessage("#list-message", error.message || "Imeshindikana kupakia rekodi.");
       $("#entry-list").innerHTML = '<div class="empty-state">Kagua schema ya Supabase na ruhusa za admin, kisha ujaribu tena.</div>';
     }
+  }
+  function renderAdminComments() {
+    const list = $("#comment-review-list");
+    const query = $("#comments-search").value.trim().toLocaleLowerCase();
+    const filtered = state.comments.filter(comment => !query || `${comment.movie_title || ""} ${comment.author || ""} ${comment.text || ""}`.toLocaleLowerCase().includes(query));
+    $("#comments-count").textContent = `${filtered.length} / ${state.comments.length} LOADED`;
+    if (!state.comments.length) {
+      list.innerHTML = '<div class="empty-state">Bado hakuna maoni ya members.</div>';
+      return;
+    }
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state">Hakuna maoni yanayolingana na utafutaji huo.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(comment => {
+      const timestamp = new Date(comment.updated_at || comment.created_at);
+      const date = Number.isNaN(timestamp.getTime()) ? "TIME UNKNOWN" : timestamp.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+      return `<article class="comment-review-card"><div class="comment-review-card__top"><div><p class="eyebrow">${escapeHtml(comment.author || "MEMBER")}</p><h3>${escapeHtml(comment.movie_title || "Untitled movie")}</h3></div><time datetime="${escapeHtml(comment.updated_at || comment.created_at || "")}">${escapeHtml(date)}</time></div><p class="comment-review-card__text">${escapeHtml(comment.text || "")}</p></article>`;
+    }).join("");
+  }
+  async function loadComments({ append = false } = {}) {
+    if (commentsLoading) return;
+    commentsLoading = true;
+    const button = $("#load-more-comments");
+    button.disabled = true;
+    const offset = append ? state.comments.length : 0;
+    if (!append) {
+      state.comments = [];
+      state.commentsHasMore = false;
+    }
+    setMessage("#comments-message", append ? "Inapakia maoni zaidi…" : "Inapakia maoni…");
+    try {
+      const data = await api(`/api/admin-comments?offset=${offset}`);
+      const page = Array.isArray(data.comments) ? data.comments : [];
+      state.comments = append ? [...state.comments, ...page] : page;
+      state.commentsHasMore = data.has_more === true;
+      renderAdminComments();
+      setMessage("#comments-message", `Maoni ${state.comments.length} yamepakiwa${state.commentsHasMore ? "; kuna mengine zaidi." : "."}`, true);
+    } catch (error) {
+      if (!append) {
+        state.comments = [];
+        state.commentsHasMore = false;
+        $("#comments-count").textContent = "LOCKED";
+        $("#comment-review-list").innerHTML = '<div class="empty-state">Feed haipatikani. Hakikisha umeingia kwa akaunti iliyo kwenye admin allow-list.</div>';
+      }
+      setMessage("#comments-message", error.message || "Imeshindikana kupakia maoni.");
+    } finally {
+      commentsLoading = false;
+      button.disabled = false;
+      button.hidden = !state.commentsHasMore;
+    }
+  }
+  async function loadDashboardData() {
+    await Promise.all([loadItems(), loadComments()]);
   }
   function resetForm() {
     form.reset();
@@ -159,7 +214,7 @@
     try {
       const data = await api("/api/admin-auth");
       setAuthenticated(data.authenticated === true);
-      if (data.authenticated) await loadItems();
+      if (data.authenticated) await loadDashboardData();
     } catch (error) {
       setAuthenticated(false);
       if (error.status === 503) setMessage("#login-message", error.message);
@@ -194,7 +249,7 @@
       setupForm.reset();
       setMessage("#setup-message", "Nenosiri limehifadhiwa.", true);
       setAuthenticated(true);
-      await loadItems();
+      await loadDashboardData();
     } catch (error) {
       setMessage("#setup-message", error.message || "Imeshindikana kuweka nenosiri.");
     } finally {
@@ -215,7 +270,7 @@
       $("#admin-password").value = "";
       setMessage("#login-message", "Umeingia.", true);
       setAuthenticated(true);
-      await loadItems();
+      await loadDashboardData();
     } catch (error) {
       setMessage("#login-message", error.message || "Imeshindikana kuingia.");
     } finally {
@@ -226,10 +281,18 @@
     try { await api("/api/admin-auth", { method: "DELETE" }); } catch { /* Always remove the local admin view. */ }
     setAuthenticated(false);
     resetForm();
+    state.comments = [];
+    state.commentsHasMore = false;
+    $("#load-more-comments").hidden = true;
+    $("#comments-count").textContent = "LOCKED";
+    $("#comment-review-list").innerHTML = '<div class="empty-state">Maoni yataonekana baada ya admin kuingia.</div>';
   });
   form.addEventListener("submit", submitItem);
   $("#reset-form").addEventListener("click", resetForm);
   $("#refresh-list").addEventListener("click", loadItems);
+  $("#refresh-comments").addEventListener("click", () => loadComments());
+  $("#load-more-comments").addEventListener("click", () => loadComments({ append: true }));
+  $("#comments-search").addEventListener("input", renderAdminComments);
   $("#entry-list").addEventListener("click", event => {
     const edit = event.target.closest("[data-edit]");
     const remove = event.target.closest("[data-delete]");

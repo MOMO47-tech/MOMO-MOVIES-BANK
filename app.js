@@ -1,7 +1,7 @@
 (() => {
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { category: "trending", query: "", movies: [], library: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
+  const state = { category: "trending", query: "", movies: [], library: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
   const localPreview = Boolean(window.MOMO_LOCAL_PREVIEW);
 
   const fallbackMovies = [
@@ -213,25 +213,81 @@
     const grid = $("#translation-grid");
     if (!grid) return;
     const rows = Array.isArray(items) ? items : [];
+    state.djItems = rows;
     if (!rows.length) {
-      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Bado hakuna vipande vya tafsiri vilivyoongezwa.</strong><span>Vipande vitaonekana baada ya kuthibitisha channel ya DJ au chanzo cha mwenye haki. Hatuweki filamu nzima au downloads zisizo na ruhusa.</span></div>`;
+      grid.innerHTML = `<div class="empty-state translation-empty"><strong>NO DJ COLLECTIONS YET</strong><span>Creator clips will appear after their public source is added. Full movies and download files require distribution permission.</span></div>`;
       return;
     }
-    grid.innerHTML = rows.map(item => {
-      const title = escapeHtml(item.title || "Filamu");
-      const dj = escapeHtml(item.dj || "DJ wa Tanzania");
-      const year = item.year ? `<span>${escapeHtml(item.year)}</span>` : "";
-      const previewUrl = safeExternalLink(item.preview_url || item.official_watch_url);
-      const sourceUrl = safeExternalLink(item.source_url);
-      const downloadUrl = item.download_authorized === true ? safeExternalLink(item.official_download_url) : "";
-      const watchLabel = escapeHtml(item.watch_label || "TAZAMA RASMI ↗");
-      const sourceNote = escapeHtml(item.source_note || "Chanzo cha DJ.");
-      const sourceLabel = escapeHtml(item.source_label || "CHANZO ↗");
-      const watchAction = previewUrl ? `<a class="button button--ghost" href="${escapeHtml(previewUrl)}" target="_blank" rel="noopener noreferrer">${watchLabel}</a>` : "";
-      const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PAKUA RASMI ↗</a>` : "";
-      const sourceMarkup = sourceUrl ? `<a class="translation-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : "";
-      return `<article class="translation-card"><div class="translation-card__mark" aria-hidden="true">TZ</div><div class="translation-card__copy"><p class="eyebrow eyebrow--muted">TAFSIRI YA DJ</p><h3>${title}</h3><p>${dj}${year ? ` · ${year}` : ""}</p><p class="translation-source-note">${sourceNote}</p>${sourceMarkup}<div class="translation-actions">${watchAction}${downloadAction}</div></div></article>`;
+    const groups = new Map();
+    rows.forEach((item, index) => {
+      const name = String(item.dj || "DJ Creator").trim() || "DJ Creator";
+      if (!groups.has(name)) groups.set(name, []);
+      groups.get(name).push({ item, index });
+    });
+    grid.innerHTML = [...groups.entries()].map(([dj, entries], groupIndex) => {
+      const shelfTitleId = `dj-shelf-title-${groupIndex}`;
+      const cards = entries.map(({ item, index }) => {
+        const title = escapeHtml(item.title || "DJ Clip");
+        const videoId = youtubeVideoId(item.preview_url || item.official_watch_url);
+        const thumbnail = videoId ? `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : "";
+        const sourceUrl = safeExternalLink(item.source_url);
+        const downloadUrl = authorizedTranslationDownload(item);
+        const note = escapeHtml(item.source_note || "Creator clip. Full-film rights are not confirmed.");
+        const sourceLabel = escapeHtml(item.source_label || "CREATOR SOURCE ↗");
+        const playAction = videoId ? `<button class="button button--ghost" type="button" data-dj-play="${index}">▶ PLAY IN MOMO</button>` : `<button class="button button--ghost" type="button" disabled aria-disabled="true">PLAYER UNAVAILABLE</button>`;
+        const downloadAction = downloadUrl
+          ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">DOWNLOAD ↗</a>`
+          : `<button class="button button--download-locked" type="button" disabled aria-disabled="true" title="No authorized download link is available">DOWNLOAD · LOCKED</button>`;
+        const sourceAction = sourceUrl ? `<a class="dj-movie-source" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : "";
+        return `<article class="dj-movie-card"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${thumbnail}" alt="${title} clip thumbnail" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">PUBLIC CLIP</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><p class="dj-movie-note">${note}</p>${sourceAction}<div class="dj-movie-actions">${playAction}${downloadAction}</div></div></article>`;
+      }).join("");
+      return `<section class="dj-movie-shelf" aria-labelledby="${shelfTitleId}"><header class="dj-movie-shelf__heading"><div><p class="eyebrow eyebrow--muted">DJ COLLECTION // ${String(groupIndex + 1).padStart(2, "0")}</p><h3 id="${shelfTitleId}">${escapeHtml(dj)} SPECIALS</h3></div><span>${entries.length} ${entries.length === 1 ? "TITLE" : "TITLES"}</span></header><div class="dj-movie-shelf__track">${cards}</div></section>`;
     }).join("");
+    $$('[data-dj-play]', grid).forEach(button => button.addEventListener("click", () => playDjClip(Number(button.dataset.djPlay))));
+  }
+  function youtubeVideoId(value) {
+    const safe = safeExternalLink(value);
+    if (!safe) return "";
+    try {
+      const url = new URL(safe);
+      let id = "";
+      if (url.hostname === "youtu.be") id = url.pathname.slice(1);
+      else if (["youtube.com", "www.youtube.com", "m.youtube.com"].includes(url.hostname) && url.pathname === "/watch") id = url.searchParams.get("v") || "";
+      return /^[A-Za-z0-9_-]{6,20}$/.test(id) ? id : "";
+    } catch { return ""; }
+  }
+  function authorizedTranslationDownload(item) {
+    if (!item || item.download_authorized !== true || item.rights_verified !== true) return "";
+    if (!safeExternalLink(item.rights_url) || typeof item.rights_notes !== "string" || !item.rights_notes.trim()) return "";
+    return safeExternalLink(item.official_download_url);
+  }
+  function playDjClip(index) {
+    const item = state.djItems[index];
+    const videoId = item && youtubeVideoId(item.preview_url || item.official_watch_url);
+    if (!item || !videoId) return;
+    const title = String(item.title || "DJ Clip").slice(0, 160);
+    const dj = String(item.dj || "DJ Creator").slice(0, 100);
+    const key = `sample:dj-${videoId.toLowerCase()}`;
+    const sourceUrl = safeExternalLink(item.source_url);
+    const downloadUrl = authorizedTranslationDownload(item);
+    const downloadMarkup = downloadUrl
+      ? `<a class="button button--ghost download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">DOWNLOAD ↗</a>`
+      : `<button class="button button--ghost download-button" type="button" disabled aria-disabled="true">DOWNLOAD · LOCKED</button>`;
+    const sourceMarkup = sourceUrl ? `<a class="translation-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">OPEN CREATOR SOURCE ↗</a>` : "";
+    const dialog = $("#movie-dialog");
+    const content = $("#dialog-content");
+    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">DJ CLIP // PREVIEW ONLY</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div><p class="dialog-overview">${escapeHtml(item.source_note || "Short public clip. This is not a full movie.")}</p><section class="inline-player" aria-label="DJ clip player"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}${sourceMarkup}</div>${commentsMarkup(key)}</div>`;
+    const iframe = document.createElement("iframe");
+    iframe.title = `In-page DJ clip player: ${title}`;
+    iframe.src = safeEmbedUrl(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`);
+    iframe.loading = "lazy";
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    iframe.sandbox = "allow-scripts allow-same-origin allow-presentation";
+    iframe.allow = "encrypted-media; picture-in-picture";
+    iframe.allowFullscreen = true;
+    $("#dj-clip-player", content).append(iframe);
+    setupMovieComments($(".movie-comments", content), key, title);
+    dialog.showModal();
   }
   async function loadTranslations() {
     try {

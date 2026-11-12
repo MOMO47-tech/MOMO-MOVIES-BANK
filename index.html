@@ -65,7 +65,7 @@
         <button class="nav-link" data-category="top_rated">Zilizokadiriwa</button>
         <button id="new-releases-label" class="nav-link" data-category="now_playing">Mpya</button>
         <button class="nav-link" data-category="tv">Series</button>
-        <button class="nav-link" type="button" data-section="tz-translations">Tafsiri za DJ</button>
+        <button class="nav-link" type="button" data-section="tz-translations">DJ Movies</button>
         <button class="nav-link" type="button" data-section="official-downloads">Download</button>
         <button class="nav-link" data-category="watchlist">Orodha yangu</button>
       </nav>
@@ -110,29 +110,27 @@
       </section>
       <button id="load-more" class="button button--load" type="button" hidden>ONYESHA ZAIDI <span aria-hidden="true">↓</span></button>
 
-      <section id="official-downloads" class="download-station" aria-labelledby="download-title">
-        <div class="download-station__heading"><div><p class="eyebrow eyebrow--muted">DOWNLOAD MANAGER</p><h2 id="download-title">Pakua kwa njia rasmi</h2><p>Sehemu maalum ya downloads; link ya faili itaonekana tu ikiwa mwenye haki ameidhinisha.</p></div><span class="download-lock">[ RIGHTS CHECK: ON ]</span></div>
-        <div class="download-terminal">
-          <div class="download-terminal__bar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><span>momo@bank: ~/downloads</span><span class="terminal-secure">SECURE</span></div>
-          <div class="download-terminal__body"><p class="download-command"><span class="term-green">momo@bank</span><span class="term-muted">:</span><span class="term-cyan">~/downloads</span><span class="term-green">$</span> scan --authorized-only</p><p class="download-state"><span class="term-yellow">STATUS:</span> HAKUNA DIRECT FILE ILIYOTHIBITISHWA</p><p>Filamu kamili hazihifadhiwi kwenye MOMO. Tumia download/offline ndani ya app rasmi ikiwa huduma yenye haki inaruhusu; full movies za tafsiri hazitaunganishwa bila ruhusa ya mwenye maudhui.</p><a class="button button--ghost" href="#home">RUDI KWENYE CATALOG <b aria-hidden="true">↑</b></a></div>
-        </div>
-      </section>
-
       <section id="tz-translations" class="translations-section" aria-labelledby="translations-title">
         <div class="translations-heading">
-          <div><p class="eyebrow eyebrow--muted">TAFSIRI ZA BONGO</p><h2 id="translations-title">Movies za DJ wa Tanzania</h2></div>
-          <span class="translation-badge">DJ ARCHIVE</span>
+          <div><p class="eyebrow eyebrow--muted">MOMO // DJ ARCHIVE</p><h2 id="translations-title">DJ Movie Collections</h2></div>
+          <span class="translation-badge">SOURCE CHECKED</span>
         </div>
-        <p class="translations-intro">Orodha hapa ina DJ wenye clips zinazoonekana chini yake. Viungo ni vipande vifupi tu; sehemu ya “toleo la asili” hufungua huduma rasmi ya filamu/series isiyotafsiriwa na DJ. Full dub na download zitaonekana tu kama haki za mwenye maudhui zimethibitishwa.</p>
-        <div class="dj-directory-heading"><h3>DJ wenye clips zinazoonekana</h3><p>Original links si tafsiri za Kiswahili.</p></div>
-        <div id="dj-directory" class="dj-directory" aria-live="polite">
-          <div class="empty-state translation-empty">Inapakia orodha ya DJs…</div>
-        </div>
-        <div class="translation-clips-heading"><p class="eyebrow eyebrow--muted">VIPANDE VILIVYOPO</p><h3>Clips fupi kutoka kwenye vyanzo vya umma</h3></div>
+        <p class="translations-intro">Browse public DJ clips by creator. Play opens here in MOMO. A download link stays locked unless its official URL and distribution permission have been verified.</p>
         <div id="translation-grid" class="translation-grid" aria-live="polite">
-          <div class="empty-state translation-empty">Inapakia katalogi ya tafsiri…</div>
+          <div class="empty-state translation-empty">Scanning DJ collections…</div>
         </div>
-        <aside class="download-policy"><strong>Downloads rasmi tu</strong><span>Hatu-hosti wala kuunganisha nakala zisizoidhinishwa. Offline download itumike ndani ya app rasmi tu ikiwa huduma inaruhusu.</span></aside>
+        <div class="dj-directory-heading"><h3>Creator channels</h3><p>Official sources and profile links only.</p></div>
+        <div id="dj-directory" class="dj-directory" aria-live="polite">
+          <div class="empty-state translation-empty">Loading DJ channels…</div>
+        </div>
+        <section id="official-downloads" class="download-station" aria-labelledby="download-title">
+          <div class="download-station__heading"><div><p class="eyebrow eyebrow--muted">DOWNLOAD MANAGER</p><h2 id="download-title">Official downloads</h2><p>Direct downloads appear only when a rights-holder has approved the official file link.</p></div><span class="download-lock">[ RIGHTS CHECK: ON ]</span></div>
+          <div class="download-terminal">
+            <div class="download-terminal__bar"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><span>momo@bank: ~/downloads</span><span class="terminal-secure">SECURE</span></div>
+            <div class="download-terminal__body"><p class="download-command"><span class="term-green">momo@bank</span><span class="term-muted">:</span><span class="term-cyan">~/downloads</span><span class="term-green">$</span> scan --authorized-only</p><p class="download-state"><span class="term-yellow">STATUS:</span> NO VERIFIED DOWNLOADS</p><p>MOMO does not host full movies. Use offline download inside an authorized platform when its terms allow it.</p><a class="button button--ghost" href="#home">BACK TO CATALOG <b aria-hidden="true">↑</b></a></div>
+          </div>
+        </section>
+        <aside class="download-policy"><strong>Official downloads only</strong><span>Unapproved full movies and downloads are not hosted or linked here.</span></aside>
       </section>
     </main>
 

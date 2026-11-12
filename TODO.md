@@ -51,3 +51,9 @@
 
 - [x] **Rahisisha movie details:** Ondoa ujumbe unaohusu TMDB/availability na maandishi yanayojirudia ya “ANGALIA UPATIKANAJI RASMI”; baki na player ya ndani na kitufe kimoja cha DOWNLOAD. Kitufe kiwe disabled ikiwa hakuna download link iliyoidhinishwa; usiongeze download isiyo na ruhusa.
 - [x] **Maoni kwa kila movie:** Ongeza sehemu ya maoni ya movie husika kwa members walioingia tu; muonekano ulingane na dark-web/hacker terminal ya MOMO. Hifadhi maoni kwa movie, onyesha maoni ya members bila kufichua namba zao za simu, zuia HTML/XSS, thibitisha origin/session kwa kutuma, na weka Supabase RLS ili browser roles zisiweze kusoma/kuandika jedwali moja kwa moja.
+
+
+## Ombi jipya — makusanyo ya DJ na ukaguzi wa maoni
+
+- [x] **Makusanyo ya movies za DJs:** Panga clips za DJ zilizopo katika shelves tofauti kulingana na jina la DJ, zikiwa na poster/cover, jina, DJ, taarifa ya chanzo, kitufe cha kucheza, na kitufe cha download. Play ifungue player ndani ya MOMO badala ya kuhamisha mtumiaji moja kwa moja YouTube; download iwe link hai tu ikiwa URL rasmi imeidhinishwa, vinginevyo ionekane disabled. Hifadhi katalogi pana kwa mpangilio wa reference bila kunakili files, images, au links zisizo na ruhusa za tovuti ya mfano.
+- [x] **Admin kuona maoni:** Admin aliyeingia na kuwa kwenye allow-list aone maoni yote ya karibuni kwa movie, kichwa cha movie, pseudonym ya member, na muda; aweze kutafuta/kuchuja na kusasisha orodha. API iwe read-only na admin-only, isifichue phone/hash ya member, na public/member access ya kawaida isiweze kuona admin feed.

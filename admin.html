@@ -21,7 +21,7 @@
       <section class="admin-intro">
         <p class="eyebrow">MOMO • CONTROL ROOM</p>
         <h1>Dashibodi ya <span>Admin</span></h1>
-        <p>Simamia makala za MOMO Movie Library. Full video huchapishwa tu baada ya kuthibitisha ruhusa na chanzo chake.</p>
+        <p>Simamia makala za MOMO Movie Library na kagua maoni ya members. Full video huchapishwa tu baada ya kuthibitisha ruhusa na chanzo chake.</p>
       </section>
       <section id="login-panel" class="panel login-panel" aria-labelledby="login-title">
         <div class="panel-heading"><div><p class="eyebrow">ADMIN ACCESS</p><h2 id="login-title">Ingia kwa Supabase Auth</h2></div><span class="access-lock">LOCKED</span></div>
@@ -88,6 +88,13 @@
             <div id="entry-list" class="entry-list"><div class="empty-state">Inapakia rekodi...</div></div>
           </section>
         </div>
+        <section class="panel comments-panel" aria-labelledby="comments-heading">
+          <div class="comments-panel__heading"><div><p class="eyebrow">COMMENT LOG // ADMIN ONLY</p><h2 id="comments-heading">Maoni ya movies</h2><p class="panel-note">Maoni ya karibuni kutoka kwa members, bila kuonyesha namba zao za simu.</p></div><span id="comments-count" class="access-lock">LOCKED</span></div>
+          <div class="comment-review-tools"><label class="sr-only" for="comments-search">Tafuta kwenye maoni</label><input id="comments-search" type="search" autocomplete="off" placeholder="Tafuta movie, member au maoni…"><button id="refresh-comments" class="button button--ghost" type="button">SASISHA MAONI ↻</button></div>
+          <p id="comments-message" class="form-message" role="status" aria-live="polite"></p>
+          <div id="comment-review-list" class="comment-review-list" aria-live="polite"><div class="empty-state">Maoni yataonekana baada ya admin kuingia.</div></div>
+          <button id="load-more-comments" class="button button--ghost comment-load-more" type="button" hidden>PAKIA MAONI ZAIDI ↓</button>
+        </section>
       </section>
     </main>
     <footer class="admin-footer"><span>ADMIN ONLY • MOMO MOVIES</span><span>Vitu vilivyochapishwa vinaonekana kwa wageni.</span></footer>

@@ -12,6 +12,7 @@ const server = http.createServer((req, res) => {
   if (url.pathname === "/api/session") return send(res, 200, { authenticated: false });
   if (url.pathname === "/api/member-count") return send(res, 200, { count: null });
   if (url.pathname === "/api/comments") return send(res, 401, { error: "Local preview does not provide member sessions or persistent comments." });
+  if (url.pathname === "/api/admin-comments") return send(res, 401, { error: "Local preview does not provide Supabase admin sessions or persistent comments." });
   if (url.pathname === "/api/admin-auth" && req.method === "GET") return send(res, 200, { authenticated: false });
   if (url.pathname === "/api/admin-auth" && req.method === "DELETE") return send(res, 200, { ok: true });
   if (url.pathname === "/api/admin-auth") return send(res, 503, { error: "Preview pekee: admin Auth huhitaji Supabase iliyosanidiwa." });

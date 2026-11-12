@@ -1,6 +1,6 @@
 # MOMO MOVIES BANK
 
-MOMO MOVIES BANK ni tovuti ya movie discovery yenye muonekano wa neon-green, nyota zinazosogea, passcode ya pamoja, kaunta ya uanachama na catalog ya filamu. Inatumia metadata, posters, trela na viungo vya huduma rasmi; haihosti filamu wala kutoa viungo vya download.
+MOMO MOVIES BANK ni tovuti ya movie discovery yenye muonekano wa neon-green, nyota zinazosogea, passcode ya pamoja, kaunta ya uanachama na catalog ya filamu. Inatumia metadata, posters na trela; haihosti filamu na hutoa direct download pekee pale mwenye haki ameidhinisha URL rasmi.
 
 ## Stack na kuendesha preview
 
@@ -55,11 +55,11 @@ select id from auth.users where lower(email) = lower('admin@example.com')
 on conflict (user_id) do nothing;
 ```
 
-Passcode ya pamoja ya lounge haitoi ruhusa ya admin. Session ya admin ni cookie ya HttpOnly ya saa 8; ruhusa hukaguliwa tena dhidi ya allow-list, na mabadiliko ya dashboard hukubali maombi ya same-origin pekee.
+Passcode ya pamoja ya lounge haitoi ruhusa ya admin. Session ya admin ni cookie ya HttpOnly ya saa 8; ruhusa hukaguliwa tena dhidi ya allow-list, na mabadiliko ya dashboard hukubali maombi ya same-origin pekee. Dashboard pia ina feed ya read-only ya maoni, kurasa 100 kwa wakati, yenye utafutaji kwa movie, pseudonym au maandishi ya comment. Feed haionyeshi namba au HMAC hash ya member.
 
 Admin anaweza kuongeza, kuhariri, kuchapisha, kuficha au kufuta filamu/series. Ili kuchapisha maudhui, dashboard inahitaji player, URL ya chanzo/uthibitisho wa haki, maelezo ya ruhusa na uthibitisho wa admin. Player inaruhusu HTTPS MP4/WebM/HLS au embed za Vimeo/YouTube no-cookie zilizowekwa ndani ya MOMO; hakuna utafutaji wa YouTube unaofunguliwa nje. Weka filamu kamili tu ikiwa una leseni/ruhusa ya kusambaza na kuchezesha. TMDB hutoa metadata na trela rasmi; player ya filamu kutoka katalogi hucheza trela ndani ya ukurasa, huku kitufe cha DOWNLOAD kikifunguka tu kwa link iliyoidhinishwa.
 
-Baada ya admin kuingia, rekodi zilizowekwa `rights_verified` na `is_published` ndizo pekee zinazorudishwa kwa wageni na kuchezwa ndani ya tovuti. Hakuna video inayopakiwa kwenye Supabase na dashboard haiongezi direct-download link. Members walioingia wanaweza kuacha comment kwa kila movie; jina linaloonekana ni pseudonym inayotokana na HMAC, si namba ya simu. Member mmoja ana comment moja kwa movie na anaweza kuisahihisha kwa kutuma tena.
+Baada ya admin kuingia, rekodi zilizowekwa `rights_verified` na `is_published` ndizo pekee zinazorudishwa kwa wageni na kuchezwa ndani ya tovuti. Hakuna video inayopakiwa kwenye Supabase. DJ clips zilizopo hupangwa kwenye shelves tofauti kwa creator na hufunguka ndani ya player ya MOMO; kila download button hubaki locked isipokuwa item iwe na `download_authorized`, `rights_verified`, `rights_url`, `rights_notes` na `official_download_url` halali. Members walioingia wanaweza kuacha comment kwa kila movie; jina linaloonekana ni pseudonym inayotokana na HMAC, si namba ya simu. Member mmoja ana comment moja kwa movie na anaweza kuisahihisha kwa kutuma tena.
 
 ## Vercel deployment
 
