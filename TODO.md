@@ -46,3 +46,8 @@
 - [x] **Join/access copy ya Termux kwa Kiingereza:** Gate ya kuingia ionyeshe lugha ya Kiingereza kwa PHONE NUMBER, UNLOCK CODE, maelezo, ujumbe na kitufe; iwe na maandishi ya kipekee ya terminal/hacker huku MOMO MOVIES ikibaki wazi na inasomeka.
 - [x] **Kaunta ya waliojiunga:** Onyesha jumla ya members kwa namba iliyopangwa kwa koma na lebo ya Kiingereza inayoeleweka; ibaki dark-web/terminal style, ionyeshe hali ya kaunta inapopatikana au isipopatikana, na isitoe namba za simu.
 - [x] **Nyota na radi zaidi:** Ongeza msongamano wa nyota na idadi ya radi zinazo-flash kwa nyuma; zisifunike wala kuzuia usomaji, ziwe nyepesi kwa simu, na heshimu `prefers-reduced-motion`.
+
+## Ombi jipya — movie details na maoni
+
+- [x] **Rahisisha movie details:** Ondoa ujumbe unaohusu TMDB/availability na maandishi yanayojirudia ya “ANGALIA UPATIKANAJI RASMI”; baki na player ya ndani na kitufe kimoja cha DOWNLOAD. Kitufe kiwe disabled ikiwa hakuna download link iliyoidhinishwa; usiongeze download isiyo na ruhusa.
+- [x] **Maoni kwa kila movie:** Ongeza sehemu ya maoni ya movie husika kwa members walioingia tu; muonekano ulingane na dark-web/hacker terminal ya MOMO. Hifadhi maoni kwa movie, onyesha maoni ya members bila kufichua namba zao za simu, zuia HTML/XSS, thibitisha origin/session kwa kutuma, na weka Supabase RLS ili browser roles zisiweze kusoma/kuandika jedwali moja kwa moja.

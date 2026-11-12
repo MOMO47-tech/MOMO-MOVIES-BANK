@@ -15,8 +15,8 @@ Kwenye local preview, kitufe cha “Angalia mwonekano wa demo” hufungua catalo
 
 ## Supabase setup
 
-1. Fungua Supabase SQL editor kwenye project unayotumia na utekeleze `supabase/schema.sql`. Inaunda jedwali la uanachama, orodha ya admin, na library ya video yenye RLS.
-2. `momo_movie_members`, `momo_movie_admins`, na `momo_movie_library` hazisomeki moja kwa moja na `anon` au `authenticated`; API ya server pekee hutumia service-role key. Kaunta ya tovuti hurudisha jumla ya wanachama tu.
+1. Fungua Supabase SQL editor kwenye project unayotumia na utekeleze `supabase/schema.sql` (kila schema mpya inaweza kutekelezwa tena kwa `create if not exists`). Inaunda jedwali la uanachama, orodha ya admin, library ya video na `momo_movie_comments`.
+2. Jedwali zote nne za app zina RLS na hazisomeki/kuandikika moja kwa moja na `anon` au `authenticated`; API ya server pekee hutumia service-role key. Kaunta ya tovuti hurudisha jumla ya wanachama tu.
 3. Katika Supabase → Authentication → Users, tuma invitation kwa email ya admin na uweke redirect ya `https://momo-movies-peach.vercel.app/admin`. Mwalikwa huchagua nenosiri lake kwenye ukurasa wa `/admin` baada ya kufungua link.
 4. Invite inapounda Auth user, ongeza email hiyo kwenye allow-list kabla hajafungua link ya mwaliko. Tumia SQL hii ukibadilisha email:
 
@@ -57,9 +57,9 @@ on conflict (user_id) do nothing;
 
 Passcode ya pamoja ya lounge haitoi ruhusa ya admin. Session ya admin ni cookie ya HttpOnly ya saa 8; ruhusa hukaguliwa tena dhidi ya allow-list, na mabadiliko ya dashboard hukubali maombi ya same-origin pekee.
 
-Admin anaweza kuongeza, kuhariri, kuchapisha, kuficha au kufuta filamu/series. Ili kuchapisha maudhui, dashboard inahitaji player, URL ya chanzo/uthibitisho wa haki, maelezo ya ruhusa na uthibitisho wa admin. Player inaruhusu HTTPS MP4/WebM/HLS au embed za Vimeo/YouTube no-cookie zilizowekwa ndani ya MOMO; hakuna utafutaji wa YouTube unaofunguliwa nje. Weka filamu kamili tu ikiwa una leseni/ruhusa ya kusambaza na kuchezesha. TMDB bado hutoa metadata na trela rasmi; filamu zisizoidhinishwa huonyesha huduma rasmi za kutazama badala ya player ya full movie.
+Admin anaweza kuongeza, kuhariri, kuchapisha, kuficha au kufuta filamu/series. Ili kuchapisha maudhui, dashboard inahitaji player, URL ya chanzo/uthibitisho wa haki, maelezo ya ruhusa na uthibitisho wa admin. Player inaruhusu HTTPS MP4/WebM/HLS au embed za Vimeo/YouTube no-cookie zilizowekwa ndani ya MOMO; hakuna utafutaji wa YouTube unaofunguliwa nje. Weka filamu kamili tu ikiwa una leseni/ruhusa ya kusambaza na kuchezesha. TMDB hutoa metadata na trela rasmi; player ya filamu kutoka katalogi hucheza trela ndani ya ukurasa, huku kitufe cha DOWNLOAD kikifunguka tu kwa link iliyoidhinishwa.
 
-Baada ya admin kuingia, rekodi zilizowekwa `rights_verified` na `is_published` ndizo pekee zinazorudishwa kwa wageni na kuchezwa ndani ya tovuti. Hakuna video inayopakiwa kwenye Supabase na dashboard haiongezi direct-download link.
+Baada ya admin kuingia, rekodi zilizowekwa `rights_verified` na `is_published` ndizo pekee zinazorudishwa kwa wageni na kuchezwa ndani ya tovuti. Hakuna video inayopakiwa kwenye Supabase na dashboard haiongezi direct-download link. Members walioingia wanaweza kuacha comment kwa kila movie; jina linaloonekana ni pseudonym inayotokana na HMAC, si namba ya simu. Member mmoja ana comment moja kwa movie na anaweza kuisahihisha kwa kutuma tena.
 
 ## Vercel deployment
 

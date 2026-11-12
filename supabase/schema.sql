@@ -44,3 +44,22 @@ create index if not exists momo_movie_library_public_order
 alter table public.momo_movie_library enable row level security;
 revoke all on table public.momo_movie_library from public, anon, authenticated;
 grant all on table public.momo_movie_library to service_role;
+
+-- Comments are accessed only through the member-authenticated server API.
+-- Member identity remains the existing HMAC phone hash; raw phone numbers
+-- are never stored in or returned from this table.
+create table if not exists public.momo_movie_comments (
+  id uuid primary key default gen_random_uuid(),
+  movie_key text not null check (char_length(movie_key) between 8 and 96),
+  movie_title text not null check (char_length(movie_title) between 1 and 160),
+  member_hash text not null references public.momo_movie_members(phone_hash) on delete cascade,
+  comment_text text not null check (char_length(comment_text) between 2 and 1000),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint momo_movie_comments_one_per_member unique (movie_key, member_hash)
+);
+create index if not exists momo_movie_comments_movie_order
+  on public.momo_movie_comments (movie_key, created_at asc);
+alter table public.momo_movie_comments enable row level security;
+revoke all on table public.momo_movie_comments from public, anon, authenticated;
+grant all on table public.momo_movie_comments to service_role;

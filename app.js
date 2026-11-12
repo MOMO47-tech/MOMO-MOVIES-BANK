@@ -255,10 +255,71 @@
       return youtube || vimeo ? url.href : "";
     } catch { return ""; }
   }
+  function commentKey(movie, id, type = "movie") {
+    const movieType = movie?.media_type === "tv" || type === "tv" ? "tv" : "movie";
+    const movieId = String(movie?.id ?? id ?? "");
+    return /^\d{1,12}$/.test(movieId) ? `tmdb:${movieType}:${movieId}` : `sample:${movieId}`;
+  }
+  function commentsMarkup(key) {
+    return `<section class="movie-comments" data-comment-key="${escapeHtml(key)}" aria-labelledby="comments-title"><div class="movie-comments__terminal"><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><span>momo@comments:~</span><b>AUTH://MEMBERS</b></div><div class="movie-comments__inner"><p class="movie-comments__eyebrow">// MOVIE DISCUSSION</p><h3 id="comments-title">COMMUNITY COMMENTS</h3><p class="movie-comments__hint">One comment per member. Submit again to update yours.</p><p class="movie-comments__status" role="status" aria-live="polite"></p><div class="movie-comments__list" aria-live="polite"><p class="movie-comments__empty">CONNECTING TO COMMENT FEED…</p></div><form class="movie-comments__form"><label for="movie-comment-input">ADD YOUR COMMENT</label><textarea id="movie-comment-input" name="text" maxlength="1000" rows="3" placeholder="Write a comment…" required></textarea><div class="movie-comments__form-footer"><span>MAX 1000 CHARACTERS</span><button class="button button--primary" type="submit">POST COMMENT ↗</button></div></form></div></section>`;
+  }
+  function renderComments(section, comments) {
+    const list = $(".movie-comments__list", section);
+    if (!Array.isArray(comments) || comments.length === 0) {
+      list.innerHTML = `<p class="movie-comments__empty">NO TRANSMISSIONS YET // START THE DISCUSSION</p>`;
+      return;
+    }
+    list.innerHTML = comments.map(comment => {
+      const timestamp = new Date(comment.created_at);
+      const date = Number.isNaN(timestamp.getTime()) ? "" : timestamp.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+      return `<article class="movie-comment"><header><strong>${escapeHtml(comment.author || "MEMBER")}</strong><time>${escapeHtml(date)}</time></header><p>${escapeHtml(comment.text || "")}</p></article>`;
+    }).join("");
+  }
+  async function setupMovieComments(section, key, title) {
+    const list = $(".movie-comments__list", section);
+    const status = $(".movie-comments__status", section);
+    const form = $(".movie-comments__form", section);
+    const load = async () => {
+      try {
+        const data = await request(`/api/comments?movie=${encodeURIComponent(key)}`);
+        if (!section.isConnected) return [];
+        renderComments(section, data.comments);
+        return Array.isArray(data.comments) ? data.comments : [];
+      } catch (error) {
+        if (!section.isConnected) return [];
+        list.innerHTML = `<p class="movie-comments__empty">${error.status === 401 ? "SESSION EXPIRED // LOG IN AGAIN TO VIEW COMMENTS" : "COMMENT FEED OFFLINE // TRY AGAIN LATER"}</p>`;
+        return [];
+      }
+    };
+    await load();
+    if (!section.isConnected) return;
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const field = $("textarea[name='text']", form);
+      const button = $("button[type='submit']", form);
+      const text = field.value.trim();
+      if (text.length < 2 || text.length > 1000) {
+        status.textContent = "ENTER 2–1000 CHARACTERS.";
+        return;
+      }
+      button.disabled = true;
+      status.textContent = "TRANSMITTING…";
+      try {
+        await request("/api/comments", { method: "POST", body: JSON.stringify({ movie: key, title, text }) });
+        field.value = "";
+        status.textContent = "COMMENT SAVED // TRANSMISSION COMPLETE";
+        await load();
+      } catch (error) {
+        status.textContent = error.message || "COMMENT NOT SAVED // TRY AGAIN";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
   async function openDetails(id, type = "movie") {
     const dialog = $("#movie-dialog");
     const content = $("#dialog-content");
-    content.innerHTML = `<div class="empty-state">Inatafuta maelezo…</div>`;
+    content.innerHTML = `<div class="empty-state">LOADING MOVIE FILE…</div>`;
     dialog.showModal();
     let movie = state.movies.find(item => String(item.id) === String(id));
     if (!movie) movie = fallbackMovies.find(item => String(item.id) === String(id));
@@ -266,24 +327,21 @@
       const data = await request(`/api/movies?detail=${encodeURIComponent(id)}&type=${encodeURIComponent(type)}`);
       movie = data.movie || movie;
     } catch { /* retain available catalogue data */ }
-    if (!movie) { content.innerHTML = `<div class="empty-state">Maelezo ya filamu hii hayapatikani.</div>`; return; }
+    if (!movie) { content.innerHTML = `<div class="empty-state">MOVIE FILE NOT FOUND.</div>`; return; }
     const title = titleOf(movie);
     const trailer = safeEmbedUrl(movie.trailer_url);
-    const providers = Array.isArray(movie.providers) ? movie.providers : [];
     const backdrop = movie.backdrop_path || movie.backdrop || "";
-    const watchUrl = safeExternalLink(movie.watch_url) || `https://www.themoviedb.org/search?query=${encodeURIComponent(title)}`;
-    const providerMarkup = providers.length
-      ? `<p class="dialog-kicker">HUDUMA RASMI ZA KUTAZAMA • TANZANIA</p><div class="provider-list">${providers.map(item => `<a class="provider-chip" href="${escapeHtml(safeExternalLink(item.link) || watchUrl)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml((item.access || []).join(" · "))}</small></a>`).join("")}</div>`
-      : `<div class="watch-empty"><p>TMDB haijaorodhesha huduma ya kutazama Tanzania kwa filamu hii kwa sasa.</p><a href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">ANGALIA UPATIKANAJI RASMI ↗</a></div>`;
     const trailerMarkup = trailer
-      ? `<section class="inline-player" aria-label="Trela rasmi ya ${escapeHtml(title)}"><div class="inline-player__frame"><iframe title="Trela rasmi ya ${escapeHtml(title)}" src="${escapeHtml(trailer)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div><p>Trela rasmi inachezwa ndani ya MOMO; si filamu nzima. Tumia huduma rasmi hapo juu kutazama filamu kamili.</p></section>`
-      : `<div class="inline-player-note">Trela ya ku-embed haipatikani kwa sasa. Hakuna utafutaji au redirect wa YouTube; angalia huduma rasmi zilizoorodheshwa.</div>`;
+      ? `<section class="inline-player" aria-label="Trailer player for ${escapeHtml(title)}"><div class="inline-player__frame"><iframe title="Trailer player for ${escapeHtml(title)}" src="${escapeHtml(trailer)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div></section>`
+      : `<section class="inline-player" aria-label="Movie player"><div class="movie-player-empty"><span>PLAYER // OFFLINE</span></div></section>`;
     const downloadUrl = movie.download_authorized === true ? safeExternalLink(movie.download_url) : "";
     const downloadMarkup = downloadUrl
-      ? `<a class="button button--ghost" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PAKUA RASMI ↗</a>`
-      : `<div class="download-note"><strong>Download rasmi</strong><span>Pakua/offline tu kupitia app ya huduma rasmi ikiwa inaruhusu; MOMO haihosti faili za filamu.</span></div>`;
-    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">MOMO MOVIE FILE • ${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FEATURE"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "Maelezo hayajapatikana.")}</p>${trailerMarkup}${providerMarkup}<div class="dialog-actions"><a class="button button--primary" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">${providers.length ? "ANGALIA HUDUMA ZA KUTAZAMA ↗" : "ANGALIA UPATIKANAJI RASMI ↗"}</a>${downloadMarkup}<button class="button button--ghost" id="save-movie" type="button">♡ HIFADHI KWENYE ORODHA</button></div></div>`;
-    $("#save-movie", content).addEventListener("click", () => toggleWatchlist(movie));
+      ? `<a class="button button--ghost download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">DOWNLOAD ↗</a>`
+      : `<button class="button button--ghost download-button" type="button" disabled aria-disabled="true">DOWNLOAD</button>`;
+    const key = commentKey(movie, id, type);
+    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">MOMO MOVIE FILE • ${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FEATURE"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p>${trailerMarkup}<div class="dialog-actions">${downloadMarkup}</div>${commentsMarkup(key)}</div>`;
+    const comments = $(".movie-comments", content);
+    setupMovieComments(comments, key, title);
   }
 
   function safeLibraryPlayback(item) {
@@ -325,7 +383,8 @@
     if (!item || !playbackUrl) return;
     const dialog = $("#movie-dialog");
     const content = $("#dialog-content");
-    content.innerHTML = `<div class="dialog-body library-player-dialog"><p class="dialog-kicker">MOMO MOVIE LIBRARY • RIGHTS VERIFIED</p><h2 id="dialog-title">${escapeHtml(item.title)}</h2><p class="dialog-overview">${escapeHtml(item.synopsis || "Maudhui rasmi yaliyoidhinishwa.")}</p><div id="library-player-mount" class="inline-player__frame"></div><p class="player-rights-note">Chanzo hiki kimeongezwa na admin aliyeidhinishwa kama maudhui yenye ruhusa ya kucheza.</p></div>`;
+    const key = `library:${item.id}`;
+    content.innerHTML = `<div class="dialog-body library-player-dialog"><p class="dialog-kicker">MOMO MOVIE LIBRARY • RIGHTS VERIFIED</p><h2 id="dialog-title">${escapeHtml(item.title)}</h2><p class="dialog-overview">${escapeHtml(item.synopsis || "")}</p><div id="library-player-mount" class="inline-player__frame"></div><div class="dialog-actions"><button class="button button--ghost download-button" type="button" disabled aria-disabled="true">DOWNLOAD</button></div>${commentsMarkup(key)}</div>`;
     const mount = $("#library-player-mount", content);
     if (item.playback_type === "embed") {
       const frame = document.createElement("iframe");
@@ -351,6 +410,7 @@
       }, { once: true });
       mount.append(video);
     }
+    setupMovieComments($(".movie-comments", content), key, item.title);
     dialog.showModal();
   }
   function toggleWatchlist(movie) {
