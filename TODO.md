@@ -28,4 +28,4 @@
 
 ## Repo na deployment
 
-- [ ] **GitHub/Vercel:** Hifadhi mabadiliko kwenye `MOMO47-tech/MOMO-MOVIES-BANK` branch `feature/momo-movies-bank`, usiweke secrets kwenye repo, na hakikisha deployment iliyosasishwa inafika kwenye domain `momo-movies-peach.vercel.app`.
+- [x] **GitHub/Vercel:** Hifadhi mabadiliko kwenye `MOMO47-tech/MOMO-MOVIES-BANK` branch `feature/momo-movies-bank`, usiweke secrets kwenye repo, na hakikisha deployment iliyosasishwa inafika kwenye domain `momo-movies-peach.vercel.app`.
