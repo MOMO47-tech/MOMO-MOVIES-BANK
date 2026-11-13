@@ -1,7 +1,7 @@
 (() => {
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { category: "popular", query: "", movies: [], shelfMovies: new Map(), library: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
+  const state = { category: "popular", query: "", movies: [], shelfMovies: new Map(), openMovies: [], library: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
   const localPreview = Boolean(window.MOMO_LOCAL_PREVIEW);
 
   const fallbackMovies = [
@@ -90,6 +90,7 @@
     renderCount();
     loadCatalog();
     loadHomeShelves();
+    loadOpenMovies();
     loadLibrary();
     loadTranslations();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -124,6 +125,7 @@
     const kind = type === "tv" ? "tv" : "movie";
     return state.movies.find(item => String(item.id) === String(id) && movieType(item) === kind)
       || state.shelfMovies.get(`${kind}:${String(id)}`)
+      || state.openMovies.find(item => String(item.id) === String(id))
       || fallbackMovies.find(item => String(item.id) === String(id))
       || null;
   }
@@ -162,6 +164,63 @@
     } catch {
       groups.forEach(([, trackId, sectionId]) => renderShelf(trackId, sectionId, []));
     }
+  }
+
+  function safeOpenMovieFile(value) {
+    const safe = safeExternalLink(value);
+    if (!safe) return "";
+    try {
+      const url = new URL(safe);
+      const host = url.hostname.toLowerCase();
+      const archiveHost = host === "archive.org" || host.endsWith(".archive.org");
+      return archiveHost && /\.mp4$/i.test(url.pathname) ? url.href : "";
+    } catch { return ""; }
+  }
+  function verifiedOpenMovie(movie) {
+    if (!movie || movie.open_movie !== true || movie.rights_verified !== true || movie.download_authorized !== true) return null;
+    if (!safeExternalLink(movie.license_url) || !safeExternalLink(movie.rights_url) || !safeExternalLink(movie.source_url)) return null;
+    if (!String(movie.license || "").trim() || !String(movie.rights_notes || "").trim() || !String(movie.attribution_text || "").trim()) return null;
+    const playbackUrl = safeOpenMovieFile(movie.playback_url);
+    const downloadUrl = safeOpenMovieFile(movie.download_url);
+    if (!playbackUrl || !downloadUrl || !/^[a-z0-9][a-z0-9-]{1,79}$/.test(String(movie.id || ""))) return null;
+    return { ...movie, playback_url: playbackUrl, download_url: downloadUrl };
+  }
+  function renderOpenMovies(items) {
+    const section = $("#open-movies-shelf");
+    const track = $("#open-movies-track");
+    if (!section || !track) return;
+    state.openMovies = (Array.isArray(items) ? items : []).map(verifiedOpenMovie).filter(Boolean);
+    section.hidden = state.openMovies.length === 0;
+    track.innerHTML = state.openMovies.map(movie => {
+      const title = escapeHtml(titleOf(movie));
+      const poster = safeExternalLink(movie.poster_path || movie.poster_url || "");
+      const year = yearOf(movie);
+      const runtime = Number.isFinite(Number(movie.runtime_minutes)) && Number(movie.runtime_minutes) > 0 ? `${Math.round(Number(movie.runtime_minutes))} MIN` : "";
+      const saved = watchlist().some(item => watchlistKey(item) === watchlistKey(movie));
+      const size = escapeHtml(movie.download_size_label || "FILE DOWNLOAD");
+      return `<article class="open-film-card movie-card--rail"><button class="open-film-card__play" type="button" data-open-film-play="${escapeHtml(movie.id)}" aria-label="Play ${title} in MOMO"><span class="open-film-card__poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster for ${title}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${title}</span></span>`}<span class="poster-play" aria-hidden="true">▶ PLAY</span><span class="poster-kind">FULL FILM</span></span></button><div class="open-film-card__body"><p class="movie-meta">${year ? `<span>${escapeHtml(year)}</span>` : ""}${runtime ? `<span>${runtime}</span>` : ""}</p><h3>${title}</h3><p class="open-film-card__license"><a href="${escapeHtml(movie.license_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(movie.license)}</a> · <a href="${escapeHtml(movie.rights_url)}" target="_blank" rel="noopener noreferrer">RIGHTS &amp; TERMS</a> · <a href="${escapeHtml(movie.source_url)}" target="_blank" rel="noopener noreferrer">FILE SOURCE</a></p><p class="open-film-card__credit">${escapeHtml(movie.attribution_text)}</p><div class="open-film-card__actions"><button class="button button--ghost" type="button" data-open-film-play="${escapeHtml(movie.id)}">▶ PLAY HERE</button><a class="button button--primary" data-open-film-download="${escapeHtml(movie.id)}" href="${escapeHtml(movie.download_url)}" target="_blank" rel="noopener noreferrer" download>DOWNLOAD ↓</a></div><p class="open-film-card__size">${size} · ADDED TO MY LIST WHEN DOWNLOADING</p><button class="watchlist-toggle" type="button" data-watchlist-toggle data-movie-id="${escapeHtml(movie.id)}" data-movie-type="movie" aria-pressed="${saved}" aria-label="${saved ? "Remove from My List" : "Add to My List"}" title="${saved ? "Remove from My List" : "Add to My List"}">${saved ? "♥" : "♡"}</button></div></article>`;
+    }).join("");
+    $$('[data-open-film-play]', track).forEach(button => button.addEventListener("click", () => {
+      const movie = state.openMovies.find(item => String(item.id) === button.dataset.openFilmPlay);
+      if (movie) playOpenMovie(movie, true);
+    }));
+    $$('[data-open-film-download]', track).forEach(link => link.addEventListener("click", event => {
+      const movie = state.openMovies.find(item => String(item.id) === link.dataset.openFilmDownload);
+      if (!movie) { event.preventDefault(); return; }
+      const alreadySaved = watchlist().some(item => watchlistKey(item) === watchlistKey(movie));
+      if (!alreadySaved && !toggleWatchlist(movie)) event.preventDefault();
+    }));
+    bindMovieCards(track);
+  }
+  async function loadOpenMovies() {
+    const section = $("#open-movies-shelf");
+    if (section) section.hidden = true;
+    try {
+      const response = await fetch("/data/open-movies.json", { headers: { Accept: "application/json" }, cache: "no-store" });
+      if (!response.ok) throw new Error("OPEN_MOVIES_UNAVAILABLE");
+      const data = await response.json();
+      renderOpenMovies(data.items);
+    } catch { renderOpenMovies([]); }
   }
 
   async function loadCatalog() {
@@ -444,6 +503,7 @@
     content.innerHTML = `<div class="empty-state">LOADING MOVIE FILE…</div>`;
     dialog.showModal();
     let movie = findMovie(id, type);
+    if (movie?.open_movie) { playOpenMovie(movie, autoplay); return; }
     try {
       const data = await request(`/api/movies?detail=${encodeURIComponent(id)}&type=${encodeURIComponent(type)}`);
       movie = data.movie || movie;
@@ -463,6 +523,37 @@
     content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">${movie.media_type === "tv" || type === "tv" ? "SERIES" : "MOVIE"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info">${year ? `<span>${escapeHtml(year)}</span>` : ""}${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p>${trailerMarkup}<div class="dialog-actions">${downloadMarkup}</div>${commentsMarkup(key)}</div>`;
     const comments = $(".movie-comments", content);
     setupMovieComments(comments, key, title);
+  }
+
+  function playOpenMovie(input, autoplay = false) {
+    const movie = verifiedOpenMovie(input);
+    if (!movie) return;
+    const title = titleOf(movie);
+    const year = yearOf(movie);
+    const runtime = Number.isFinite(Number(movie.runtime_minutes)) && Number(movie.runtime_minutes) > 0 ? `${Math.round(Number(movie.runtime_minutes))} min` : "";
+    const backdrop = safeExternalLink(movie.backdrop_path || "");
+    const size = escapeHtml(movie.download_size_label || "");
+    const rightsNotes = escapeHtml(movie.rights_notes || "");
+    const attributionText = escapeHtml(movie.attribution_text || "");
+    const dialog = $("#movie-dialog");
+    const content = $("#dialog-content");
+    const key = `sample:${movie.id}`;
+    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body open-film-dialog"><p class="dialog-kicker">VERIFIED OPEN-LICENSE FEATURE</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info">${year ? `<span>${escapeHtml(year)}</span>` : ""}${runtime ? `<span>${escapeHtml(runtime)}</span>` : ""}${size ? `<span>${size}</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p><section class="inline-player" aria-label="Full film player for ${escapeHtml(title)}"><div id="open-film-player" class="inline-player__frame"></div></section><div class="dialog-actions"><a class="button button--primary" data-open-movie-dialog-download href="${escapeHtml(movie.download_url)}" target="_blank" rel="noopener noreferrer" download>DOWNLOAD ↓</a><a class="open-film-source" href="${escapeHtml(movie.source_url)}" target="_blank" rel="noopener noreferrer">OFFICIAL FILE SOURCE ↗</a></div><p class="open-film-download-note">Your browser controls where the file is saved. On Android it usually goes to Downloads; Gallery visibility depends on the device.</p><section class="open-film-rights"><p><strong>${escapeHtml(movie.license || "OPEN LICENSE")}</strong> · <a href="${escapeHtml(movie.license_url)}" target="_blank" rel="noopener noreferrer">VIEW LICENSE ↗</a> · <a href="${escapeHtml(movie.rights_url)}" target="_blank" rel="noopener noreferrer">RIGHTSHOLDER ↗</a></p><p>${rightsNotes}</p><p>${attributionText}</p></section>${commentsMarkup(key)}</div>`;
+    const video = document.createElement("video");
+    video.controls = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.setAttribute("aria-label", `Play ${title}`);
+    video.src = movie.playback_url;
+    $("#open-film-player", content).append(video);
+    const downloadLink = $("[data-open-movie-dialog-download]", content);
+    downloadLink.addEventListener("click", event => {
+      const alreadySaved = watchlist().some(item => watchlistKey(item) === watchlistKey(movie));
+      if (!alreadySaved && !toggleWatchlist(movie)) event.preventDefault();
+    });
+    setupMovieComments($(".movie-comments", content), key, title);
+    if (!dialog.open) dialog.showModal();
+    if (autoplay) video.play().catch(() => {});
   }
 
   function safeLibraryPlayback(item) {
@@ -555,11 +646,27 @@
       vote_average: Number(movie.vote_average) || null,
       genre_ids: Array.isArray(movie.genre_ids) ? movie.genre_ids : [],
       trailer_url: movie.trailer_url || "",
-      watch_url: movie.watch_url || ""
+      watch_url: movie.watch_url || "",
+      ...(movie.open_movie === true ? {
+        open_movie: true,
+        creator: movie.creator || "",
+        runtime_minutes: Number(movie.runtime_minutes) || null,
+        license: movie.license || "",
+        license_url: movie.license_url || "",
+        rights_url: movie.rights_url || "",
+        rights_notes: movie.rights_notes || "",
+        source_url: movie.source_url || "",
+        attribution_text: movie.attribution_text || "",
+        playback_url: movie.playback_url || "",
+        download_url: movie.download_url || "",
+        download_authorized: movie.download_authorized === true,
+        rights_verified: movie.rights_verified === true,
+        download_size_label: movie.download_size_label || ""
+      } : {})
     };
     const next = (exists ? list.filter(saved => watchlistKey(saved) !== key) : [...list, item]).slice(-150);
     try { localStorage.setItem("momo-watchlist", JSON.stringify(next)); }
-    catch { $("#catalog-message").textContent = "Could not save your list on this device."; return; }
+    catch { $("#catalog-message").textContent = "Could not save your list on this device."; return false; }
     if (state.category === "watchlist") {
       state.movies = next;
       renderMovies(next);
@@ -574,6 +681,7 @@
       });
     }
     $("#catalog-message").textContent = exists ? "Removed from My List." : "Saved to My List.";
+    return true;
   }
 
   function setupControls() {

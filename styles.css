@@ -2646,3 +2646,137 @@ a {
   .dj-movie-shelf__track { grid-auto-columns: 43vw; }
   .complete-catalog .movie-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* Verified open-license movie shelf and full-film playback. */
+.open-film-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(80, 250, 123, 0.19);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(5, 22, 13, 0.96), rgba(2, 10, 6, 0.98));
+  scroll-snap-align: start;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.open-film-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(80, 250, 123, 0.5);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32), 0 0 20px rgba(36, 223, 128, 0.08);
+}
+.open-film-card__play {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: #031009;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.open-film-card__poster {
+  position: relative;
+  display: flex;
+  align-items: end;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  padding: 10px;
+  background: radial-gradient(circle at 68% 24%, rgba(57, 226, 142, 0.28), transparent 34%), linear-gradient(145deg, #123522, #031009 75%);
+}
+.open-film-card__poster::after {
+  content: "";
+  position: absolute;
+  inset: 25% 0 0;
+  background: linear-gradient(0deg, rgba(1, 9, 5, 0.94), transparent);
+  pointer-events: none;
+}
+.open-film-card__poster > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.open-film-card__poster .poster-play,
+.open-film-card__poster .poster-kind { z-index: 1; }
+.open-film-card__body { position: relative; padding: 10px; }
+.open-film-card__body > .movie-meta { display: flex; flex-wrap: wrap; gap: 8px; min-height: 1.3em; margin: 0 28px 5px 0; color: #89aa96; font-size: 0.58rem; }
+.open-film-card__body h3 {
+  min-height: 2.5em;
+  margin: 0 25px 6px 0;
+  color: #e2f6e8;
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+.open-film-card__license {
+  margin: 0 0 7px;
+  color: #73b58d;
+  font: 700 0.52rem/1.4 var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.open-film-card__license a { color: #8be9fd; text-decoration: underline dotted; text-underline-offset: 2px; }
+.open-film-card__license a:focus-visible { outline: 2px solid var(--term-cyan); outline-offset: 2px; }
+.open-film-card__credit { margin: 0 0 10px; color: #9bb5a4; font: 0.5rem/1.5 var(--font-mono); overflow-wrap: anywhere; }
+.open-film-card__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.open-film-card__actions .button {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 5px;
+  font-size: 0.5rem;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+.open-film-card__size {
+  margin: 8px 0 0;
+  color: #658271;
+  font: 0.48rem/1.45 var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.open-film-card .watchlist-toggle {
+  top: 8px;
+  right: 7px;
+  bottom: auto;
+  left: auto;
+  z-index: 2;
+  min-height: 27px;
+  padding: 0 7px;
+  font-size: 0.75rem;
+}
+.open-film-card .watchlist-toggle:focus-visible { outline: 2px solid var(--term-cyan); outline-offset: 2px; }
+.open-film-dialog .inline-player { margin-top: 16px; }
+.open-film-dialog .inline-player__frame { background: #000; }
+.open-film-dialog .inline-player__frame video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 68vh;
+  background: #000;
+}
+.open-film-source,
+.open-film-rights a { color: #8be9fd; font: 700 0.62rem var(--font-mono); text-decoration: none; }
+.open-film-source:hover,
+.open-film-rights a:hover { text-decoration: underline; }
+.open-film-rights {
+  margin-top: 16px;
+  padding: 13px 14px;
+  border: 1px solid rgba(80, 250, 123, 0.16);
+  border-radius: 10px;
+  background: rgba(0, 8, 4, 0.68);
+}
+.open-film-rights p { margin: 0 0 8px; color: #94b09e; font-size: 0.68rem; line-height: 1.6; }
+.open-film-rights p:last-child { margin-bottom: 0; }
+.open-film-rights strong { color: var(--term-green); }
+@media (max-width: 700px) {
+  .open-film-card__actions .button { min-height: 33px; font-size: 0.48rem; }
+  .open-film-dialog .dialog-body { padding-right: 16px; padding-left: 16px; }
+  .open-film-rights { padding: 11px; }
+}
+
+.open-film-download-note {
+  margin: 9px 0 0;
+  color: #7e9a88;
+  font: 0.61rem/1.55 var(--font-mono);
+}

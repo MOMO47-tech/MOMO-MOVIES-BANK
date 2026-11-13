@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#03100b">
-  <meta name="description" content="MOMO MOVIES — browse movie and series posters, watch trailers in-page and discover DJ specials.">
+  <meta name="description" content="MOMO MOVIES — browse movies and series, play trailers in-page, discover DJ specials and download verified open-license films.">
   <meta name="robots" content="noindex,nofollow">
   <title>MOMO MOVIES — Movies, Series &amp; DJ Specials</title>
   <link rel="icon" type="image/svg+xml" href="/assets/momo-mark.svg">
   <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
   <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
+  <link rel="preconnect" href="https://archive.org" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
@@ -101,6 +102,10 @@
         <section id="trending-shelf" class="home-shelf" aria-labelledby="trending-title">
           <header class="home-shelf__heading"><div><p class="eyebrow eyebrow--muted">TRENDING</p><h2 id="trending-title">Trending Now</h2></div><div class="home-shelf__controls"><button class="shelf-arrow" type="button" data-shelf-scroll="trending-track" data-direction="-1" aria-label="Scroll Trending Movies left">‹</button><button class="shelf-arrow" type="button" data-shelf-scroll="trending-track" data-direction="1" aria-label="Scroll Trending Movies right">›</button><button class="shelf-see-all" type="button" data-category="trending">SEE ALL <span aria-hidden="true">→</span></button></div></header>
           <div id="trending-track" class="movie-rail" aria-label="Trending Movies"></div>
+        </section>
+        <section id="open-movies-shelf" class="home-shelf open-movies-shelf" aria-labelledby="open-movies-title" hidden>
+          <header class="home-shelf__heading"><div><p class="eyebrow eyebrow--muted">VERIFIED OPEN LICENSE</p><h2 id="open-movies-title">Open Film Downloads</h2></div></header>
+          <div id="open-movies-track" class="movie-rail open-film-rail" aria-label="Films with verified open licenses"></div>
         </section>
       </div>
 

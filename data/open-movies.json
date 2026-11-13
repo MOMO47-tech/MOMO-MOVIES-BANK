@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "sita-sings-the-blues-2008",
+      "title": "Sita Sings the Blues",
+      "release_date": "2008-02-11",
+      "runtime_minutes": 82,
+      "creator": "Nina Paley",
+      "media_type": "movie",
+      "open_movie": true,
+      "overview": "An animated feature that intertwines the Ramayana with blues recordings and an autobiographical story.",
+      "poster_path": "https://image.tmdb.org/t/p/w500/hrtW78FNfwFSiIetgey0cR8AT0g.jpg",
+      "backdrop_path": "https://image.tmdb.org/t/p/w1280/u1zRxIN8FLmdXTcGkl2Gt64tREA.jpg",
+      "license": "CC0 1.0 Universal",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_url": "https://www.sitasingstheblues.com/",
+      "rights_verified": true,
+      "rights_notes": "Nina Paley released the complete film under CC0. Some songs in the soundtrack have separate restrictions; keep them only within the complete film and do not distribute them separately.",
+      "source_url": "https://archive.org/details/Sita_Sings_the_Blues",
+      "playback_type": "video",
+      "playback_url": "https://archive.org/download/Sita_Sings_the_Blues/Sita_Sings_the_Blues_small.mp4",
+      "download_url": "https://archive.org/download/Sita_Sings_the_Blues/Sita_Sings_the_Blues_small.mp4?download=1",
+      "download_authorized": true,
+      "download_size_bytes": 223616052,
+      "download_size_label": "224 MB",
+      "attribution_text": "Sita Sings the Blues (2008), created by Nina Paley. Released under CC0 1.0 Universal. Some soundtrack songs have separate restrictions and must remain within the complete film."
+    }
+  ]
+}
