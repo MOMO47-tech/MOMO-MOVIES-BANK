@@ -33,6 +33,7 @@
       trending: "Trending",
       popular: "Maarufu",
       now_playing: "Mpya",
+      watchlist: "My List",
       tv: "Series",
       horror: "Horror",
       action: "Action",
@@ -54,7 +55,14 @@
     loadCatalog();
   }
   function watchlist() {
-    try { return JSON.parse(localStorage.getItem("momo-watchlist") || "[]"); } catch { return []; }
+    try {
+      const saved = JSON.parse(localStorage.getItem("momo-watchlist") || "[]");
+      return Array.isArray(saved) ? saved.filter(item => item && (typeof item.id === "string" || Number.isSafeInteger(item.id))).slice(-150) : [];
+    } catch { return []; }
+  }
+  function watchlistKey(movie) {
+    const type = movie?.media_type === "tv" || movie?.type === "tv" ? "tv" : "movie";
+    return `${type}:${String(movie?.id || "")}`;
   }
   async function request(url, options = {}) {
     const response = await fetch(url, { credentials: "same-origin", ...options, headers: { "Content-Type": "application/json", ...(options.headers || {}) } });
@@ -113,6 +121,15 @@
     state.busy = true;
     $("#catalog-message").textContent = "";
     $("#catalog-count").textContent = state.query ? "Inatafuta…" : "Inapakia movies…";
+    if (state.category === "watchlist" && !state.query) {
+      state.activeController = null;
+      state.busy = false;
+      state.movies = watchlist();
+      renderMovies(state.movies);
+      $("#load-more").hidden = true;
+      $("#catalog-message").textContent = state.movies.length ? "Orodha yangu huhifadhiwa kwenye kifaa hiki." : "Bado hujahifadhi movie. Bonyeza ♡ HIFADHI kwenye kadi.";
+      return;
+    }
     try {
       const params = new URLSearchParams();
       if (state.query) params.set("search", state.query);
@@ -134,7 +151,7 @@
         state.movies = [...state.movies, ...movies.filter(item => !seen.has(keyOf(item)))];
       } else state.movies = movies;
       renderMovies(state.movies);
-      $("#catalog-count").textContent = state.movies.length ? (state.category === "tv" ? "Series" : "Movies") : "Hakuna movie";
+      $("#catalog-count").textContent = state.category === "watchlist" ? "Orodha yangu" : state.movies.length ? (state.category === "tv" ? "Series" : "Movies") : "Hakuna movie";
       $("#load-more").hidden = !data.hasMore || Boolean(state.query) || state.category === "watchlist";
       const needsTmdbKey = data.error === "TMDB_API_KEY_MISSING" || data.source === "sample";
       if (needsTmdbKey) {
@@ -171,10 +188,15 @@
     const playLabel = canRequestTrailer ? "▶ CHEZA" : "MAELEZO";
     const cardLabel = canRequestTrailer ? `Cheza trela ya ${title} ndani ya MOMO` : `Fungua maelezo ya ${title} ndani ya MOMO`;
     const rating = Number(movie.vote_average) > 0 ? `★ ${Number(movie.vote_average).toFixed(1)}` : (movie.genre || (isTv ? "SERIES" : "DISCOVER"));
-    return `<button class="movie-card" type="button" data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-label="${escapeHtml(cardLabel)}">
-      <div class="poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster ya ${escapeHtml(title)}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${escapeHtml(title)}</span></span>`}<span class="poster-play" aria-hidden="true">${playLabel}</span><span class="poster-kind">${isTv ? "SERIES" : "FILAMU"}</span></div>
-      <h3>${escapeHtml(title)}</h3><p class="movie-meta"><span>${escapeHtml(yearOf(movie))}</span><span class="movie-rating">${escapeHtml(rating)}</span></p>
-    </button>`;
+    const saved = watchlist().some(item => watchlistKey(item) === watchlistKey(movie));
+    const saveLabel = saved ? "♥ IMEHIFADHIWA" : "♡ HIFADHI";
+    return `<article class="movie-card">
+      <button class="movie-card__open" type="button" data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-label="${escapeHtml(cardLabel)}">
+        <div class="poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster ya ${escapeHtml(title)}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${escapeHtml(title)}</span></span>`}<span class="poster-play" aria-hidden="true">${playLabel}</span><span class="poster-kind">${isTv ? "SERIES" : "FILAMU"}</span></div>
+        <h3>${escapeHtml(title)}</h3><p class="movie-meta"><span>${escapeHtml(yearOf(movie))}</span><span class="movie-rating">${escapeHtml(rating)}</span></p>
+      </button>
+      <button class="watchlist-toggle" type="button" data-watchlist-toggle data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-pressed="${saved}" aria-label="${saved ? "Ondoa kwenye My List" : "Hifadhi kwenye My List"}">${saveLabel}</button>
+    </article>`;
   }
   function updateDownloadStation(movies) {
     const select = $("#download-movie");
@@ -203,7 +225,7 @@
     button.disabled = !downloadUrl;
     button.textContent = !movie ? "CHAGUA FILAMU" : downloadUrl ? "PAKUA FAILI ↓" : "HAKUNA FAILI";
     if (note) note.textContent = !movie
-      ? "Chagua filamu; DOWNLOAD itawezeshwa tu ikiwa faili la moja kwa moja limeidhinishwa."
+      ? "Kwa sasa hakuna faili la movie lililoidhinishwa. PAKUA FAILI huwashwa tu kwa direct file yenye ruhusa."
       : downloadUrl
         ? "Faili la moja kwa moja limeidhinishwa kwa kupakuliwa."
         : "Hakuna faili la kupakua lililoidhinishwa kwa filamu hii. Tumia kitufe tofauti cha kutazama chanzo rasmi kwenye maelezo.";
@@ -211,9 +233,13 @@
   function renderMovies(movies) {
     const grid = $("#movie-grid");
     grid.innerHTML = movies.length ? movies.map(movieCard).join("") : `<div class="empty-state">Hakuna movie kwa sasa. Jaribu tena baadaye.</div>`;
-    $$(".movie-card", grid).forEach(button => button.addEventListener("click", () => openDetails(button.dataset.movieId, button.dataset.movieType, true)));
+    $$(".movie-card__open", grid).forEach(button => button.addEventListener("click", () => openDetails(button.dataset.movieId, button.dataset.movieType, true)));
+    $$("[data-watchlist-toggle]", grid).forEach(button => button.addEventListener("click", () => {
+      const movie = state.movies.find(item => String(item.id) === button.dataset.movieId && (item.media_type === "tv" ? "tv" : "movie") === button.dataset.movieType);
+      if (movie) toggleWatchlist(movie);
+    }));
     updateDownloadStation(movies);
-    $("#catalog-count").textContent = movies.length ? (state.category === "tv" ? "Series" : "Movies") : "Hakuna movie";
+    $("#catalog-count").textContent = state.category === "watchlist" ? "Orodha yangu" : movies.length ? (state.category === "tv" ? "Series" : "Movies") : "Hakuna movie";
     if (movies.length && !state.query && state.page === 1 && state.category !== "watchlist") {
       const lead = movies[0];
       $("#hero-title").innerHTML = `${escapeHtml(titleOf(lead))}<br><span>${escapeHtml(yearOf(lead))}</span>`;
@@ -230,6 +256,11 @@
       return url.protocol === "https:" && !url.username && !url.password ? url.href : "";
     } catch { return ""; }
   }
+  function directDownloadUrl(value) {
+    const safe = safeExternalLink(value);
+    if (!safe) return "";
+    return /\.(mp4|webm)$/i.test(new URL(safe).pathname) ? safe : "";
+  }
   function officialSourceUrl(movie) {
     const watchUrl = safeExternalLink(movie?.watch_url);
     if (watchUrl) return watchUrl;
@@ -241,7 +272,7 @@
   function authorizedMovieDownload(movie) {
     if (movie?.download_authorized !== true || movie?.rights_verified !== true) return "";
     if (!safeExternalLink(movie?.rights_url) || typeof movie?.rights_notes !== "string" || !movie.rights_notes.trim()) return "";
-    return safeExternalLink(movie?.download_url);
+    return directDownloadUrl(movie?.download_url);
   }
   function translationSourceUrl(item) {
     return safeExternalLink(item?.official_watch_url || item?.source_url);
@@ -324,7 +355,7 @@
   function authorizedTranslationDownload(item) {
     if (!item || item.download_authorized !== true || item.rights_verified !== true) return "";
     if (!safeExternalLink(item.rights_url) || typeof item.rights_notes !== "string" || !item.rights_notes.trim()) return "";
-    return safeExternalLink(item.official_download_url);
+    return directDownloadUrl(item.official_download_url);
   }
   function playDjClip(index) {
     const item = state.djItems[index];
@@ -541,11 +572,39 @@
   }
   function toggleWatchlist(movie) {
     const list = watchlist();
-    const exists = list.some(item => String(item.id) === String(movie.id));
-    const next = exists ? list.filter(item => String(item.id) !== String(movie.id)) : [...list, movie];
-    localStorage.setItem("momo-watchlist", JSON.stringify(next));
-    const button = $("#save-movie");
-    if (button) button.textContent = exists ? "♡ HIFADHI KWENYE ORODHA" : "✓ IMEHIFADHIWA";
+    const key = watchlistKey(movie);
+    const exists = list.some(item => watchlistKey(item) === key);
+    const item = {
+      id: movie.id,
+      media_type: movie.media_type === "tv" || movie.type === "tv" ? "tv" : "movie",
+      title: movie.title || "",
+      name: movie.name || "",
+      overview: movie.overview || "",
+      release_date: movie.release_date || movie.first_air_date || "",
+      poster_path: movie.poster_path || movie.poster || "",
+      backdrop_path: movie.backdrop_path || movie.backdrop || "",
+      vote_average: Number(movie.vote_average) || null,
+      genre_ids: Array.isArray(movie.genre_ids) ? movie.genre_ids : [],
+      trailer_url: movie.trailer_url || "",
+      watch_url: movie.watch_url || ""
+    };
+    const next = (exists ? list.filter(saved => watchlistKey(saved) !== key) : [...list, item]).slice(-150);
+    try { localStorage.setItem("momo-watchlist", JSON.stringify(next)); }
+    catch { $("#catalog-message").textContent = "Imeshindikana kuhifadhi orodha kwenye kifaa hiki."; return; }
+    if (state.category === "watchlist") {
+      state.movies = next;
+      renderMovies(next);
+      $("#load-more").hidden = true;
+    } else {
+      const saved = !exists;
+      $$('[data-watchlist-toggle]').forEach(button => {
+        if (button.dataset.movieId !== String(movie.id) || button.dataset.movieType !== (item.media_type === "tv" ? "tv" : "movie")) return;
+        button.textContent = saved ? "♥ IMEHIFADHIWA" : "♡ HIFADHI";
+        button.setAttribute("aria-pressed", String(saved));
+        button.setAttribute("aria-label", saved ? "Ondoa kwenye My List" : "Hifadhi kwenye My List");
+      });
+    }
+    $("#catalog-message").textContent = exists ? "Imeondolewa kwenye My List." : "Imehifadhiwa kwenye My List ya kifaa hiki.";
   }
 
   function setupControls() {
@@ -591,6 +650,12 @@
     }));
     $$(".genre-chip").forEach(chip => chip.addEventListener("click", () => activateCategory(chip.dataset.category)));
     let searchTimer;
+    const searchInput = $("#search-input");
+    $$("[data-search-pick]").forEach(button => button.addEventListener("click", () => {
+      searchInput.value = button.dataset.searchPick || "";
+      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      $("#movie-grid").scrollIntoView({ behavior: "smooth", block: "start" });
+    }));
     $("#search-input").addEventListener("input", event => {
       clearTimeout(searchTimer);
       state.activeController?.abort();

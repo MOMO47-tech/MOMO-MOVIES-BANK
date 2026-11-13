@@ -9,8 +9,10 @@
 
 - [x] **Mwaka wa kutolewa:** Kila movie/series ionyeshe mwaka kutoka release date yake halisi; usiweke mwaka wa sasa kwa titles zote.
 - [x] **Kategorii:** Weka Trending, Mpya, Horror, Action/Mapigano na Animation/Cartoon; Horror, Action na Animation/Cartoon zionyeshwe bila namba/counts na filters zake zionyeshe matokeo yanayolingana.
+- [x] **My List:** Mtumiaji aweze kuhifadhi/kuondoa movie au series kwa kitufe kwenye card, kuona zilizo kwenye My List kupitia nav, na list ionekane mara moja bila kuomba catalog nyingine. Iandike wazi kuwa orodha inahifadhiwa kwenye browser/kifaa hicho tu.
+- [x] **Titles kutoka reference:** Onyesha majina yaliyoonekana kwenye Top 10 ya FreyStar kama quick searches; kubonyeza jina kutafute metadata halisi kupitia TMDB. Usinakili video/posters au kuonyesha madai ya DJ, mwaka, quality, full episodes au download bila verification.
 - [x] **PLAY ndani ya MOMO:** Kubonyeza movie card au PLAY ya hero kufungue trela/player ndani ya MOMO; DJ clips pia zicheze ndani ya modal bila kumpeleka mtumiaji moja kwa moja YouTube.
-- [x] **Pakua au tazama kwa lebo sahihi:** “PAKUA FAILI” ionekane na ianzishe upakuaji tu pale direct file URL, ruhusa ya kupakua na haki za mwenye maudhui vimethibitishwa. Katalogi ya TMDB, YouTube, BBC iPlayer, Prime Video, au ukurasa mwingine wa kutazama usipewe button ya DOWNLOAD; uonyeshwe kama “TAZAMA CHANZO RASMI” tofauti. Download station isi-open provider page ikibonyezwa ikiwa hakuna faili lililoidhinishwa; izime kitufe na ieleze sababu.
+- [ ] **Pakua au tazama kwa lebo sahihi:** “PAKUA FAILI” ianzishe upakuaji tu pale direct `.mp4`/`.webm` file URL, ruhusa ya kupakua na haki za mwenye maudhui vimethibitishwa. Katalogi ya TMDB, YouTube, BBC iPlayer, Prime Video, au ukurasa mwingine wa kutazama usipewe button ya DOWNLOAD; uonyeshwe kama “TAZAMA CHANZO RASMI” tofauti. Download station isi-open provider page ikibonyezwa ikiwa hakuna faili lililoidhinishwa; izime kitufe na ieleze sababu. Kwa sasa catalog haina direct movie files zilizothibitishwa, hivyo hakuna full-movie download inayowezeshwa.
 
 ## Tafsiri za DJs wa Tanzania
 

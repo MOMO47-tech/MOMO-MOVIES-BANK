@@ -619,13 +619,45 @@ a {
 }
 .movie-card {
   min-width: 0;
+  position: relative;
   border: 0;
   background: transparent;
   padding: 0;
   text-align: left;
-  cursor: pointer;
+  cursor: default;
   color: var(--text);
 }
+.movie-card__open {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.movie-card__open:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 14px; }
+.watchlist-toggle {
+  position: absolute;
+  z-index: 3;
+  top: 8px;
+  left: 8px;
+  min-height: 31px;
+  padding: 0 9px;
+  border: 1px solid rgba(111, 248, 177, 0.55);
+  border-radius: 999px;
+  background: rgba(2, 12, 7, 0.86);
+  color: #d7ffe7;
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+.watchlist-toggle[aria-pressed="true"] { border-color: var(--green); background: rgba(14, 77, 45, 0.9); color: var(--green-2); }
+.watchlist-toggle:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .poster {
   aspect-ratio: 2/3;
   width: 100%;
@@ -1672,6 +1704,20 @@ a {
 .genre-chip--animation:hover,
 .genre-chip--animation.is-active { box-shadow: 0 0 18px rgba(139, 233, 253, 0.2); }
 .genre-chip:focus-visible { outline: 2px solid var(--chip-accent); outline-offset: 3px; }
+.search-picks {
+  margin: 20px 0 24px;
+  padding: 15px 17px;
+  border: 1px solid rgba(80, 250, 123, 0.13);
+  border-radius: 13px;
+  background: rgba(3, 13, 8, 0.72);
+}
+.search-picks__heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 13px; margin-bottom: 10px; }
+.search-picks__heading h3 { margin: 0; color: #d5f9e2; font-size: 0.76rem; }
+.search-picks__heading p { margin: 0; color: #7f9d8b; font-size: 0.66rem; }
+.search-picks__list { display: flex; flex-wrap: wrap; gap: 7px; }
+.search-picks__list button { min-height: 32px; padding: 0 10px; border: 1px solid rgba(80, 250, 123, 0.2); border-radius: 999px; background: rgba(9, 29, 17, 0.72); color: #a9cdb7; font-size: 0.64rem; cursor: pointer; }
+.search-picks__list button:hover,
+.search-picks__list button:focus-visible { border-color: var(--green); color: var(--green-2); outline: none; }
 .download-station {
   margin: 66px 0 8px;
   padding: clamp(20px, 4vw, 32px);
