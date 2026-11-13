@@ -1,137 +1,52 @@
 {
-  "djs": [
-    {
-      "name": "Babu DJ",
-      "profile_url": "https://www.youtube.com/watch?v=1W8baZ5heY8",
-      "profile_label": "MAHOJIANO YA DJ ↗",
-      "status_note": "Kipande cha Mutiny kinaonekana hapa chini. Mahojiano yanamtaja kama mtafsiri; channel ya clip na haki za full dub hazijathibitishwa.",
-      "original_title": "Mutiny · toleo la asili",
-      "original_url": "https://www.amazon.com/gp/video/detail/B0HC48NNR4",
-      "original_cta": "TAZAMA KWENYE PRIME VIDEO ↗",
-      "original_note": "Prime Video ina listing ya filamu asilia; si dub ya Babu DJ. Upatikanaji hutegemea eneo."
-    },
-    {
-      "name": "Murphy DJ",
-      "status_note": "Clip fupi ya Merlin inaonekana hapa chini. Channel inayojitambulisha kama DJ Murphy Movie Swahili imechapisha kipande; haki za full translation hazijathibitishwa.",
-      "original_title": "Merlin · toleo la asili",
-      "original_url": "https://www.bbc.co.uk/iplayer/episodes/b00mjlxv/merlin",
-      "original_cta": "TAZAMA KWENYE BBC iPLAYER ↗",
-      "original_note": "BBC iPlayer ina vipindi vya original Merlin; si tafsiri ya Kiswahili ya DJ Murphy. Upatikanaji hutegemea nchi."
-    },
-    {
-      "name": "DJ Mjukuu",
-      "status_note": "Kipande cha Charging 01 kinaonekana hapa chini. Channel inayojitambulisha kama Dj Mjukuu Og ina vipande/episodes za Kiswahili; haki za full dub hazijathibitishwa.",
-      "original_title": "Ghost Ship · toleo la asili",
-      "original_url": "https://www.warnerbros.com/movies/ghost-ship",
-      "original_cta": "UKURASA RASMI WA WARNER BROS ↗",
-      "original_note": "Ukurasa huu ni wa filamu asilia na wauzaji rasmi, si tafsiri ya DJ Mjukuu; upatikanaji hutegemea eneo."
-    },
-    {
-      "name": "DJ Mack",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "DJ Prabhat",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "Remmy DJ",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "DJ Bryton",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "Juma Khan",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "DJ Skills",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "DJ Six Fingers",
-      "status_note": "Jina limeongezwa kwenye orodha. Clip, full movie au download itaonyeshwa baada ya kuthibitisha chanzo rasmi na ruhusa ya mwenye haki."
-    },
-    {
-      "name": "Ommy DJ",
-      "profile_url": "https://www.youtube.com/@OmmyDjOfficial",
-      "profile_label": "CHANNEL YA OMMY DJ ↗",
-      "status_note": "Clips nne za filamu zinaonekana kwenye sehemu ya clips hapa chini. Hizi si filamu nzima; haki za full dub hazijathibitishwa."
-    }
-  ],
   "items": [
     {
       "title": "INFILTRATION",
       "dj": "Ommy DJ",
-      "year": "2024",
+      "year": "2022",
       "preview_url": "https://www.youtube.com/watch?v=6O5uB1y3fIE",
-      "watch_label": "TAZAMA KIPANDE ↗",
-      "source_url": "https://www.youtube.com/@OmmyDjOfficial",
-      "source_label": "OMMY DJ PRODUCTION ↗",
-      "source_note": "Kipande kifupi cha tafsiri; si filamu nzima.",
-      "download_authorized": false
+      "download_authorized": false,
+      "rights_verified": false
     },
     {
       "title": "WOLF WARRIOR",
       "dj": "Ommy DJ",
-      "year": "2024",
+      "year": "2015",
       "preview_url": "https://www.youtube.com/watch?v=xEd-tZzlZLc",
-      "watch_label": "TAZAMA KIPANDE ↗",
-      "source_url": "https://www.youtube.com/@OmmyDjOfficial",
-      "source_label": "OMMY DJ PRODUCTION ↗",
-      "source_note": "Kipande kifupi cha tafsiri; si filamu nzima.",
-      "download_authorized": false
+      "download_authorized": false,
+      "rights_verified": false
     },
     {
       "title": "LAND OF BAD",
       "dj": "Ommy DJ",
       "year": "2024",
       "preview_url": "https://www.youtube.com/watch?v=mDzN3CIWiFw",
-      "watch_label": "TAZAMA KIPANDE ↗",
-      "source_url": "https://www.youtube.com/@OmmyDjOfficial",
-      "source_label": "OMMY DJ PRODUCTION ↗",
-      "source_note": "Kipande kifupi cha tafsiri; si filamu nzima.",
-      "download_authorized": false
+      "download_authorized": false,
+      "rights_verified": false
     },
     {
       "title": "BLACK SITE",
       "dj": "Ommy DJ",
-      "year": "2024",
+      "year": "2022",
       "preview_url": "https://www.youtube.com/watch?v=zM8fqZ1hr9Q",
-      "watch_label": "TAZAMA KIPANDE ↗",
-      "source_url": "https://www.youtube.com/@OmmyDjOfficial",
-      "source_label": "OMMY DJ PRODUCTION ↗",
-      "source_note": "Kipande kifupi cha tafsiri; si filamu nzima.",
-      "download_authorized": false
+      "download_authorized": false,
+      "rights_verified": false
     },
     {
       "title": "MERLIN EP 01 · CLIP",
       "dj": "Murphy DJ",
+      "year": "2008",
       "preview_url": "https://www.youtube.com/watch?v=CXkB3LinAHA",
-      "official_watch_url": "https://www.bbc.co.uk/iplayer/episodes/b00mjlxv/merlin",
-      "watch_label": "TAZAMA CLIP (8 SEK) ↗",
-      "source_note": "Kipande cha sekunde 8 tu. Kiungo rasmi ni cha BBC iPlayer ya toleo la asili, si dub ya DJ; haki za full dub hazijathibitishwa.",
-      "download_authorized": false
+      "download_authorized": false,
+      "rights_verified": false
     },
     {
       "title": "MUTINY · CLIP",
       "dj": "Babu DJ",
+      "year": "2026",
       "preview_url": "https://www.youtube.com/watch?v=Abup03qneSA",
-      "official_watch_url": "https://www.amazon.com/gp/video/detail/B0HC48NNR4",
-      "watch_label": "TAZAMA CLIP (1:11) ↗",
-      "source_note": "Kipande cha 1:11 tu. Kiungo rasmi ni cha Prime Video ya toleo la asili, si dub ya DJ; haki za full dub hazijathibitishwa.",
-      "download_authorized": false
-    },
-    {
-      "title": "CHARGING 01 · CLIP",
-      "dj": "DJ Mjukuu",
-      "preview_url": "https://www.youtube.com/watch?v=gGmUo-EnrOM",
-      "official_watch_url": "https://www.warnerbros.com/movies/ghost-ship",
-      "watch_label": "TAZAMA KIPANDE (3:22) ↗",
-      "source_note": "Kipande cha 3:22 tu. Kiungo rasmi ni cha ukurasa wa Warner Bros wa toleo la asili, si dub ya DJ; haki za full dub hazijathibitishwa.",
-      "download_authorized": false
+      "download_authorized": false,
+      "rights_verified": false
     }
   ]
 }

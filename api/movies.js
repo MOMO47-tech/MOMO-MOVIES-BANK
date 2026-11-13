@@ -4,8 +4,8 @@ const fallback = require("../data/fallback-movies.json");
 const API_BASE = "https://api.themoviedb.org/3";
 const IMAGE_BASE = "https://image.tmdb.org/t/p";
 const ROUTES = {
-  trending: "/trending/all/week",
-  popular: "/trending/all/week",
+  trending: "/trending/movie/week",
+  popular: "/movie/popular",
   top_rated: "/movie/top_rated",
   tv: "/tv/popular"
 };
@@ -18,6 +18,7 @@ function normalize(item) {
     title: item.title || item.name || "Untitled",
     overview: item.overview || "",
     release_date: item.release_date || item.first_air_date || "",
+    release_year: String(item.release_date || item.first_air_date || "").match(/^\d{4}/)?.[0] || null,
     poster_path: image(item.poster_path),
     backdrop_path: image(item.backdrop_path, "w1280"),
     vote_average: Number(item.vote_average) || null,
@@ -35,6 +36,7 @@ function sendJson(res, status, body) {
 function fallbackResults(query, category) {
   let results = fallback;
   if (category === "tv") results = fallback.filter(item => item.media_type === "tv");
+  if (["popular", "top_rated", "trending"].includes(category)) results = fallback.filter(item => item.media_type !== "tv");
   if (category === "horror") results = fallback.filter(item => (item.genre_ids || []).includes(27) || /horror|kutisha/i.test(item.genre || ""));
   if (category === "action") results = fallback.filter(item => (item.genre_ids || []).includes(28) || /action|fight|combat|mapigano/i.test(item.genre || ""));
   if (category === "animation") results = fallback.filter(item => (item.genre_ids || []).includes(16) || /animation|cartoon|katuni/i.test(item.genre || ""));
@@ -46,7 +48,7 @@ function fallbackResults(query, category) {
     const needle = query.toLocaleLowerCase();
     results = results.filter(item => `${item.title} ${item.name || ""} ${item.overview} ${item.genre || ""}`.toLocaleLowerCase().includes(needle));
   }
-  return results;
+  return results.filter(isReleased);
 }
 async function tmdb(path, params = {}) {
   const key = process.env.TMDB_API_KEY;
@@ -57,31 +59,6 @@ async function tmdb(path, params = {}) {
   const response = await fetch(url, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12000) });
   if (!response.ok) throw new Error("TMDB_REQUEST_FAILED");
   return response.json();
-}
-function pickProviders(watchData) {
-  const region = (process.env.TMDB_WATCH_REGION || "TZ").toUpperCase();
-  const regional = watchData?.results?.[region];
-  if (!regional) return [];
-  const groups = [
-    ["flatrate", "Streaming"],
-    ["free", "Bure"],
-    ["ads", "Bure kwa matangazo"],
-    ["rent", "Kodi"],
-    ["buy", "Nunua"]
-  ];
-  const unique = new Map();
-  for (const [key, label] of groups) {
-    for (const provider of regional[key] || []) {
-      const entry = unique.get(provider.provider_id) || {
-        name: provider.provider_name,
-        link: regional.link || "https://www.themoviedb.org/",
-        access: []
-      };
-      entry.access.push(label);
-      unique.set(provider.provider_id, entry);
-    }
-  }
-  return [...unique.values()];
 }
 function pickTrailer(detail) {
   const videos = detail.videos?.results || [];
@@ -97,6 +74,10 @@ function tanzaniaDateParts(date = new Date()) {
   }).formatToParts(date).map(part => [part.type, part.value]));
   return { year: Number(parts.year), today: `${parts.year}-${parts.month}-${parts.day}` };
 }
+function isReleased(item) {
+  const date = String(item.release_date || item.first_air_date || "").slice(0, 10);
+  return !/^\d{4}-\d{2}-\d{2}$/.test(date) || date <= tanzaniaDateParts().today;
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") { res.setHeader("Allow", "GET"); return sendJson(res, 405, { error: "Method not allowed" }); }
@@ -111,22 +92,36 @@ module.exports = async function handler(req, res) {
       const movie = fallback.find(item => String(item.id) === detailId);
       return movie ? sendJson(res, 200, { movie, source: "sample" }) : sendJson(res, 404, { error: "Maelezo hayapatikani." });
     }
+    if (category === "home") {
+      const movies = fallback.filter(item => item.media_type !== "tv" && isReleased(item)).slice(0, 10);
+      const series = fallback.filter(item => item.media_type === "tv" && isReleased(item)).slice(0, 10);
+      return sendJson(res, 200, { shelves: { top_rated: movies, popular_series: series, popular_movies: movies, trending: movies }, source: "sample", error: "TMDB_API_KEY_MISSING" });
+    }
     const results = fallbackResults(query, category);
     return sendJson(res, 200, { results, page: 1, hasMore: false, source: "sample", error: "TMDB_API_KEY_MISSING" });
   }
   try {
     if (detailId) {
       if (!/^\d{1,12}$/.test(detailId)) return sendJson(res, 400, { error: "ID ya filamu si sahihi." });
-      const [detail, watchData] = await Promise.all([
-        tmdb(`/${type}/${detailId}`, { append_to_response: "videos" }),
-        tmdb(`/${type}/${detailId}/watch/providers`).catch(() => ({ results: {} }))
-      ]);
+      const detail = await tmdb(`/${type}/${detailId}`, { append_to_response: "videos" });
       const movie = normalize({ ...detail, media_type: type });
       movie.trailer_url = pickTrailer(detail);
-      movie.providers = pickProviders(watchData);
-      const region = (process.env.TMDB_WATCH_REGION || "TZ").toUpperCase();
-      movie.watch_url = watchData.results?.[region]?.link || `https://www.themoviedb.org/${type}/${detailId}`;
       return sendJson(res, 200, { movie, source: "tmdb" });
+    }
+    if (category === "home") {
+      const safeList = async route => {
+        try {
+          const payload = await tmdb(route, { page: 1, region: process.env.TMDB_WATCH_REGION || "TZ" });
+          return (payload.results || []).filter(item => item.media_type !== "person" && isReleased(item)).slice(0, 10).map(normalize);
+        } catch { return []; }
+      };
+      const [topRated, popularSeries, popularMovies, trending] = await Promise.all([
+        safeList("/movie/top_rated"),
+        safeList("/tv/popular"),
+        safeList("/movie/popular"),
+        safeList("/trending/movie/week")
+      ]);
+      return sendJson(res, 200, { shelves: { top_rated: topRated, popular_series: popularSeries, popular_movies: popularMovies, trending }, source: "tmdb" });
     }
     let payload;
     if (query) payload = await tmdb("/search/multi", { query, include_adult: "false", page });
@@ -136,8 +131,8 @@ module.exports = async function handler(req, res) {
         tmdb("/discover/tv", { with_genres: 16, sort_by: "popularity.desc", page })
       ]);
       const results = [
-        ...(movieData.results || []).map(item => normalize({ ...item, media_type: "movie" })),
-        ...(tvData.results || []).map(item => normalize({ ...item, media_type: "tv" }))
+        ...(movieData.results || []).filter(isReleased).map(item => normalize({ ...item, media_type: "movie" })),
+        ...(tvData.results || []).filter(isReleased).map(item => normalize({ ...item, media_type: "tv" }))
       ].sort((a, b) => b.popularity - a.popularity);
       return sendJson(res, 200, {
         results,
@@ -165,7 +160,7 @@ module.exports = async function handler(req, res) {
         page
       });
     } else payload = await tmdb(ROUTES[category] || ROUTES.trending, { page, region: process.env.TMDB_WATCH_REGION || "TZ" });
-    const rows = (payload.results || []).filter(item => item.media_type !== "person").map(normalize);
+    const rows = (payload.results || []).filter(item => item.media_type !== "person" && isReleased(item)).map(normalize);
     return sendJson(res, 200, { results: rows, page, hasMore: Number(payload.total_pages) > page, source: "tmdb" });
   } catch {
     if (detailId) return sendJson(res, 502, { error: "TMDB_UNAVAILABLE", message: "Maelezo ya filamu hayapatikani kwa sasa." });

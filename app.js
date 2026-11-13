@@ -1,19 +1,19 @@
 (() => {
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { category: "trending", query: "", movies: [], library: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
+  const state = { category: "popular", query: "", movies: [], shelfMovies: new Map(), library: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
   const localPreview = Boolean(window.MOMO_LOCAL_PREVIEW);
 
   const fallbackMovies = [
-    { id: "metropolis-1927", media_type: "movie", title: "Metropolis", overview: "Katika jiji la baadaye lenye tabaka tofauti, mvumbuzi na mfanyakazi wanajaribu kuunganisha jamii iliyogawanyika.", release_date: "1927-01-10", poster_path: null, vote_average: null, genre: "SCI-FI CLASSIC", trailer_query: "Metropolis 1927 official trailer" },
-    { id: "nosferatu-1922", media_type: "movie", title: "Nosferatu", overview: "Msimulizi wa kutisha kuhusu safari ya mgeni wa ajabu na kivuli kinachotanda katika mji wa mbali.", release_date: "1922-03-04", poster_path: null, vote_average: null, genre: "SILENT HORROR", trailer_query: "Nosferatu 1922 official trailer" },
-    { id: "the-general-1926", media_type: "movie", title: "The General", overview: "Dereva wa treni anajikuta katikati ya tukio la kusisimua na la kuchekesha wakati wa vita vya wenyewe kwa wenyewe.", release_date: "1926-12-25", poster_path: null, vote_average: null, genre: "ACTION / CLASSIC COMEDY", trailer_query: "The General 1926 official trailer" },
-    { id: "sherlock-jr-1924", media_type: "movie", title: "Sherlock Jr.", overview: "Mwendesha projekta anaota kuwa mpelelezi, na mipaka kati ya sinema na maisha halisi inaanza kuyeyuka.", release_date: "1924-04-21", poster_path: null, vote_average: null, genre: "SILENT COMEDY", trailer_query: "Sherlock Jr 1924 official trailer" },
-    { id: "caligari-1920", media_type: "movie", title: "The Cabinet of Dr. Caligari", overview: "Mwanamume anasimulia fumbo la usingizi, siri na matukio yasiyoeleweka katika mji wa zamani.", release_date: "1920-02-26", poster_path: null, vote_average: null, genre: "EXPRESSIONIST", trailer_query: "The Cabinet of Dr Caligari 1920 official trailer" },
-    { id: "phantom-1925", media_type: "movie", title: "The Phantom of the Opera", overview: "Mwimbaji mchanga anavutia usikivu wa mtu wa ajabu anayeishi katika njia za chini ya jumba la opera.", release_date: "1925-09-06", poster_path: null, vote_average: null, genre: "SILENT DRAMA", trailer_query: "The Phantom of the Opera 1925 official trailer" },
-    { id: "haxan-1922", media_type: "movie", title: "Häxan", overview: "Filamu ya kipekee inayochanganya maigizo na uchunguzi wa historia ya imani na hofu za zamani.", release_date: "1922-09-18", poster_path: null, vote_average: null, genre: "DOCUMENTARY CLASSIC", trailer_query: "Haxan 1922 official trailer" },
-    { id: "safety-last-1923", media_type: "movie", title: "Safety Last!", overview: "Kijana mjini anajikuta katika mfululizo wa vichekesho na changamoto za kazi na mapenzi.", release_date: "1923-04-01", poster_path: null, vote_average: null, genre: "CLASSIC COMEDY", trailer_query: "Safety Last 1923 official trailer" },
-    { id: "prince-achmed-1926", media_type: "movie", title: "The Adventures of Prince Achmed", overview: "Hadithi ya kifalme katika filamu ya uhuishaji ya kivuli ya Lotte Reiniger.", release_date: "1926-09-02", poster_path: null, vote_average: null, genre: "ANIMATION / CLASSIC", trailer_query: "The Adventures of Prince Achmed 1926 official trailer" }
+    { id: "metropolis-1927", media_type: "movie", title: "Metropolis", overview: "In a futuristic city divided by class, an inventor and a worker try to unite a fractured society.", release_date: "1927-01-10", poster_path: null, vote_average: null, genre: "SCI-FI CLASSIC" },
+    { id: "nosferatu-1922", media_type: "movie", title: "Nosferatu", overview: "A silent horror story about a mysterious visitor and a shadow over a distant town.", release_date: "1922-03-04", poster_path: null, vote_average: null, genre: "SILENT HORROR" },
+    { id: "the-general-1926", media_type: "movie", title: "The General", overview: "A train engineer faces a comic adventure during the American Civil War.", release_date: "1926-12-25", poster_path: null, vote_average: null, genre: "ACTION / CLASSIC COMEDY" },
+    { id: "sherlock-jr-1924", media_type: "movie", title: "Sherlock Jr.", overview: "A projectionist dreams of becoming a detective as cinema and real life collide.", release_date: "1924-04-21", poster_path: null, vote_average: null, genre: "SILENT COMEDY" },
+    { id: "caligari-1920", media_type: "movie", title: "The Cabinet of Dr. Caligari", overview: "A mysterious tale of sleep, secrets and strange events in an old town.", release_date: "1920-02-26", poster_path: null, vote_average: null, genre: "EXPRESSIONIST" },
+    { id: "phantom-1925", media_type: "movie", title: "The Phantom of the Opera", overview: "A young singer attracts the attention of a mysterious figure beneath an opera house.", release_date: "1925-09-06", poster_path: null, vote_average: null, genre: "SILENT DRAMA" },
+    { id: "haxan-1922", media_type: "movie", title: "Häxan", overview: "A distinctive blend of drama and documentary exploring the history of belief and superstition.", release_date: "1922-09-18", poster_path: null, vote_average: null, genre: "DOCUMENTARY CLASSIC" },
+    { id: "safety-last-1923", media_type: "movie", title: "Safety Last!", overview: "A young man faces comic challenges with work, city life and romance.", release_date: "1923-04-01", poster_path: null, vote_average: null, genre: "CLASSIC COMEDY" },
+    { id: "prince-achmed-1926", media_type: "movie", title: "The Adventures of Prince Achmed", overview: "Lotte Reiniger's landmark silhouette-animated fairy tale.", release_date: "1926-09-02", poster_path: null, vote_average: null, genre: "ANIMATION / CLASSIC" }
   ];
 
   function escapeHtml(value = "") {
@@ -22,7 +22,7 @@
   function yearOf(movie) {
     const date = movie.release_date || movie.first_air_date || "";
     const match = String(date).match(/^\d{4}/);
-    return match ? match[0] : "—";
+    return match ? match[0] : "";
   }
   function currentTanzaniaYear() {
     return new Intl.DateTimeFormat("en", { timeZone: "Africa/Dar_es_Salaam", year: "numeric" }).format(new Date());
@@ -30,22 +30,25 @@
   function titleOf(movie) { return movie.title || movie.name || "Untitled"; }
   function categoryTitle(category) {
     return {
-      trending: "Trending",
-      popular: "Maarufu",
-      now_playing: "Mpya",
+      trending: "Trending Now",
+      popular: "Popular Movies",
+      top_rated: "Top Rated Movies",
+      now_playing: "New Releases",
       watchlist: "My List",
       tv: "Series",
       horror: "Horror",
       action: "Action",
-      animation: "Animation / Cartoon"
-    }[category] || "Filamu";
+      animation: "Animation"
+    }[category] || "Movies";
   }
-  function activateCategory(category) {
+  function activateCategory(category, scrollTarget = "complete-catalog") {
     state.category = category;
     state.query = "";
     state.page = 1;
+    $("#catalog-view").classList.remove("is-searching");
     $("#search-input").value = "";
-    $$(".nav-link").forEach(link => link.classList.toggle("is-active", link.dataset.category === category));
+    const categoryNavExists = Boolean($(`.nav-link[data-category="${category}"]`));
+    $$(".nav-link").forEach(link => link.classList.toggle("is-active", categoryNavExists ? link.dataset.category === category : (!link.dataset.category && link.dataset.section === scrollTarget)));
     $$(".genre-chip").forEach(chip => {
       const active = chip.dataset.category === category;
       chip.classList.toggle("is-active", active);
@@ -53,6 +56,7 @@
     });
     $("#section-title").textContent = categoryTitle(category);
     loadCatalog();
+    document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   function watchlist() {
     try {
@@ -68,7 +72,7 @@
     const response = await fetch(url, { credentials: "same-origin", ...options, headers: { "Content-Type": "application/json", ...(options.headers || {}) } });
     let data = {};
     try { data = await response.json(); } catch { /* a server error may not be JSON */ }
-    if (!response.ok) throw Object.assign(new Error(data.error || "Ombi halikukamilika."), { status: response.status, data });
+    if (!response.ok) throw Object.assign(new Error(data.error || "Request failed. Please try again."), { status: response.status, data });
     return data;
   }
 
@@ -82,8 +86,10 @@
   function showCatalog() {
     $("#gate-view").hidden = true;
     $("#catalog-view").hidden = false;
+    $("#catalog-view").classList.remove("is-searching");
     renderCount();
     loadCatalog();
+    loadHomeShelves();
     loadLibrary();
     loadTranslations();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -113,6 +119,51 @@
     }
   }
 
+  function movieType(movie) { return movie?.media_type === "tv" || movie?.type === "tv" ? "tv" : "movie"; }
+  function findMovie(id, type) {
+    const kind = type === "tv" ? "tv" : "movie";
+    return state.movies.find(item => String(item.id) === String(id) && movieType(item) === kind)
+      || state.shelfMovies.get(`${kind}:${String(id)}`)
+      || fallbackMovies.find(item => String(item.id) === String(id))
+      || null;
+  }
+  function bindMovieCards(container) {
+    $(".movie-card__open", container) && $$(".movie-card__open", container).forEach(button => button.addEventListener("click", () => openDetails(button.dataset.movieId, button.dataset.movieType, true)));
+    $$("[data-watchlist-toggle]", container).forEach(button => button.addEventListener("click", () => {
+      const movie = findMovie(button.dataset.movieId, button.dataset.movieType);
+      if (movie) toggleWatchlist(movie);
+    }));
+  }
+  function renderShelf(trackId, sectionId, rows) {
+    const track = $(`#${trackId}`);
+    const section = $(`#${sectionId}`);
+    if (!track || !section) return;
+    const items = Array.isArray(rows) ? rows.slice(0, 10) : [];
+    section.hidden = !items.length;
+    track.setAttribute("aria-busy", "false");
+    if (!items.length) { track.replaceChildren(); return; }
+    items.forEach(item => state.shelfMovies.set(`${movieType(item)}:${String(item.id)}`, item));
+    track.innerHTML = items.map(item => movieCard(item, true)).join("");
+    bindMovieCards(track);
+  }
+  async function loadHomeShelves() {
+    const groups = [
+      ["top_rated", "top-rated-track", "top-rated-shelf"],
+      ["popular_series", "popular-series-track", "popular-series-shelf"],
+      ["popular_movies", "popular-movies-track", "popular-movies-shelf"],
+      ["trending", "trending-track", "trending-shelf"]
+    ];
+    state.shelfMovies.clear();
+    groups.forEach(([, trackId]) => $(`#${trackId}`)?.setAttribute("aria-busy", "true"));
+    try {
+      const data = await request("/api/movies?category=home");
+      const shelves = data.shelves || {};
+      groups.forEach(([key, trackId, sectionId]) => renderShelf(trackId, sectionId, shelves[key]));
+    } catch {
+      groups.forEach(([, trackId, sectionId]) => renderShelf(trackId, sectionId, []));
+    }
+  }
+
   async function loadCatalog() {
     const requestId = ++state.requestId;
     state.activeController?.abort();
@@ -120,14 +171,14 @@
     state.activeController = controller;
     state.busy = true;
     $("#catalog-message").textContent = "";
-    $("#catalog-count").textContent = state.query ? "Inatafuta…" : "Inapakia movies…";
+    $("#section-title").textContent = state.query ? `Results for “${state.query}”` : categoryTitle(state.category);
     if (state.category === "watchlist" && !state.query) {
       state.activeController = null;
       state.busy = false;
       state.movies = watchlist();
       renderMovies(state.movies);
       $("#load-more").hidden = true;
-      $("#catalog-message").textContent = state.movies.length ? "Orodha yangu huhifadhiwa kwenye kifaa hiki." : "Bado hujahifadhi movie. Bonyeza ♡ HIFADHI kwenye kadi.";
+      $("#catalog-message").textContent = state.movies.length ? "Saved on this device." : "Your list is empty.";
       return;
     }
     try {
@@ -151,13 +202,12 @@
         state.movies = [...state.movies, ...movies.filter(item => !seen.has(keyOf(item)))];
       } else state.movies = movies;
       renderMovies(state.movies);
-      $("#catalog-count").textContent = state.category === "watchlist" ? "Orodha yangu" : state.movies.length ? (state.category === "tv" ? "Series" : "Movies") : "Hakuna movie";
       $("#load-more").hidden = !data.hasMore || Boolean(state.query) || state.category === "watchlist";
       const needsTmdbKey = data.error === "TMDB_API_KEY_MISSING" || data.source === "sample";
       if (needsTmdbKey) {
-        $("#catalog-message").textContent = "Katalogi ya sasa haipatikani. Mmiliki aangalie TMDB_API_KEY kwenye Vercel.";
+        $("#catalog-message").textContent = "Movie catalog is unavailable. Please try again later.";
       } else if (!movies.length) {
-        $("#catalog-message").textContent = state.category === "watchlist" ? "Bado hakuna movie zilizohifadhiwa." : "Hakuna movie au series zilizopatikana.";
+        $("#catalog-message").textContent = state.category === "watchlist" ? "Your list is empty." : "No titles found.";
       }
     } catch (error) {
       if (controller.signal.aborted || requestId !== state.requestId) return;
@@ -172,82 +222,54 @@
       });
       state.movies = samples;
       renderMovies(samples);
-      $("#catalog-count").textContent = samples.length ? "Movies za mfano" : "Hakuna movie";
       $("#load-more").hidden = true;
-      $("#catalog-message").textContent = "Katalogi haipatikani kwa sasa. Tafadhali jaribu tena baadaye.";
+      $("#catalog-message").textContent = "The catalog is temporarily unavailable.";
     } finally {
       if (state.activeController === controller) state.busy = false;
     }
   }
 
-  function movieCard(movie) {
+  function movieCard(movie, inRail = false) {
     const title = titleOf(movie);
     const poster = movie.poster_path || movie.poster || "";
     const isTv = movie.media_type === "tv" || movie.type === "tv";
     const canRequestTrailer = Boolean(movie.trailer_url) || /^\d{1,12}$/.test(String(movie.id));
-    const playLabel = canRequestTrailer ? "▶ CHEZA" : "MAELEZO";
-    const cardLabel = canRequestTrailer ? `Cheza trela ya ${title} ndani ya MOMO` : `Fungua maelezo ya ${title} ndani ya MOMO`;
-    const rating = Number(movie.vote_average) > 0 ? `★ ${Number(movie.vote_average).toFixed(1)}` : (movie.genre || (isTv ? "SERIES" : "DISCOVER"));
+    const playLabel = canRequestTrailer ? "▶ PLAY" : "DETAILS";
+    const cardLabel = canRequestTrailer ? `Play the ${title} trailer in MOMO` : `Open details for ${title} in MOMO`;
+    const rating = Number(movie.vote_average) > 0 ? `★ ${Number(movie.vote_average).toFixed(1)}` : "";
+    const year = yearOf(movie);
     const saved = watchlist().some(item => watchlistKey(item) === watchlistKey(movie));
-    const saveLabel = saved ? "♥ IMEHIFADHIWA" : "♡ HIFADHI";
-    return `<article class="movie-card">
+    const saveLabel = saved ? "♥" : "♡";
+    return `<article class="movie-card${inRail ? " movie-card--rail" : ""}">
       <button class="movie-card__open" type="button" data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-label="${escapeHtml(cardLabel)}">
-        <div class="poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster ya ${escapeHtml(title)}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${escapeHtml(title)}</span></span>`}<span class="poster-play" aria-hidden="true">${playLabel}</span><span class="poster-kind">${isTv ? "SERIES" : "FILAMU"}</span></div>
-        <h3>${escapeHtml(title)}</h3><p class="movie-meta"><span>${escapeHtml(yearOf(movie))}</span><span class="movie-rating">${escapeHtml(rating)}</span></p>
+        <div class="poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster for ${escapeHtml(title)}" onerror="this.remove()">` : `<span class="poster-placeholder"><span class="poster-title">${escapeHtml(title)}</span></span>`}<span class="poster-play" aria-hidden="true">${playLabel}</span><span class="poster-kind">${isTv ? "SERIES" : "MOVIE"}</span></div>
+        <h3>${escapeHtml(title)}</h3><p class="movie-meta">${year ? `<span>${escapeHtml(year)}</span>` : ""}${rating ? `<span class="movie-rating">${escapeHtml(rating)}</span>` : ""}</p>
       </button>
-      <button class="watchlist-toggle" type="button" data-watchlist-toggle data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-pressed="${saved}" aria-label="${saved ? "Ondoa kwenye My List" : "Hifadhi kwenye My List"}">${saveLabel}</button>
+      <button class="watchlist-toggle" type="button" data-watchlist-toggle data-movie-id="${escapeHtml(movie.id)}" data-movie-type="${isTv ? "tv" : "movie"}" aria-pressed="${saved}" aria-label="${saved ? "Remove from My List" : "Add to My List"}" title="${saved ? "Remove from My List" : "Add to My List"}">${saveLabel}</button>
     </article>`;
-  }
-  function updateDownloadStation(movies) {
-    const select = $("#download-movie");
-    if (!select) return;
-    const previous = select.value;
-    const options = (Array.isArray(movies) ? movies : []).map(movie => {
-      const type = movie.media_type === "tv" ? "tv" : "movie";
-      const value = `${type}:${movie.id}`;
-      return `<option value="${escapeHtml(value)}">${escapeHtml(titleOf(movie))} · ${escapeHtml(yearOf(movie))}</option>`;
-    }).join("");
-    select.innerHTML = `<option value="">Chagua movie</option>${options}`;
-    if (previous && [...select.options].some(option => option.value === previous)) select.value = previous;
-    updateDownloadButton();
-  }
-  function selectedDownloadMovie() {
-    const value = $("#download-movie")?.value || "";
-    const [type, id] = value.split(":");
-    return state.movies.find(item => String(item.id) === id && (item.media_type || "movie") === type) || null;
-  }
-  function updateDownloadButton() {
-    const button = $("#download-current");
-    const note = $("#download-current-note");
-    if (!button) return;
-    const movie = selectedDownloadMovie();
-    const downloadUrl = movie && authorizedMovieDownload(movie);
-    button.disabled = !downloadUrl;
-    button.textContent = !movie ? "CHAGUA FILAMU" : downloadUrl ? "PAKUA FAILI ↓" : "HAKUNA FAILI";
-    if (note) note.textContent = !movie
-      ? "Kwa sasa hakuna faili la movie lililoidhinishwa. PAKUA FAILI huwashwa tu kwa direct file yenye ruhusa."
-      : downloadUrl
-        ? "Faili la moja kwa moja limeidhinishwa kwa kupakuliwa."
-        : "Hakuna faili la kupakua lililoidhinishwa kwa filamu hii. Tumia kitufe tofauti cha kutazama chanzo rasmi kwenye maelezo.";
   }
   function renderMovies(movies) {
     const grid = $("#movie-grid");
-    grid.innerHTML = movies.length ? movies.map(movieCard).join("") : `<div class="empty-state">Hakuna movie kwa sasa. Jaribu tena baadaye.</div>`;
-    $$(".movie-card__open", grid).forEach(button => button.addEventListener("click", () => openDetails(button.dataset.movieId, button.dataset.movieType, true)));
-    $$("[data-watchlist-toggle]", grid).forEach(button => button.addEventListener("click", () => {
-      const movie = state.movies.find(item => String(item.id) === button.dataset.movieId && (item.media_type === "tv" ? "tv" : "movie") === button.dataset.movieType);
-      if (movie) toggleWatchlist(movie);
-    }));
-    updateDownloadStation(movies);
-    $("#catalog-count").textContent = state.category === "watchlist" ? "Orodha yangu" : movies.length ? (state.category === "tv" ? "Series" : "Movies") : "Hakuna movie";
+    grid.innerHTML = movies.length ? movies.map(movie => movieCard(movie)).join("") : `<div class="empty-state">No titles found.</div>`;
+    bindMovieCards(grid);
     if (movies.length && !state.query && state.page === 1 && state.category !== "watchlist") {
       const lead = movies[0];
-      $("#hero-title").innerHTML = `${escapeHtml(titleOf(lead))}<br><span>${escapeHtml(yearOf(lead))}</span>`;
-      $("#hero-overview").textContent = lead.overview || "Angalia maelezo, trela na chanzo rasmi cha kutazama.";
+      const year = yearOf(lead);
+      $("#hero-title").innerHTML = `${escapeHtml(titleOf(lead))}${year ? `<br><span>${escapeHtml(year)}</span>` : ""}`;
+      $("#hero-overview").textContent = lead.overview || "Browse movie details and watch trailers here on MOMO.";
       state.selected = lead;
-      $("#hero-trailer").textContent = Boolean(lead.trailer_url) || /^\d{1,12}$/.test(String(lead.id)) ? "▶ CHEZA TRELA HAPA" : "▶ MAELEZO YA FILAMU";
+      $("#hero-trailer").textContent = Boolean(lead.trailer_url) || /^\d{1,12}$/.test(String(lead.id)) ? "▶ PLAY TRAILER" : "MOVIE DETAILS";
       const backdrop = lead.backdrop_path || lead.backdrop;
-      if (backdrop) $("#hero-art").style.backgroundImage = `linear-gradient(90deg,rgba(5,18,12,.12),rgba(5,18,12,.48)),url("${backdrop.replace(/["\\]/g, "")}")`;
+      const heroArt = $("#hero-art");
+      if (backdrop) {
+        heroArt.style.backgroundImage = `url("${backdrop.replace(/["\\]/g, "")}")`;
+        heroArt.classList.add("has-backdrop");
+      } else {
+        heroArt.style.backgroundImage = "";
+        heroArt.classList.remove("has-backdrop");
+      }
+    } else if (!movies.length && !state.query) {
+      state.selected = null;
     }
   }
   function safeExternalLink(value) {
@@ -261,61 +283,22 @@
     if (!safe) return "";
     return /\.(mp4|webm)$/i.test(new URL(safe).pathname) ? safe : "";
   }
-  function officialSourceUrl(movie) {
-    const watchUrl = safeExternalLink(movie?.watch_url);
-    if (watchUrl) return watchUrl;
-    const type = movie?.media_type === "tv" || movie?.type === "tv" ? "tv" : "movie";
-    const id = String(movie?.id || "");
-    if (/^\d{1,12}$/.test(id)) return `https://www.themoviedb.org/${type}/${encodeURIComponent(id)}`;
-    return `https://www.themoviedb.org/search?query=${encodeURIComponent(titleOf(movie || {}))}`;
-  }
   function authorizedMovieDownload(movie) {
     if (movie?.download_authorized !== true || movie?.rights_verified !== true) return "";
     if (!safeExternalLink(movie?.rights_url) || typeof movie?.rights_notes !== "string" || !movie.rights_notes.trim()) return "";
     return directDownloadUrl(movie?.download_url);
   }
-  function translationSourceUrl(item) {
-    return safeExternalLink(item?.official_watch_url || item?.source_url);
-  }
-  function renderDjDirectory(djs) {
-    const grid = $("#dj-directory");
-    if (!grid) return;
-    const rows = Array.isArray(djs) ? djs : [];
-    if (!rows.length) {
-      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Orodha ya DJs haipatikani kwa sasa.</strong><span>Hakuna clip au movie kamili inayoongezwa bila chanzo na ruhusa kuthibitishwa.</span></div>`;
-      return;
-    }
-    const sourceRows = rows.filter(item => safeExternalLink(item.profile_url) || safeExternalLink(item.original_url));
-    const pendingRows = rows.filter(item => !safeExternalLink(item.profile_url) && !safeExternalLink(item.original_url));
-    const sourceCards = sourceRows.map(item => {
-      const name = escapeHtml(item.name || "DJ");
-      const status = escapeHtml(item.status_note || "Chanzo cha DJ kinahitaji kuthibitishwa.");
-      const profileUrl = safeExternalLink(item.profile_url);
-      const profileLabel = escapeHtml(item.profile_label || "FUNGUA CHANZO ↗");
-      const originalUrl = safeExternalLink(item.original_url);
-      const originalTitle = escapeHtml(item.original_title || "Toleo la asili");
-      const originalNote = escapeHtml(item.original_note || "Kiungo hiki ni cha original version, si tafsiri ya DJ; upatikanaji hutegemea eneo.");
-      const originalCta = escapeHtml(item.original_cta || "TAZAMA TOLEO LA ASILI ↗");
-      const profileAction = profileUrl ? `<a class="translation-source-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noopener noreferrer">${profileLabel}</a>` : "";
-      const originalAction = originalUrl ? `<div class="dj-original"><p class="dj-original-label">TOLEO LA ASILI · SI TAFSIRI YA DJ</p><strong>${originalTitle}</strong><p>${originalNote}</p><a class="button button--ghost" href="${escapeHtml(originalUrl)}" target="_blank" rel="noopener noreferrer">${originalCta}</a></div>` : "";
-      return `<article class="dj-profile-card"><div class="dj-profile-head"><h3>${name}</h3><span>DJ</span></div><p class="dj-profile-status">${status}</p>${profileAction ? `<div class="dj-profile-links">${profileAction}</div>` : ""}${originalAction}</article>`;
-    }).join("");
-    const pendingNames = pendingRows.length
-      ? `<div class="dj-pending-list"><p>Wametajwa pia</p><div class="dj-pending-chips">${pendingRows.map(item => `<span>${escapeHtml(item.name || "DJ")}</span>`).join("")}</div><small>Clip rasmi au full movie itaonekana baada ya chanzo na ruhusa kuthibitishwa.</small></div>`
-      : "";
-    grid.innerHTML = `${sourceCards}${pendingNames}`;
-  }
   function renderTranslations(items) {
+    const section = $("#tz-translations");
     const grid = $("#translation-grid");
-    if (!grid) return;
+    if (!grid || !section) return;
     const rows = Array.isArray(items) ? items : [];
     state.djItems = rows;
-    if (!rows.length) {
-      grid.innerHTML = `<div class="empty-state translation-empty"><strong>Hakuna clips za DJ kwa sasa.</strong><span>Movie kamili na downloads huongezwa tu baada ya ruhusa kuthibitishwa.</span></div>`;
-      return;
-    }
+    const playableRows = rows.map((item, index) => ({ item, index })).filter(({ item }) => youtubeVideoId(item.preview_url || item.official_watch_url));
+    section.hidden = !playableRows.length;
+    if (!playableRows.length) { grid.replaceChildren(); return; }
     const groups = new Map();
-    rows.forEach((item, index) => {
+    playableRows.forEach(({ item, index }) => {
       const name = String(item.dj || "DJ Creator").trim() || "DJ Creator";
       if (!groups.has(name)) groups.set(name, []);
       groups.get(name).push({ item, index });
@@ -326,16 +309,10 @@
         const title = escapeHtml(item.title || "DJ Clip");
         const videoId = youtubeVideoId(item.preview_url || item.official_watch_url);
         const thumbnail = videoId ? `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : "";
-        const sourceUrl = safeExternalLink(item.source_url);
-        const downloadUrl = authorizedTranslationDownload(item);
-        const watchUrl = translationSourceUrl(item);
-        const note = escapeHtml(item.source_note || "Clip fupi ya creator; si movie nzima.");
-        const sourceLabel = escapeHtml(item.source_label || "CHANZO RASMI ↗");
-        const playAction = videoId ? `<button class="button button--ghost" type="button" data-dj-play="${index}">▶ CHEZA HAPA</button>` : `<button class="button button--ghost" type="button" disabled aria-disabled="true">PLAYER HAIPATIKANI</button>`;
-        const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" download title="Pakua faili iliyoidhinishwa">PAKUA FAILI ↓</a>` : "";
-        const sourceAction = sourceUrl ? `<a class="dj-movie-source" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : "";
-        const watchAction = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA CHANZO RASMI ↗</a>` : "";
-        return `<article class="dj-movie-card"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${thumbnail}" alt="${title} clip thumbnail" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">PUBLIC CLIP</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><p class="dj-movie-note">${note}</p>${sourceAction}<div class="dj-movie-actions">${playAction}${downloadAction}${watchAction}</div></div></article>`;
+      const downloadUrl = authorizedTranslationDownload(item);
+      const playAction = `<button class="button button--ghost" type="button" data-dj-play="${index}">▶ PLAY CLIP</button>`;
+      const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" download>DOWNLOAD ↓</a>` : "";
+      return `<article class="dj-movie-card"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${thumbnail}" alt="${title} clip poster" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">CLIP</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><div class="dj-movie-actions">${playAction}${downloadAction}</div></div></article>`;
       }).join("");
       return `<section class="dj-movie-shelf" aria-labelledby="${shelfTitleId}"><header class="dj-movie-shelf__heading"><h3 id="${shelfTitleId}">${escapeHtml(dj)}</h3></header><div class="dj-movie-shelf__track">${cards}</div></section>`;
     }).join("");
@@ -364,15 +341,11 @@
     const title = String(item.title || "DJ Clip").slice(0, 160);
     const dj = String(item.dj || "DJ Creator").slice(0, 100);
     const key = `sample:dj-${videoId.toLowerCase()}`;
-    const sourceUrl = safeExternalLink(item.source_url);
     const downloadUrl = authorizedTranslationDownload(item);
-    const watchUrl = translationSourceUrl(item);
-    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>PAKUA FAILI ↓</a>` : "";
-    const sourceMarkup = sourceUrl ? `<a class="translation-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">FUNGUA CHANZO ↗</a>` : "";
-    const watchMarkup = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA CHANZO RASMI ↗</a>` : "";
+    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>DOWNLOAD ↓</a>` : "";
     const dialog = $("#movie-dialog");
     const content = $("#dialog-content");
-    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">CLIP YA DJ</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div><p class="dialog-overview">${escapeHtml(item.source_note || "Hiki ni kipande kifupi, si movie nzima.")}</p><section class="inline-player" aria-label="Kicheza clip ya DJ"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}${watchMarkup}${sourceMarkup}</div>${downloadUrl ? `<p class="download-note">Faili iliyoidhinishwa imeunganishwa kwa upakuaji wa moja kwa moja.</p>` : `<p class="download-note">Hakuna faili la kupakua lililoidhinishwa kwa clip hii. Tumia player ya hapa au fungua chanzo rasmi kwa kitendo chake tofauti.</p>`}${commentsMarkup(key)}</div>`;
+    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">DJ CLIP</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div><section class="inline-player" aria-label="DJ clip player"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}</div>${commentsMarkup(key)}</div>`;
     const iframe = document.createElement("iframe");
     iframe.title = `In-page DJ clip player: ${title}`;
     iframe.src = safeEmbedUrl(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`);
@@ -391,10 +364,8 @@
       if (!response.ok) throw new Error("TRANSLATIONS_UNAVAILABLE");
       const data = await response.json();
       const items = Array.isArray(data.items) ? data.items : [];
-      const djs = Array.isArray(data.djs) ? data.djs : [];
-      renderDjDirectory(djs);
       renderTranslations(items);
-    } catch { renderDjDirectory([]); renderTranslations([]); }
+    } catch { renderTranslations([]); }
   }
   function safeEmbedUrl(value) {
     const safe = safeExternalLink(value);
@@ -472,8 +443,7 @@
     const content = $("#dialog-content");
     content.innerHTML = `<div class="empty-state">LOADING MOVIE FILE…</div>`;
     dialog.showModal();
-    let movie = state.movies.find(item => String(item.id) === String(id));
-    if (!movie) movie = fallbackMovies.find(item => String(item.id) === String(id));
+    let movie = findMovie(id, type);
     try {
       const data = await request(`/api/movies?detail=${encodeURIComponent(id)}&type=${encodeURIComponent(type)}`);
       movie = data.movie || movie;
@@ -485,13 +455,12 @@
     const backdrop = movie.backdrop_path || movie.backdrop || "";
     const trailerMarkup = trailer
       ? `<section class="inline-player" aria-label="Trailer player for ${escapeHtml(title)}"><div class="inline-player__frame"><iframe title="Trailer player for ${escapeHtml(title)}" src="${escapeHtml(trailer)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div></section>`
-      : `<section class="inline-player" aria-label="Trela"><div class="movie-player-empty"><span>TRELA HAIJAPATIKANA KWA SASA</span></div></section>`;
+      : `<section class="inline-player" aria-label="Trailer"><div class="movie-player-empty"><span>TRAILER UNAVAILABLE</span></div></section>`;
     const downloadUrl = authorizedMovieDownload(movie);
-    const watchUrl = officialSourceUrl(movie);
-    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>PAKUA FAILI ↓</a>` : "";
-    const watchMarkup = watchUrl ? `<a class="button button--ghost" href="${escapeHtml(watchUrl)}" target="_blank" rel="noopener noreferrer">TAZAMA CHANZO RASMI ↗</a>` : "";
+    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>DOWNLOAD ↓</a>` : "";
     const key = commentKey(movie, id, type);
-    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">${movie.media_type === "tv" || type === "tv" ? "SERIES" : "FILAMU"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(yearOf(movie))}</span>${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p>${trailerMarkup}<div class="dialog-actions">${downloadMarkup}${watchMarkup}</div>${downloadUrl ? `<p class="download-note">Faili iliyoidhinishwa imeunganishwa kwa upakuaji wa moja kwa moja.</p>` : `<p class="download-note">Katalogi ina kiungo cha kutazama rasmi, si faili la movie la kupakua. Huduma husika inaweza kutoa offline download ndani ya app yake.</p>`}${commentsMarkup(key)}</div>`;
+    const year = yearOf(movie);
+    content.innerHTML = `<div class="dialog-backdrop" ${backdrop ? `style="background-image:linear-gradient(0deg,#06140c,transparent 80%),url('${escapeHtml(backdrop)}')"` : ""}></div><div class="dialog-body"><p class="dialog-kicker">${movie.media_type === "tv" || type === "tv" ? "SERIES" : "MOVIE"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info">${year ? `<span>${escapeHtml(year)}</span>` : ""}${Number(movie.vote_average) > 0 ? `<span>★ ${Number(movie.vote_average).toFixed(1)}</span>` : ""}${movie.runtime ? `<span>${escapeHtml(movie.runtime)} min</span>` : ""}</div><p class="dialog-overview">${escapeHtml(movie.overview || "")}</p>${trailerMarkup}<div class="dialog-actions">${downloadMarkup}</div>${commentsMarkup(key)}</div>`;
     const comments = $(".movie-comments", content);
     setupMovieComments(comments, key, title);
   }
@@ -517,7 +486,7 @@
     if (section) section.hidden = false;
     grid.innerHTML = rows.map(item => {
       const poster = safeExternalLink(item.poster_url);
-      return `<article class="library-card"><div class="library-card__poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster ya ${escapeHtml(item.title)}" onerror="this.remove()">` : `<span>⬡</span>`}</div><div class="library-card__copy"><p class="eyebrow">${item.media_type === "series" ? "SERIES" : "FILAMU"} · RIGHTS VERIFIED</p><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.synopsis || "Maudhui rasmi yaliyoidhinishwa.")}</p><button class="button button--primary library-play" type="button" data-library-id="${escapeHtml(item.id)}">▶ CHEZA HAPA</button></div></article>`;
+      return `<article class="library-card"><div class="library-card__poster">${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="Poster for ${escapeHtml(item.title)}" onerror="this.remove()">` : `<span>⬡</span>`}</div><div class="library-card__copy"><p class="eyebrow">${item.media_type === "series" ? "SERIES" : "MOVIE"} · RIGHTS VERIFIED</p><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.synopsis || "Officially approved title.")}</p><button class="button button--primary library-play" type="button" data-library-id="${escapeHtml(item.id)}">▶ PLAY HERE</button></div></article>`;
     }).join("");
     $$(".library-play", grid).forEach(button => button.addEventListener("click", () => playLibraryItem(button.dataset.libraryId)));
   }
@@ -540,7 +509,7 @@
     const key = `library:${item.id}`;
     const downloadAllowed = item.download_authorized === true && item.rights_verified === true && safeExternalLink(item.rights_url) && typeof item.rights_notes === "string" && item.rights_notes.trim();
     const downloadUrl = downloadAllowed ? safeExternalLink(item.download_url) : "";
-    const downloadMarkup = downloadUrl ? `<div class="dialog-actions"><a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>PAKUA FAILI ↓</a></div><p class="download-note">Faili iliyoidhinishwa imeunganishwa kwa upakuaji wa moja kwa moja.</p>` : "";
+    const downloadMarkup = downloadUrl ? `<div class="dialog-actions"><a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>DOWNLOAD ↓</a></div>` : "";
     content.innerHTML = `<div class="dialog-body library-player-dialog"><p class="dialog-kicker">VIDEO ILIYOIDHINISHWA</p><h2 id="dialog-title">${escapeHtml(item.title)}</h2><p class="dialog-overview">${escapeHtml(item.synopsis || "")}</p><div id="library-player-mount" class="inline-player__frame"></div>${downloadMarkup}${commentsMarkup(key)}</div>`;
     const mount = $("#library-player-mount", content);
     if (item.playback_type === "embed") {
@@ -562,7 +531,7 @@
       video.addEventListener("error", () => {
         const note = document.createElement("p");
         note.className = "inline-player-note";
-        note.textContent = "Video haikucheza kwenye kifaa hiki. Kagua kiungo au tumia HLS kwenye browser inayoiunga mkono.";
+        note.textContent = "This video could not play. Check the authorized source or try a browser with HLS support.";
         mount.append(note);
       }, { once: true });
       mount.append(video);
@@ -590,7 +559,7 @@
     };
     const next = (exists ? list.filter(saved => watchlistKey(saved) !== key) : [...list, item]).slice(-150);
     try { localStorage.setItem("momo-watchlist", JSON.stringify(next)); }
-    catch { $("#catalog-message").textContent = "Imeshindikana kuhifadhi orodha kwenye kifaa hiki."; return; }
+    catch { $("#catalog-message").textContent = "Could not save your list on this device."; return; }
     if (state.category === "watchlist") {
       state.movies = next;
       renderMovies(next);
@@ -599,12 +568,12 @@
       const saved = !exists;
       $$('[data-watchlist-toggle]').forEach(button => {
         if (button.dataset.movieId !== String(movie.id) || button.dataset.movieType !== (item.media_type === "tv" ? "tv" : "movie")) return;
-        button.textContent = saved ? "♥ IMEHIFADHIWA" : "♡ HIFADHI";
+        button.textContent = saved ? "♥" : "♡";
         button.setAttribute("aria-pressed", String(saved));
-        button.setAttribute("aria-label", saved ? "Ondoa kwenye My List" : "Hifadhi kwenye My List");
+        button.setAttribute("aria-label", saved ? "Remove from My List" : "Add to My List");
       });
     }
-    $("#catalog-message").textContent = exists ? "Imeondolewa kwenye My List." : "Imehifadhiwa kwenye My List ya kifaa hiki.";
+    $("#catalog-message").textContent = exists ? "Removed from My List." : "Saved to My List.";
   }
 
   function setupControls() {
@@ -616,59 +585,57 @@
       const message = $("#login-message");
       message.textContent = "";
       message.classList.remove("is-success");
-      if (!phone || !password) { message.textContent = "Weka namba yako ya simu na nenosiri."; return; }
+      if (!phone || !password) { message.textContent = "Enter your phone number and unlock code."; return; }
       button.disabled = true;
-      button.querySelector("span").textContent = "INAHAKIKI…";
+      button.querySelector("span").textContent = "AUTHENTICATING…";
       try {
         await request("/api/enter", { method: "POST", body: JSON.stringify({ phone, password }) });
-        message.textContent = "Umeingia. Inafungua katalogi ya movies…";
+        message.textContent = "Access granted. Opening the movie network…";
         message.classList.add("is-success");
-        await renderCount();
         showCatalog();
       } catch (error) {
-        message.textContent = error.status === 503 ? "Huduma ya kuingia haipatikani. Mmiliki aangalie Supabase kwenye Vercel." : (error.message || "Imeshindikana kuingia. Kagua taarifa zako.");
+        message.textContent = error.status === 503 ? "Access service is offline. Try again later." : (error.message || "Access denied. Check your phone number and unlock code.");
       } finally {
         button.disabled = false;
-        button.querySelector("span").textContent = "INGIA";
+        button.querySelector("span").textContent = "ENTER SITE";
       }
     });
     $("#toggle-password").addEventListener("click", () => {
       const input = $("#password-input");
       input.type = input.type === "password" ? "text" : "password";
-      $("#toggle-password").setAttribute("aria-label", input.type === "password" ? "Onyesha nenosiri" : "Ficha nenosiri");
+      $("#toggle-password").setAttribute("aria-label", input.type === "password" ? "Show unlock code" : "Hide unlock code");
     });
     $("#logout-button").addEventListener("click", async () => {
       try { await request("/api/logout", { method: "POST", body: "{}" }); } catch { /* clear the local view anyway */ }
-      showGate("Umetoka kwenye akaunti.", true);
+      showGate("Session closed.", true);
     });
     $$(".nav-link").forEach(link => link.addEventListener("click", () => {
-      if (link.dataset.section) {
-        document.getElementById(link.dataset.section)?.scrollIntoView({ behavior: "smooth" });
-        return;
-      }
-      activateCategory(link.dataset.category);
+      const target = link.dataset.section || "complete-catalog";
+      const category = link.dataset.category || "popular";
+      activateCategory(category, target);
     }));
-    $$(".genre-chip").forEach(chip => chip.addEventListener("click", () => activateCategory(chip.dataset.category)));
+    $$('[data-category]:not(.nav-link)').forEach(button => button.addEventListener("click", () => activateCategory(button.dataset.category)));
+    $$('[data-shelf-scroll]').forEach(button => button.addEventListener("click", () => {
+      const track = document.getElementById(button.dataset.shelfScroll);
+      if (!track) return;
+      track.scrollBy({ left: track.clientWidth * Number(button.dataset.direction || 1), behavior: "smooth" });
+    }));
     let searchTimer;
     const searchInput = $("#search-input");
-    $$("[data-search-pick]").forEach(button => button.addEventListener("click", () => {
-      searchInput.value = button.dataset.searchPick || "";
-      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-      $("#movie-grid").scrollIntoView({ behavior: "smooth", block: "start" });
-    }));
     $("#search-input").addEventListener("input", event => {
       clearTimeout(searchTimer);
       state.activeController?.abort();
       state.requestId++;
       state.query = event.target.value.trim(); state.page = 1;
       if (state.query) state.category = "trending";
+      $("#catalog-view").classList.toggle("is-searching", Boolean(state.query));
       $$(".nav-link").forEach(item => item.classList.toggle("is-active", !state.query && item.dataset.category === state.category));
       $$(".genre-chip").forEach(item => {
         const active = !state.query && item.dataset.category === state.category;
         item.classList.toggle("is-active", active);
         item.setAttribute("aria-pressed", String(active));
       });
-      $("#section-title").textContent = state.query ? `Matokeo ya “${state.query}”` : categoryTitle(state.category);
+      $("#section-title").textContent = state.query ? `Results for “${state.query}”` : categoryTitle(state.category);
       searchTimer = setTimeout(loadCatalog, 300);
     });
     $("#load-more").addEventListener("click", () => { state.page += 1; loadCatalog(); });
@@ -678,20 +645,6 @@
     $("#movie-dialog").addEventListener("click", event => { if (event.target === $("#movie-dialog")) $("#movie-dialog").close(); });
     $("#movie-dialog").addEventListener("close", () => { $("#dialog-content").replaceChildren(); });
     $("#year").textContent = new Date().getFullYear();
-    $("#download-movie")?.addEventListener("change", updateDownloadButton);
-    $("#download-current")?.addEventListener("click", () => {
-      const movie = selectedDownloadMovie();
-      const url = movie && authorizedMovieDownload(movie);
-      if (!url) { updateDownloadButton(); return; }
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "";
-      link.rel = "noopener noreferrer";
-      document.body.append(link);
-      link.click();
-      link.remove();
-      $("#download-current-note").textContent = "Upakuaji umeanzishwa. Ikiwa seva ya faili inazuia download, wasiliana na msimamizi wa chanzo.";
-    });
     if (localPreview) {
       const demo = $("#demo-button");
       demo.hidden = false;

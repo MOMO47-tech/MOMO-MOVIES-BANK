@@ -28,6 +28,11 @@ const server = http.createServer((req, res) => {
       const movie = movies.find(item => String(item.id) === detail);
       return movie ? send(res, 200, { movie, source: "sample" }) : send(res, 404, { error: "Maelezo hayapatikani." });
     }
+    if (category === "home") {
+      const movieRows = movies.filter(movie => movie.media_type !== "tv").slice(0, 10);
+      const seriesRows = movies.filter(movie => movie.media_type === "tv").slice(0, 10);
+      return send(res, 200, { shelves: { top_rated: movieRows, popular_series: seriesRows, popular_movies: movieRows, trending: movieRows }, source: "sample" });
+    }
     let catalogue = movies;
     if (category === "tv") catalogue = movies.filter(movie => movie.media_type === "tv");
     if (category === "horror") catalogue = movies.filter(movie => /horror|kutisha/i.test(movie.genre || ""));

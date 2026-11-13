@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="sw">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#03100b">
-  <meta name="description" content="MOMO MOVIES BANK — gundua filamu, trela na huduma rasmi za kutazama.">
+  <meta name="description" content="MOMO MOVIES — browse movie and series posters, watch trailers in-page and discover DJ specials.">
   <meta name="robots" content="noindex,nofollow">
-  <title>MOMO MOVIES BANK — Filamu na trela</title>
+  <title>MOMO MOVIES — Movies, Series &amp; DJ Specials</title>
   <link rel="icon" type="image/svg+xml" href="/assets/momo-mark.svg">
   <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
+  <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
@@ -18,139 +19,131 @@
   <div class="ambient ambient--two" aria-hidden="true"></div>
   <div class="lightning-layer" aria-hidden="true"><span class="lightning-bolt lightning-bolt--one"></span><span class="lightning-bolt lightning-bolt--two"></span><span class="lightning-bolt lightning-bolt--three"></span><span class="lightning-bolt lightning-bolt--four"></span></div>
 
-  <main id="gate-view" class="gate-view" lang="sw">
+  <main id="gate-view" class="gate-view" lang="en">
     <div class="gate-brand">
       <div class="brand-orbit" aria-hidden="true"><span class="brand-hex">⬡</span></div>
-      <p class="eyebrow">MOMO // GUNDUA FILAMU</p>
+      <p class="eyebrow">MOMO // MOVIE NETWORK</p>
       <h1 class="hacker-wordmark" data-text="MOMO MOVIES">MOMO <span>MOVIES</span></h1>
-      <p class="gate-subtitle">FILAMU • TRELA • CHANZO RASMI</p>
+      <p class="gate-subtitle">FILMS • TRAILERS • VERIFIED WATCH SOURCES</p>
     </div>
 
     <section class="gate-card" aria-labelledby="gate-title">
-      <div class="gate-terminal-bar" aria-hidden="true"><span class="terminal-lights"><i></i><i></i><i></i></span><span class="gate-terminal-location">momo@movies:~</span><span class="terminal-secure">INGIA://SALAMA</span></div>
+      <div class="gate-terminal-bar" aria-hidden="true"><span class="terminal-lights"><i></i><i></i><i></i></span><span class="gate-terminal-location">momo@movies:~</span><span class="terminal-secure">AUTH://SECURE</span></div>
       <div class="card-symbol" aria-hidden="true"><span>$_</span></div>
-      <p class="eyebrow eyebrow--muted">INGIA KUENDELEA</p>
-      <h2 id="gate-title" class="gate-title"><span class="gate-title__lead">KARIBU KWENYE</span><strong class="gate-title__name">MOMO MOVIES</strong></h2>
-      <p class="gate-copy">Weka namba yako ya simu na nenosiri la kuingia.</p>
-      <p class="gate-terminal-command" aria-hidden="true"><span>momo@movies</span><b>:~$</b><code> ingia</code><i></i></p>
+      <p class="eyebrow eyebrow--muted">MEMBER ACCESS NODE</p>
+      <h2 id="gate-title" class="gate-title"><span class="gate-title__lead">WELCOME TO</span><strong class="gate-title__name">MOMO MOVIES</strong></h2>
+      <p class="gate-copy">Enter your phone number and shared unlock code to access the movie network.</p>
+      <p class="gate-terminal-command" aria-hidden="true"><span>momo@movies</span><b>:~$</b><code> auth --secure</code><i></i></p>
 
       <form id="login-form" novalidate>
-        <label for="phone-input">NAMBA YA SIMU</label>
+        <label for="phone-input">PHONE NUMBER</label>
         <div class="input-wrap"><span aria-hidden="true">+</span><input id="phone-input" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="255 7XX XXX XXX" required></div>
-        <label for="password-input">NENOSIRI</label>
-        <div class="input-wrap input-wrap--password"><input id="password-input" name="password" type="password" autocomplete="current-password" placeholder="Weka nenosiri" required><button id="toggle-password" class="eye-button" type="button" aria-label="Onyesha nenosiri">◉</button></div>
-        <p class="privacy-note">Namba yako haionyeshwi hadharani.</p>
+        <label for="password-input">UNLOCK CODE</label>
+        <div class="input-wrap input-wrap--password"><input id="password-input" name="password" type="password" autocomplete="current-password" placeholder="Enter unlock code" required><button id="toggle-password" class="eye-button" type="button" aria-label="Show unlock code">◉</button></div>
+        <p class="privacy-note">Your phone number is not shown publicly.</p>
         <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
-        <button id="login-button" class="button button--primary" type="submit"><span>INGIA</span><b aria-hidden="true">→</b></button>
+        <button id="login-button" class="button button--primary" type="submit"><span>ENTER SITE</span><b aria-hidden="true">→</b></button>
       </form>
-      <button id="demo-button" class="demo-button" type="button" hidden>Fungua mfano</button>
+      <button id="demo-button" class="demo-button" type="button" hidden>Open demo preview</button>
 
       <div id="member-count" class="member-count" data-state="pending" role="status" aria-live="polite" aria-atomic="true">
         <span class="member-count__icon" aria-hidden="true">#</span>
-        <div class="member-count__copy"><span class="member-count__label">WANACHAMA</span><div class="member-count__total"><strong id="member-count-value">—</strong><span>wamejiunga</span></div></div>
-        <span id="member-count-status" class="member-count__status">INAUNGANISHA</span>
+        <div class="member-count__copy"><span class="member-count__label">COMMUNITY MEMBERS</span><div class="member-count__total"><strong id="member-count-value">—</strong><span>joined</span></div></div>
+        <span id="member-count-status" class="member-count__status">SYNCING</span>
       </div>
-      <p class="gate-footnote">Nenosiri la pamoja • uthibitishaji wa SMS haujawashwa.</p>
-      <a class="gate-admin-link" href="/admin">USIMAMIZI ↗</a>
+      <p class="gate-footnote">Shared access code • SMS verification is not enabled.</p>
+      <a class="gate-admin-link" href="/admin">ADMIN CONSOLE ↗</a>
     </section>
-    <p class="gate-footer">MOMO MOVIES BANK <span>•</span> GUNDUA FILAMU</p>
+    <p class="gate-footer">MOMO MOVIES <span>•</span> PRIVATE CINEMA ACCESS</p>
   </main>
 
   <div id="catalog-view" class="catalog-view" hidden>
     <header class="topbar">
-      <a class="wordmark" href="#home" aria-label="Mwanzo wa MOMO Movies"><span class="wordmark-icon">⬡</span><span class="wordmark-text hacker-wordmark" data-text="MOMO MOVIES">MOMO <span class="wordmark-accent">MOVIES</span></span></a>
-      <nav class="main-nav" aria-label="Urambazaji mkuu">
-        <button class="nav-link is-active" data-category="trending">Trending</button>
-        <button id="new-releases-label" class="nav-link" data-category="now_playing">Mpya</button>
-        <button class="nav-link" data-category="horror">Horror</button>
-        <button class="nav-link" data-category="action">Action</button>
-        <button class="nav-link" data-category="animation">Animation</button>
-        <button class="nav-link" data-category="watchlist">My List</button>
-        <button class="nav-link" type="button" data-section="tz-translations">Tafsiri za DJ</button>
-        <button class="nav-link" type="button" data-section="official-downloads">Download</button>
+      <a class="wordmark" href="#home" aria-label="MOMO Movies home"><span class="wordmark-icon">⬡</span><span class="wordmark-text hacker-wordmark" data-text="MOMO MOVIES">MOMO <span class="wordmark-accent">MOVIES</span></span></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link is-active" type="button" data-section="home">Home</button>
+        <button class="nav-link" type="button" data-section="complete-catalog">Movies</button>
+        <button class="nav-link" type="button" data-category="tv">Series</button>
+        <button class="nav-link" type="button" data-category="watchlist">My List</button>
+        <button class="nav-link" type="button" data-section="tz-translations">DJ Specials</button>
       </nav>
       <div class="topbar-actions">
-        <label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Tafuta movie au series..." aria-label="Tafuta movie au series"></label>
-        <a class="admin-dashboard-link" href="/admin">USIMAMIZI ↗</a>
-        <button id="logout-button" class="icon-button" type="button" aria-label="Toka" title="Toka">↪</button>
+        <label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Search movies or series…" aria-label="Search movies or series"></label>
+        <a class="admin-dashboard-link" href="/admin">ADMIN ↗</a>
+        <button id="logout-button" class="icon-button" type="button" aria-label="Log out" title="Log out">↪</button>
       </div>
     </header>
 
     <main id="home" class="catalog-main">
       <section id="featured-hero" class="featured-hero">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="live-dot"></span> FILAMU ZA LEO</p>
-          <h1 id="hero-title">Gundua filamu<br><span>zinazokufaa.</span></h1>
-          <p id="hero-overview" class="hero-overview">Tafuta filamu, chunguza maelezo na ufungue trela au huduma rasmi za kutazama.</p>
-          <div class="hero-actions"><button id="hero-details" class="button button--primary" type="button">MAELEZO <b aria-hidden="true">→</b></button><button id="hero-trailer" class="button button--ghost" type="button">▶ CHEZA TRELA HAPA</button></div>
+          <p class="eyebrow"><span class="live-dot"></span> FEATURED</p>
+          <h1 id="hero-title">Discover your<br><span>next movie.</span></h1>
+          <p id="hero-overview" class="hero-overview">Browse movies and series, open details, and play trailers here on MOMO.</p>
+          <div class="hero-actions"><button id="hero-details" class="button button--primary" type="button">MOVIE DETAILS <b aria-hidden="true">→</b></button><button id="hero-trailer" class="button button--ghost" type="button">▶ PLAY TRAILER</button></div>
         </div>
         <div id="hero-art" class="hero-art" aria-hidden="true"><div class="hero-art-ring"></div><div class="hero-art-core">M</div><span class="hero-art-label">MOMO<br>SELECT</span></div>
       </section>
 
-      <section class="catalog-toolbar" aria-label="Vichujio vya katalogi">
-          <div><p class="eyebrow eyebrow--muted">KATALOGI</p><h2 id="section-title">Trending</h2></div>
-        <div class="catalog-status"><span class="pulse-dot" aria-hidden="true"></span><span id="catalog-count">Inapakia katalogi…</span></div>
-      </section>
-      <section class="genre-console" aria-label="Chagua aina ya filamu">
-        <div class="genre-console__title">Aina za filamu</div>
-        <div class="genre-filter-row">
-          <button class="genre-chip is-active" type="button" data-category="trending" aria-pressed="true">TRENDING</button>
-          <button class="genre-chip genre-chip--horror" type="button" data-category="horror" aria-pressed="false">HORROR</button>
-          <button class="genre-chip genre-chip--action" type="button" data-category="action" aria-pressed="false">ACTION / MAPIGANO</button>
-          <button class="genre-chip genre-chip--animation" type="button" data-category="animation" aria-pressed="false">ANIMATION / CARTOON</button>
-        </div>
-      </section>
-      <section class="search-picks" aria-labelledby="search-picks-title">
-        <div class="search-picks__heading"><h3 id="search-picks-title">Tafuta majina yanayopendekezwa</h3><p>Majina tu — trela na maelezo hupatikana kupitia TMDB.</p></div>
-        <div class="search-picks__list">
-          <button type="button" data-search-pick="Ultimate Revenge">Ultimate Revenge</button>
-          <button type="button" data-search-pick="They Will Kill You">They Will Kill You</button>
-          <button type="button" data-search-pick="The Debt Collector">The Debt Collector</button>
-          <button type="button" data-search-pick="The Legend Of Aang The Last Airbender">The Legend of Aang</button>
-          <button type="button" data-search-pick="Sorop">Sorop</button>
-          <button type="button" data-search-pick="Pushed Off a Plane and Survived">Pushed Off a Plane and Survived</button>
-          <button type="button" data-search-pick="Psycho Killer">Psycho Killer</button>
-          <button type="button" data-search-pick="Predator">Predator</button>
-          <button type="button" data-search-pick="Nampyeondeul Husbands in Action">Husbands in Action</button>
-          <button type="button" data-search-pick="Disclosure">Disclosure</button>
-          <button type="button" data-search-pick="Mortal Kombat II">Mortal Kombat II</button>
-          <button type="button" data-search-pick="Hoppers">Hoppers</button>
-        </div>
-      </section>
-      <div id="catalog-message" class="catalog-message" role="status" aria-live="polite"></div>
-      <section id="movie-grid" class="movie-grid" aria-label="Filamu"></section>
-      <section class="approved-library" aria-labelledby="approved-library-title">
-        <div class="approved-library__heading"><div><p class="eyebrow eyebrow--muted">MOMO MOVIES</p><h2 id="approved-library-title">Video zilizoidhinishwa</h2><p>Video hizi zimewekwa na msimamizi na hucheza ndani ya ukurasa.</p></div><span class="download-lock">RUHUSA IMETHIBITISHWA</span></div>
-        <div id="library-grid" class="library-grid" aria-live="polite"><div class="empty-state">Inakagua maudhui yaliyoidhinishwa...</div></div>
-      </section>
-      <button id="load-more" class="button button--load" type="button" hidden>ONYESHA ZAIDI <span aria-hidden="true">↓</span></button>
+      <div id="home-shelves" class="home-shelves" aria-label="Featured movies and series">
+        <section id="top-rated-shelf" class="home-shelf" aria-labelledby="top-rated-title">
+          <header class="home-shelf__heading"><div><p class="eyebrow eyebrow--muted">HIGHEST RATED</p><h2 id="top-rated-title">Top Rated Movies</h2></div><div class="home-shelf__controls"><button class="shelf-arrow" type="button" data-shelf-scroll="top-rated-track" data-direction="-1" aria-label="Scroll Top Rated Movies left">‹</button><button class="shelf-arrow" type="button" data-shelf-scroll="top-rated-track" data-direction="1" aria-label="Scroll Top Rated Movies right">›</button><button class="shelf-see-all" type="button" data-category="top_rated">SEE ALL <span aria-hidden="true">→</span></button></div></header>
+          <div id="top-rated-track" class="movie-rail" aria-label="Top Rated Movies"></div>
+        </section>
+        <section id="popular-series-shelf" class="home-shelf" aria-labelledby="popular-series-title">
+          <header class="home-shelf__heading"><div><p class="eyebrow eyebrow--muted">SERIES</p><h2 id="popular-series-title">Popular Series</h2></div><div class="home-shelf__controls"><button class="shelf-arrow" type="button" data-shelf-scroll="popular-series-track" data-direction="-1" aria-label="Scroll Popular Series left">‹</button><button class="shelf-arrow" type="button" data-shelf-scroll="popular-series-track" data-direction="1" aria-label="Scroll Popular Series right">›</button><button class="shelf-see-all" type="button" data-category="tv">SEE ALL <span aria-hidden="true">→</span></button></div></header>
+          <div id="popular-series-track" class="movie-rail" aria-label="Popular Series"></div>
+        </section>
+        <section id="popular-movies-shelf" class="home-shelf" aria-labelledby="popular-movies-title">
+          <header class="home-shelf__heading"><div><p class="eyebrow eyebrow--muted">MOVIE PICKS</p><h2 id="popular-movies-title">Popular Movies</h2></div><div class="home-shelf__controls"><button class="shelf-arrow" type="button" data-shelf-scroll="popular-movies-track" data-direction="-1" aria-label="Scroll Popular Movies left">‹</button><button class="shelf-arrow" type="button" data-shelf-scroll="popular-movies-track" data-direction="1" aria-label="Scroll Popular Movies right">›</button><button class="shelf-see-all" type="button" data-category="popular">SEE ALL <span aria-hidden="true">→</span></button></div></header>
+          <div id="popular-movies-track" class="movie-rail" aria-label="Popular Movies"></div>
+        </section>
+        <section id="trending-shelf" class="home-shelf" aria-labelledby="trending-title">
+          <header class="home-shelf__heading"><div><p class="eyebrow eyebrow--muted">TRENDING</p><h2 id="trending-title">Trending Now</h2></div><div class="home-shelf__controls"><button class="shelf-arrow" type="button" data-shelf-scroll="trending-track" data-direction="-1" aria-label="Scroll Trending Movies left">‹</button><button class="shelf-arrow" type="button" data-shelf-scroll="trending-track" data-direction="1" aria-label="Scroll Trending Movies right">›</button><button class="shelf-see-all" type="button" data-category="trending">SEE ALL <span aria-hidden="true">→</span></button></div></header>
+          <div id="trending-track" class="movie-rail" aria-label="Trending Movies"></div>
+        </section>
+      </div>
 
       <section id="tz-translations" class="translations-section" aria-labelledby="translations-title">
-        <div class="translations-heading"><div><p class="eyebrow eyebrow--muted">TAFSIRI ZA WATANZANIA</p><h2 id="translations-title">Movies za DJs</h2></div></div>
-        <p class="translations-intro">Cheza clips zilizowekwa hadharani ndani ya MOMO. Full movies zitaongezwa tu pale ruhusa ya mwenye haki inapothibitishwa.</p>
-        <div id="translation-grid" class="translation-grid" aria-live="polite"><div class="empty-state translation-empty">Inapakia clips za DJs…</div></div>
-        <div class="dj-directory-heading"><h3>Vyanzo rasmi</h3><p>Links za creators na filamu asilia.</p></div>
-        <div id="dj-directory" class="dj-directory" aria-live="polite"><div class="empty-state translation-empty">Inapakia DJs…</div></div>
+        <div class="translations-heading"><div><p class="eyebrow eyebrow--muted">DJ COLLECTIONS</p><h2 id="translations-title">DJ Movie Shelves</h2></div></div>
+        <div id="translation-grid" class="translation-grid" aria-live="polite"></div>
       </section>
-      <section id="official-downloads" class="download-station" aria-labelledby="download-title">
-        <div class="download-station__heading"><div><p class="eyebrow eyebrow--muted">PAKUA FAILI</p><h2 id="download-title">Upakuaji wa moja kwa moja</h2><p>Kitufe cha kupakua hufanya kazi tu kwa faili la moja kwa moja ambalo mwenye haki ameruhusu. Link za huduma za kutazama zitaandikwa tofauti.</p></div></div>
-        <div class="download-terminal">
-          <label class="download-select-label" for="download-movie">CHAGUA FILAMU</label>
-          <div class="download-controls"><select id="download-movie" class="download-select"><option value="">Chagua movie</option></select><button id="download-current" class="button button--primary" type="button" disabled>CHAGUA FILAMU</button></div>
-          <p id="download-current-note" class="download-note" role="status" aria-live="polite">Chagua filamu; DOWNLOAD itawezeshwa tu ikiwa faili la moja kwa moja limeidhinishwa.</p>
-        </div>
+
+      <section class="approved-library" aria-labelledby="approved-library-title" hidden>
+        <div class="approved-library__heading"><div><p class="eyebrow eyebrow--muted">MOMO LIBRARY</p><h2 id="approved-library-title">Full Movies</h2></div></div>
+        <div id="library-grid" class="library-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="complete-catalog" class="complete-catalog" aria-labelledby="section-title">
+        <div class="catalog-toolbar"><div><p class="eyebrow eyebrow--muted">BROWSE EVERYTHING</p><h2 id="section-title">Complete Movie Catalog</h2></div></div>
+        <section class="genre-console" aria-label="Browse movie categories">
+          <div class="genre-console__title">Browse</div>
+          <div class="genre-filter-row">
+            <button class="genre-chip is-active" type="button" data-category="popular" aria-pressed="true">POPULAR</button>
+            <button class="genre-chip" type="button" data-category="top_rated" aria-pressed="false">TOP RATED</button>
+            <button class="genre-chip" type="button" data-category="trending" aria-pressed="false">TRENDING</button>
+            <button class="genre-chip" type="button" data-category="now_playing" aria-pressed="false">NEW RELEASES</button>
+            <button class="genre-chip" type="button" data-category="tv" aria-pressed="false">SERIES</button>
+            <button class="genre-chip genre-chip--horror" type="button" data-category="horror" aria-pressed="false">HORROR</button>
+            <button class="genre-chip genre-chip--action" type="button" data-category="action" aria-pressed="false">ACTION</button>
+            <button class="genre-chip genre-chip--animation" type="button" data-category="animation" aria-pressed="false">ANIMATION</button>
+          </div>
+        </section>
+        <div id="catalog-message" class="catalog-message" role="status" aria-live="polite"></div>
+        <section id="movie-grid" class="movie-grid" aria-label="Complete Movie Catalog"></section>
+        <button id="load-more" class="button button--load" type="button" hidden>LOAD MORE <span aria-hidden="true">↓</span></button>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div><a class="wordmark wordmark--small" href="#home"><span class="wordmark-icon">⬡</span><span class="wordmark-text hacker-wordmark" data-text="MOMO MOVIES">MOMO <span class="wordmark-accent">MOVIES</span></span></a><p class="footer-copy">Gundua kinachofuata kutazama kupitia trela na huduma rasmi.</p></div>
+      <div><a class="wordmark wordmark--small" href="#home"><span class="wordmark-icon">⬡</span><span class="wordmark-text hacker-wordmark" data-text="MOMO MOVIES">MOMO <span class="wordmark-accent">MOVIES</span></span></a><p class="footer-copy">Movies, series and DJ collections.</p></div>
       <div class="credits"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" aria-label="The Movie Database"><img src="https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" alt="TMDB logo"></a><p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p></div>
       <p class="copyright">© <span id="year"></span> MOMO MOVIES BANK</p>
     </footer>
   </div>
 
   <dialog id="movie-dialog" class="movie-dialog" aria-labelledby="dialog-title">
-    <button id="dialog-close" class="dialog-close" type="button" aria-label="Funga">×</button>
+    <button id="dialog-close" class="dialog-close" type="button" aria-label="Close">×</button>
     <div id="dialog-content" class="dialog-content"></div>
   </dialog>
 </body>
