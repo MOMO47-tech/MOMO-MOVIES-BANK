@@ -2780,3 +2780,7 @@ a {
   color: #7e9a88;
   font: 0.61rem/1.55 var(--font-mono);
 }
+
+.dj-movie-card--full .dj-movie-poster__badge{color:#04110a;background:linear-gradient(110deg,#42ed9c,#b3ffd3);border-color:rgba(80,250,151,.55)}.dj-upload-rights{margin-top:15px;padding-top:12px;border-top:1px solid rgba(94,235,157,.14);color:#9db7a6;font-size:.75rem;line-height:1.6}.dj-upload-rights p{margin:6px 0}.dj-upload-rights a{color:#50fa97;text-decoration:underline;text-underline-offset:3px}.dj-upload-rights .open-film-download-note{color:#8ca697;font-size:.7rem}
+.dj-card-rights{display:inline-flex;margin-top:9px;color:#50fa97;font:700 .58rem ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em;text-underline-offset:3px;text-decoration:underline}.dj-card-rights:hover{color:#b3ffd3}
+.dj-movie-card--full{position:relative}.dj-movie-card--full .watchlist-toggle{top:10px;right:10px;z-index:4}

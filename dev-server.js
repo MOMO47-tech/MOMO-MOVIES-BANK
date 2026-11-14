@@ -18,6 +18,7 @@ const server = http.createServer((req, res) => {
   if (url.pathname === "/api/admin-auth") return send(res, 503, { error: "Preview pekee: admin Auth huhitaji Supabase iliyosanidiwa." });
   if (url.pathname === "/api/library") return send(res, 200, { items: [] });
   if (url.pathname === "/api/admin-library") return send(res, 503, { error: "Preview pekee: hifadhidata ya admin huhitaji Supabase iliyosanidiwa." });
+  if (url.pathname === "/api/admin-dj-upload") return send(res, 401, { error: "Admin upload is unavailable in local preview without Supabase Auth." });
   if (url.pathname === "/api/logout" && req.method === "POST") { res.setHeader("Set-Cookie", "momo_session=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0"); return send(res, 200, { ok: true }); }
   if (url.pathname === "/api/enter") return send(res, 503, { error: "Preview pekee: weka secrets na Supabase kwenye Vercel ili kuwezesha kuingia." });
   if (url.pathname === "/api/movies") {

@@ -1,6 +1,7 @@
 "use strict";
 const { isMovieAdmin, listAdminLibrary, createLibraryItem, updateLibraryItem, deleteLibraryItem } = require("../lib/supabase");
-const { UUID, normalizeLibraryInput } = require("../lib/movie-library");
+const { UUID, isDjMackSynopsis, normalizeLibraryInput } = require("../lib/movie-library");
+const { objectPathFromPublicUrl, deleteDjObject } = require("../lib/dj-storage");
 const { verifyAdminSession, sendJson } = require("../lib/security");
 function sameOrigin(req) {
   const origin = req.headers.origin;
@@ -39,6 +40,16 @@ module.exports = async function handler(req, res) {
     if (req.method === "DELETE") {
       const id = String(req.query?.id || "");
       if (!UUID.test(id)) return sendJson(res, 400, { error: "ID si sahihi." });
+      const existing = (await listAdminLibrary()).find(item => String(item.id) === id);
+      if (!existing) return sendJson(res, 404, { error: "Rekodi haipo." });
+      if (isDjMackSynopsis(existing.synopsis)) {
+        const objectPath = objectPathFromPublicUrl(existing.playback_url);
+        if (!objectPath) return sendJson(res, 409, { error: "Video ya DJ Mack haijaunganishwa na faili salama la bucket." });
+        const hiddenRows = await updateLibraryItem(id, normalizeLibraryInput({ ...existing, is_published: false }), session.sub);
+        if (!Array.isArray(hiddenRows) || !hiddenRows.length) return sendJson(res, 404, { error: "Rekodi haipo tena." });
+        try { await deleteDjObject(objectPath); }
+        catch { return sendJson(res, 503, { error: "Rekodi imefichwa kwenye tovuti, lakini faili halijaondolewa Storage. Bonyeza Futa tena baada ya kuangalia Supabase." }); }
+      }
       await deleteLibraryItem(id);
       return sendJson(res, 200, { ok: true });
     }

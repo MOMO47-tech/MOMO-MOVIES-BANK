@@ -5,7 +5,10 @@
   const form = $("#library-form");
   const setupPanel = $("#setup-panel");
   const setupForm = $("#admin-setup-form");
-  const state = { items: [], comments: [], commentsHasMore: false };
+  const djUploadForm = $("#dj-upload-form");
+  const DJ_MACK_MARKER = "[[MOMO_DJ_MACK]]";
+  const state = { items: [], comments: [], commentsHasMore: false, editingDjMack: false };
+  const uploadState = { context: null, file: null, upload: null, busy: false };
   let commentsLoading = false;
   const inviteContext = { accessToken: null };
 
@@ -20,7 +23,7 @@
     });
     let data = {};
     try { data = await response.json(); } catch { /* Use a safe fallback for non-JSON errors. */ }
-    if (!response.ok) throw Object.assign(new Error(data.error || "Ombi halijakamilika."), { status: response.status });
+    if (!response.ok) throw Object.assign(new Error(data.error || "Ombi halijakamilika."), { status: response.status, data });
     return data;
   }
   function setMessage(selector, text, success = false) {
@@ -66,8 +69,10 @@
     }
     list.innerHTML = state.items.map(item => {
       const status = item.is_published && item.rights_verified ? "IMECHAPISHWA" : "RASIMU";
-      const kind = item.media_type === "series" ? "SERIES" : "FILAMU";
-      return `<article class="entry-card"><div class="entry-copy"><p class="eyebrow">${kind} · ${status}</p><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.synopsis || "Hakuna maelezo.")}</p><small>${item.rights_verified ? "✓ Haki zimethibitishwa" : "Haki hazijathibitishwa"}${item.updated_at ? ` · Imesasishwa ${escapeHtml(new Date(item.updated_at).toLocaleDateString("sw-TZ"))}` : ""}</small></div><div class="entry-actions"><button class="text-button" type="button" data-edit="${escapeHtml(item.id)}">Hariri</button><button class="text-button text-button--danger" type="button" data-delete="${escapeHtml(item.id)}">Futa</button></div></article>`;
+      const djMack = String(item.synopsis || "").startsWith(`${DJ_MACK_MARKER}\n`);
+      const kind = djMack ? "DJ MACK" : item.media_type === "series" ? "SERIES" : "FILAMU";
+      const synopsis = djMack ? String(item.synopsis || "").slice(DJ_MACK_MARKER.length).trim() : item.synopsis;
+      return `<article class="entry-card"><div class="entry-copy"><p class="eyebrow">${kind} · ${status}</p><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(synopsis || "Hakuna maelezo.")}</p><small>${item.rights_verified ? "✓ Haki zimethibitishwa" : "Haki hazijathibitishwa"}${item.updated_at ? ` · Imesasishwa ${escapeHtml(new Date(item.updated_at).toLocaleDateString("sw-TZ"))}` : ""}</small></div><div class="entry-actions"><button class="text-button" type="button" data-edit="${escapeHtml(item.id)}">Hariri</button><button class="text-button text-button--danger" type="button" data-delete="${escapeHtml(item.id)}">Futa</button></div></article>`;
     }).join("");
   }
   async function loadItems() {
@@ -139,6 +144,7 @@
   function resetForm() {
     form.reset();
     $("#item-id").value = "";
+    state.editingDjMack = false;
     $("#editor-title").textContent = "Ongeza maudhui";
     $("#save-item").innerHTML = "HIFADHI MAUDHUI <span>→</span>";
     setMessage("#form-message", "");
@@ -146,11 +152,12 @@
   function editItem(id) {
     const item = state.items.find(candidate => String(candidate.id) === String(id));
     if (!item) return;
+    state.editingDjMack = String(item.synopsis || "").startsWith(`${DJ_MACK_MARKER}\n`);
     $("#item-id").value = item.id;
     $("#item-title").value = item.title || "";
     $("#item-type").value = item.media_type || "movie";
     $("#item-date").value = item.release_date || "";
-    $("#item-synopsis").value = item.synopsis || "";
+    $("#item-synopsis").value = state.editingDjMack ? String(item.synopsis || "").slice(DJ_MACK_MARKER.length).trim() : (item.synopsis || "");
     $("#item-poster").value = item.poster_url || "";
     $("#item-playback-type").value = item.playback_type || "file";
     $("#item-playback").value = item.playback_url || "";
@@ -173,7 +180,7 @@
       title: data.get("title"),
       media_type: data.get("media_type"),
       release_date: data.get("release_date"),
-      synopsis: data.get("synopsis"),
+      synopsis: `${state.editingDjMack ? `${DJ_MACK_MARKER}\n` : ""}${String(data.get("synopsis") || "")}`,
       poster_url: data.get("poster_url"),
       playback_type: data.get("playback_type"),
       playback_url: data.get("playback_url"),
@@ -208,6 +215,175 @@
       await loadItems();
     } catch (error) {
       setMessage("#list-message", error.message || "Imeshindikana kufuta rekodi.");
+    }
+  }
+  function uploadDetails() {
+    const data = new FormData(djUploadForm);
+    return {
+      title: String(data.get("title") || "").trim(),
+      release_year: String(data.get("release_year") || "").trim(),
+      synopsis: String(data.get("synopsis") || "").trim(),
+      poster_url: String(data.get("poster_url") || "").trim(),
+      rights_url: String(data.get("rights_url") || "").trim(),
+      rights_notes: String(data.get("rights_notes") || "").trim(),
+      rights_confirmed: $("#dj-upload-rights-confirm").checked
+    };
+  }
+  function sameUploadFile(first, second) {
+    return Boolean(first && second && first.name === second.name && first.size === second.size && first.lastModified === second.lastModified);
+  }
+  function formatBytes(value) {
+    const bytes = Number(value) || 0;
+    if (bytes < 1024) return `${bytes} B`;
+    const units = ["KB", "MB", "GB", "TB"];
+    let size = bytes / 1024;
+    let index = 0;
+    while (size >= 1024 && index < units.length - 1) { size /= 1024; index += 1; }
+    return `${size.toFixed(size >= 100 ? 0 : 1)} ${units[index]}`;
+  }
+  function setUploadProgress(percentage, uploaded, total) {
+    const progress = $("#dj-upload-progress");
+    progress.hidden = false;
+    progress.value = Math.max(0, Math.min(100, Number(percentage) || 0));
+    const suffix = total ? ` · ${formatBytes(uploaded)} / ${formatBytes(total)}` : "";
+    setMessage("#dj-upload-message", `Uploading to Supabase: ${Math.round(progress.value)}%${suffix}`);
+  }
+  function setUploadBusy(value) {
+    uploadState.busy = value;
+    $("#dj-upload-submit").disabled = value;
+    djUploadForm.querySelectorAll("input, textarea").forEach(field => { field.disabled = value; });
+    $("#dj-upload-submit").innerHTML = value ? "UPLOADING…" : (uploadState.context ? "RESUME / RETRY UPLOAD" : "UPLOAD TO DJ MACK <span>↑</span>");
+  }
+  async function discardUploadContext() {
+    const context = uploadState.context;
+    if (!context) return;
+    try { if (uploadState.upload) await uploadState.upload.abort(true); } catch {}
+    if (context.upload?.path) {
+      try {
+        await api("/api/admin-dj-upload", { method: "POST", body: JSON.stringify({ action: "discard", path: context.upload.path }) });
+      } catch { /* An unfinished TUS session expires; an unlisted file can be retried or removed by an admin. */ }
+    }
+    uploadState.context = null;
+    uploadState.file = null;
+    uploadState.upload = null;
+    $("#dj-upload-progress").hidden = true;
+  }
+  async function publishDjUpload(context, file) {
+    setUploadBusy(true);
+    setMessage("#dj-upload-message", "Upload complete. Verifying MP4 and publishing to DJ Mack…");
+    try {
+      await api("/api/admin-dj-upload", {
+        method: "POST",
+        body: JSON.stringify({
+          ...context.details,
+          action: "complete",
+          path: context.upload.path,
+          file_size: file.size
+        })
+      });
+      $("#dj-upload-progress").value = 100;
+      setMessage("#dj-upload-message", "Published to DJ Mack. The movie now appears on the public site.", true);
+      djUploadForm.reset();
+      uploadState.context = null;
+      uploadState.file = null;
+      uploadState.upload = null;
+      $("#dj-upload-submit").innerHTML = "UPLOAD TO DJ MACK <span>↑</span>";
+      await loadItems();
+    } catch (error) {
+      throw error;
+    } finally {
+      setUploadBusy(false);
+    }
+  }
+  async function runTusUpload(file, context) {
+    if (!window.tusClient || typeof window.tusClient.Upload !== "function") throw new Error("TUS upload library failed to load. Refresh the page and try again.");
+    return new Promise((resolve, reject) => {
+      const upload = new window.tusClient.Upload(file, {
+        endpoint: context.upload.endpoint,
+        headers: { "x-signature": context.upload.token },
+        chunkSize: 6 * 1024 * 1024,
+        retryDelays: [0, 3000, 5000, 10000, 20000],
+        uploadDataDuringCreation: true,
+        removeFingerprintOnSuccess: true,
+        fingerprint: (fileInfo, options) => Promise.resolve(`${options.endpoint}:${context.upload.path}:${fileInfo.size}:${fileInfo.lastModified}`),
+        metadata: {
+          bucketName: context.upload.bucket,
+          objectName: context.upload.path,
+          contentType: "video/mp4",
+          cacheControl: "3600"
+        },
+        onProgress: (uploaded, total) => setUploadProgress(total ? uploaded / total * 100 : 0, uploaded, total),
+        onError: () => {
+          uploadState.upload = null;
+          setUploadBusy(false);
+          setMessage("#dj-upload-message", "Upload paused. Check your connection and tap RESUME / RETRY UPLOAD.");
+          reject(new Error("Upload paused. Check your connection and retry."));
+        },
+        onSuccess: () => {
+          context.completed = true;
+          uploadState.upload = null;
+          setUploadProgress(100, file.size, file.size);
+          resolve();
+        }
+      });
+      uploadState.upload = upload;
+      (async () => {
+        const previous = await upload.findPreviousUploads();
+        if (previous.length) upload.resumeFromPreviousUpload(previous[0]);
+        upload.start();
+      })().catch(reject);
+    });
+  }
+  async function submitDjUpload(event) {
+    event.preventDefault();
+    if (uploadState.busy) return;
+    if (!djUploadForm.reportValidity()) return;
+    const file = $("#dj-upload-file").files?.[0];
+    if (!file || !/\.mp4$/i.test(file.name) || (file.type && !["video/mp4", "application/octet-stream"].includes(file.type))) {
+      setMessage("#dj-upload-message", "Choose an MP4 video file from your phone.");
+      return;
+    }
+    const details = uploadDetails();
+    if (details.rights_notes.length < 15) {
+      setMessage("#dj-upload-message", "Add at least 15 characters describing the permission or license.");
+      $("#dj-upload-rights-notes").focus();
+      return;
+    }
+
+    if (uploadState.context && (!sameUploadFile(file, uploadState.file) || JSON.stringify(details) !== JSON.stringify(uploadState.context.details))) {
+      await discardUploadContext();
+      setMessage("#dj-upload-message", "The selected file or details changed. A fresh upload will start.");
+    }
+
+    setUploadBusy(true);
+    $("#dj-upload-progress").hidden = false;
+    try {
+      if (!uploadState.context) {
+        setMessage("#dj-upload-message", "Checking admin access and preparing a secure upload…");
+        const initialized = await api("/api/admin-dj-upload", {
+          method: "POST",
+          body: JSON.stringify({ action: "init", ...details, file_size: file.size })
+        });
+        uploadState.context = { upload: initialized.upload, details: { ...details }, completed: false };
+        uploadState.file = file;
+      }
+      if (!uploadState.context.completed) await runTusUpload(file, uploadState.context);
+      await publishDjUpload(uploadState.context, file);
+    } catch (error) {
+      if (error.data?.retry_upload === true && uploadState.context?.completed) {
+        await discardUploadContext();
+        const message = error.data.cleanup_failed === true
+          ? "MP4 haikuchapishwa na usafi wa faili haujathibitishwa. Kagua Supabase Storage, kisha upload upya."
+          : "MP4 iliwasilishwa lakini haikuchapishwa. Bonyeza UPLOAD tena ili kujaribu upya.";
+        setMessage("#dj-upload-message", message);
+        return;
+      }
+      setUploadBusy(false);
+      const limit = Number(error.data?.maxFileBytes);
+      const message = Number.isSafeInteger(limit) && limit > 0
+        ? `This MP4 exceeds the current Supabase limit of ${formatBytes(limit)}. Reduce the file size or raise the Storage limit in Supabase.`
+        : (error.message || "Upload failed. Check your connection and try again.");
+      setMessage("#dj-upload-message", message);
     }
   }
   async function checkSession() {
@@ -278,6 +454,7 @@
     }
   });
   $("#admin-logout").addEventListener("click", async () => {
+    if (uploadState.context) await discardUploadContext();
     try { await api("/api/admin-auth", { method: "DELETE" }); } catch { /* Always remove the local admin view. */ }
     setAuthenticated(false);
     resetForm();
@@ -288,6 +465,13 @@
     $("#comment-review-list").innerHTML = '<div class="empty-state">Maoni yataonekana baada ya admin kuingia.</div>';
   });
   form.addEventListener("submit", submitItem);
+  djUploadForm.addEventListener("submit", submitDjUpload);
+  $("#dj-upload-file").addEventListener("change", () => {
+    const file = $("#dj-upload-file").files?.[0];
+    if (!file) return;
+    $("#dj-upload-progress").hidden = true;
+    setMessage("#dj-upload-message", `Selected MP4 · ${formatBytes(file.size)}. The original filename will not be published.`);
+  });
   $("#reset-form").addEventListener("click", resetForm);
   $("#refresh-list").addEventListener("click", loadItems);
   $("#refresh-comments").addEventListener("click", () => loadComments());

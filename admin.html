@@ -9,6 +9,7 @@
   <title>Admin · MOMO MOVIES</title>
   <link rel="icon" type="image/svg+xml" href="/assets/momo-mark.svg">
   <link rel="stylesheet" href="/admin.css">
+  <script src="/assets/tus-client.min.js" defer></script>
   <script src="/admin.js" defer></script>
 </head>
 <body>
@@ -52,6 +53,23 @@
           <div><p class="eyebrow">LIBRARY MANAGER</p><h2>Maudhui yaliyoidhinishwa</h2><p class="panel-note">Unganisha tu video unazoruhusiwa kusambaza. Admin huthibitisha haki kabla ya kuchapisha.</p></div>
           <button id="admin-logout" class="button button--ghost" type="button">TOKA</button>
         </div>
+        <section class="panel upload-panel" aria-labelledby="dj-upload-heading">
+          <div class="panel-heading"><div><p class="eyebrow">DIRECT STORAGE // DJ MACK</p><h2 id="dj-upload-heading">Upload a movie from your phone</h2></div><span class="access-lock">ADMIN ONLY</span></div>
+          <p class="panel-note">Choose an MP4 from your phone. Large files upload directly to Supabase in resumable chunks, with progress shown below. A published movie is public and uses your Supabase storage/bandwidth quota. The original filename is not shown on the website.</p>
+          <form id="dj-upload-form" class="admin-form upload-form" novalidate>
+            <div class="field-row"><div><label for="dj-upload-title">Movie title <span>*</span></label><input id="dj-upload-title" name="title" required maxlength="160" value="On The Hunt" autocomplete="off"></div><div><label for="dj-upload-year">Release year <span>*</span></label><input id="dj-upload-year" name="release_year" type="number" min="1888" max="2100" inputmode="numeric" required value="2026"></div></div>
+            <label for="dj-upload-file">MP4 video file <span>*</span></label><input id="dj-upload-file" name="file" type="file" accept="video/mp4,.mp4" required>
+            <p class="field-help">Phone picker: select the video in Files/Downloads. Supabase plan limits apply; keep this page open until the upload and publishing step finish.</p>
+            <label for="dj-upload-synopsis">Short description</label><textarea id="dj-upload-synopsis" name="synopsis" rows="3" maxlength="3900" placeholder="Optional movie description"></textarea>
+            <label for="dj-upload-poster">Poster URL (optional, HTTPS)</label><input id="dj-upload-poster" name="poster_url" type="url" inputmode="url" placeholder="https://...">
+            <label for="dj-upload-rights-url">Rights proof/source URL <span>*</span></label><input id="dj-upload-rights-url" name="rights_url" type="url" inputmode="url" required placeholder="https://official-rights-source...">
+            <label for="dj-upload-rights-notes">Permission details <span>*</span></label><textarea id="dj-upload-rights-notes" name="rights_notes" rows="3" maxlength="1000" required placeholder="Describe the license or permission that allows public streaming and downloading."></textarea>
+            <label class="check-row"><input id="dj-upload-rights-confirm" name="rights_confirmed" type="checkbox" required><span>I confirm I have the rights and permission to publish this movie for public streaming and download.</span></label>
+            <progress id="dj-upload-progress" class="upload-progress" max="100" value="0" hidden aria-label="Upload progress"></progress>
+            <p id="dj-upload-message" class="form-message" role="status" aria-live="polite"></p>
+            <button id="dj-upload-submit" class="button button--primary" type="submit">UPLOAD TO DJ MACK <span>↑</span></button>
+          </form>
+        </section>
         <div class="dashboard-layout">
           <section class="panel editor-panel" aria-labelledby="editor-title">
             <div class="panel-heading"><h2 id="editor-title">Ongeza maudhui</h2><button id="reset-form" class="text-button" type="button">Futa fomu</button></div>

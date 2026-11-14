@@ -1,7 +1,7 @@
 (() => {
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { category: "popular", query: "", movies: [], shelfMovies: new Map(), openMovies: [], library: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
+  const state = { category: "popular", query: "", movies: [], shelfMovies: new Map(), openMovies: [], library: [], staticDjItems: [], djItems: [], selected: null, page: 1, busy: false, requestId: 0, activeController: null };
   const localPreview = Boolean(window.MOMO_LOCAL_PREVIEW);
 
   const fallbackMovies = [
@@ -126,6 +126,7 @@
     return state.movies.find(item => String(item.id) === String(id) && movieType(item) === kind)
       || state.shelfMovies.get(`${kind}:${String(id)}`)
       || state.openMovies.find(item => String(item.id) === String(id))
+      || state.library.find(item => String(item.id) === String(id) && movieType(item) === kind)
       || fallbackMovies.find(item => String(item.id) === String(id))
       || null;
   }
@@ -347,13 +348,17 @@
     if (!safeExternalLink(movie?.rights_url) || typeof movie?.rights_notes !== "string" || !movie.rights_notes.trim()) return "";
     return directDownloadUrl(movie?.download_url);
   }
+  function isUploadedDjMovie(item) {
+    return item?.full_movie === true && item?.creator === "DJ Mack" && /^[0-9a-f-]{36}$/i.test(String(item.id || "")) && Boolean(directDownloadUrl(item.playback_url));
+  }
   function renderTranslations(items) {
     const section = $("#tz-translations");
     const grid = $("#translation-grid");
     if (!grid || !section) return;
     const rows = Array.isArray(items) ? items : [];
     state.djItems = rows;
-    const playableRows = rows.map((item, index) => ({ item, index })).filter(({ item }) => youtubeVideoId(item.preview_url || item.official_watch_url));
+    const playableRows = rows.map((item, index) => ({ item, index, fullMovie: isUploadedDjMovie(item), videoId: youtubeVideoId(item.preview_url || item.official_watch_url) }))
+      .filter(({ fullMovie, videoId }) => fullMovie || videoId);
     section.hidden = !playableRows.length;
     if (!playableRows.length) { grid.replaceChildren(); return; }
     const groups = new Map();
@@ -367,15 +372,28 @@
       const cards = entries.map(({ item, index }) => {
         const title = escapeHtml(item.title || "DJ Clip");
         const videoId = youtubeVideoId(item.preview_url || item.official_watch_url);
-        const thumbnail = videoId ? `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : "";
-      const downloadUrl = authorizedTranslationDownload(item);
-      const playAction = `<button class="button button--ghost" type="button" data-dj-play="${index}">▶ PLAY CLIP</button>`;
-      const downloadAction = downloadUrl ? `<a class="button button--primary" href="${escapeHtml(downloadUrl)}" download>DOWNLOAD ↓</a>` : "";
-      return `<article class="dj-movie-card"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${thumbnail}" alt="${title} clip poster" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">CLIP</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><div class="dj-movie-actions">${playAction}${downloadAction}</div></div></article>`;
+        const fullMovie = isUploadedDjMovie(item);
+        const poster = safeExternalLink(item.poster_url);
+        const thumbnail = poster || (videoId ? `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : "");
+        const downloadUrl = authorizedTranslationDownload(item);
+        const saved = fullMovie && watchlist().some(savedItem => watchlistKey(savedItem) === watchlistKey(item));
+        const playAction = `<button class="button button--ghost" type="button" data-dj-play="${index}">▶ ${fullMovie ? "PLAY MOVIE" : "PLAY CLIP"}</button>`;
+        const downloadAction = downloadUrl ? `<a class="button button--primary"${fullMovie ? ` data-dj-upload-download="${index}"` : ""} href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" download>DOWNLOAD ↓</a>` : "";
+        const rightsUrl = fullMovie ? safeExternalLink(item.rights_url) : "";
+        const rightsAction = rightsUrl ? `<a class="dj-card-rights" href="${escapeHtml(rightsUrl)}" target="_blank" rel="noopener noreferrer">RIGHTS SOURCE ↗</a>` : "";
+        const saveAction = fullMovie ? `<button class="watchlist-toggle" type="button" data-watchlist-toggle data-movie-id="${escapeHtml(item.id)}" data-movie-type="movie" aria-pressed="${saved}" aria-label="${saved ? "Remove from My List" : "Add to My List"}" title="${saved ? "Remove from My List" : "Add to My List"}">${saved ? "♥" : "♡"}</button>` : "";
+        const badge = fullMovie ? "FULL MOVIE" : "CLIP";
+        return `<article class="dj-movie-card${fullMovie ? " dj-movie-card--full" : ""}"><div class="dj-movie-poster">${thumbnail ? `<img loading="lazy" src="${escapeHtml(thumbnail)}" alt="${title} poster" onerror="this.remove()">` : ""}<span class="dj-movie-poster__title">${title}</span><span class="dj-movie-poster__badge">${badge}</span></div><div class="dj-movie-card__body"><p class="eyebrow eyebrow--muted">${escapeHtml(dj)}${item.year ? ` · ${escapeHtml(item.year)}` : ""}</p><h4>${title}</h4><div class="dj-movie-actions">${playAction}${downloadAction}</div>${rightsAction}${saveAction}</div></article>`;
       }).join("");
       return `<section class="dj-movie-shelf" aria-labelledby="${shelfTitleId}"><header class="dj-movie-shelf__heading"><h3 id="${shelfTitleId}">${escapeHtml(dj)}</h3></header><div class="dj-movie-shelf__track">${cards}</div></section>`;
     }).join("");
     $$('[data-dj-play]', grid).forEach(button => button.addEventListener("click", () => playDjClip(Number(button.dataset.djPlay))));
+    $$('[data-dj-upload-download]', grid).forEach(link => link.addEventListener("click", event => {
+      const item = state.djItems[Number(link.dataset.djUploadDownload)];
+      const alreadySaved = item && watchlist().some(savedItem => watchlistKey(savedItem) === watchlistKey(item));
+      if (!item || (!alreadySaved && !toggleWatchlist(item))) event.preventDefault();
+    }));
+    bindMovieCards(grid);
   }
   function youtubeVideoId(value) {
     const safe = safeExternalLink(value);
@@ -391,29 +409,50 @@
   function authorizedTranslationDownload(item) {
     if (!item || item.download_authorized !== true || item.rights_verified !== true) return "";
     if (!safeExternalLink(item.rights_url) || typeof item.rights_notes !== "string" || !item.rights_notes.trim()) return "";
-    return directDownloadUrl(item.official_download_url);
+    return directDownloadUrl(item.official_download_url || item.download_url);
   }
   function playDjClip(index) {
     const item = state.djItems[index];
+    const fullMovie = isUploadedDjMovie(item);
+    if (fullMovie) { playDjUploadMovie(item, true); return; }
     const videoId = item && youtubeVideoId(item.preview_url || item.official_watch_url);
-    if (!item || !videoId) return;
+    const playbackUrl = fullMovie ? directDownloadUrl(item.playback_url) : "";
+    if (!item || (!fullMovie && !videoId)) return;
     const title = String(item.title || "DJ Clip").slice(0, 160);
     const dj = String(item.dj || "DJ Creator").slice(0, 100);
-    const key = `sample:dj-${videoId.toLowerCase()}`;
+    const key = fullMovie ? `library:${item.id}` : `sample:dj-${videoId.toLowerCase()}`;
     const downloadUrl = authorizedTranslationDownload(item);
-    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" download>DOWNLOAD ↓</a>` : "";
+    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" download>DOWNLOAD ↓</a>` : "";
+    const rightsUrl = fullMovie ? safeExternalLink(item.rights_url) : "";
+    const rightsMarkup = fullMovie && rightsUrl ? `<section class="dj-upload-rights"><p><a href="${escapeHtml(rightsUrl)}" target="_blank" rel="noopener noreferrer">RIGHTS SOURCE ↗</a></p><p>${escapeHtml(item.rights_notes || "")}</p><p class="open-film-download-note">Your browser controls where the file is saved. On Android it usually goes to Downloads; Gallery visibility depends on the device.</p></section>` : "";
     const dialog = $("#movie-dialog");
     const content = $("#dialog-content");
-    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">DJ CLIP</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div><section class="inline-player" aria-label="DJ clip player"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}</div>${commentsMarkup(key)}</div>`;
-    const iframe = document.createElement("iframe");
-    iframe.title = `In-page DJ clip player: ${title}`;
-    iframe.src = safeEmbedUrl(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`);
-    iframe.loading = "lazy";
-    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-    iframe.sandbox = "allow-scripts allow-same-origin allow-presentation";
-    iframe.allow = "encrypted-media; picture-in-picture";
-    iframe.allowFullscreen = true;
-    $("#dj-clip-player", content).append(iframe);
+    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">${fullMovie ? "DJ MACK · FULL MOVIE" : "DJ CLIP"}</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(dj)}</span>${item.year ? `<span>${escapeHtml(item.year)}</span>` : ""}</div>${item.synopsis ? `<p class="dialog-overview">${escapeHtml(item.synopsis)}</p>` : ""}<section class="inline-player" aria-label="${fullMovie ? "Full movie" : "DJ clip"} player"><div id="dj-clip-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}</div>${rightsMarkup}${commentsMarkup(key)}</div>`;
+    const mount = $("#dj-clip-player", content);
+    if (fullMovie) {
+      const video = document.createElement("video");
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.src = playbackUrl;
+      video.addEventListener("error", () => {
+        const note = document.createElement("p");
+        note.className = "inline-player-note";
+        note.textContent = "This MP4 could not play. Check the file or try another browser.";
+        mount.append(note);
+      }, { once: true });
+      mount.append(video);
+    } else {
+      const iframe = document.createElement("iframe");
+      iframe.title = `In-page DJ clip player: ${title}`;
+      iframe.src = safeEmbedUrl(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`);
+      iframe.loading = "lazy";
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      iframe.sandbox = "allow-scripts allow-same-origin allow-presentation";
+      iframe.allow = "encrypted-media; picture-in-picture";
+      iframe.allowFullscreen = true;
+      mount.append(iframe);
+    }
     setupMovieComments($(".movie-comments", content), key, title);
     dialog.showModal();
   }
@@ -423,8 +462,9 @@
       if (!response.ok) throw new Error("TRANSLATIONS_UNAVAILABLE");
       const data = await response.json();
       const items = Array.isArray(data.items) ? data.items : [];
-      renderTranslations(items);
-    } catch { renderTranslations([]); }
+      state.staticDjItems = items;
+      renderTranslations([...state.staticDjItems, ...state.library.filter(isUploadedDjMovie)]);
+    } catch { state.staticDjItems = []; renderTranslations(state.library.filter(isUploadedDjMovie)); }
   }
   function safeEmbedUrl(value) {
     const safe = safeExternalLink(value);
@@ -504,6 +544,7 @@
     dialog.showModal();
     let movie = findMovie(id, type);
     if (movie?.open_movie) { playOpenMovie(movie, autoplay); return; }
+    if (movie?.dj_upload_movie === true || (movie?.full_movie === true && movie?.creator === "DJ Mack")) { playDjUploadMovie(movie, autoplay); return; }
     try {
       const data = await request(`/api/movies?detail=${encodeURIComponent(id)}&type=${encodeURIComponent(type)}`);
       movie = data.movie || movie;
@@ -569,7 +610,7 @@
     const section = $(".approved-library");
     const grid = $("#library-grid");
     if (!grid) return;
-    const rows = Array.isArray(items) ? items : [];
+    const rows = (Array.isArray(items) ? items : []).filter(item => !isUploadedDjMovie(item));
     if (!rows.length) {
       if (section) section.hidden = true;
       return;
@@ -586,13 +627,16 @@
       const data = await request("/api/library");
       state.library = Array.isArray(data.items) ? data.items : [];
       renderLibrary(state.library);
+      renderTranslations([...state.staticDjItems, ...state.library.filter(isUploadedDjMovie)]);
     } catch {
       state.library = [];
       renderLibrary([]);
+      renderTranslations(state.staticDjItems);
     }
   }
   function playLibraryItem(id) {
     const item = state.library.find(candidate => String(candidate.id) === String(id));
+    if (item?.dj_upload_movie === true || (item?.full_movie === true && item?.creator === "DJ Mack")) { playDjUploadMovie(item, true); return; }
     const playbackUrl = item && safeLibraryPlayback(item);
     if (!item || !playbackUrl) return;
     const dialog = $("#movie-dialog");
@@ -630,6 +674,53 @@
     setupMovieComments($(".movie-comments", content), key, item.title);
     dialog.showModal();
   }
+  function playDjUploadMovie(item, autoplay = false) {
+    const playbackUrl = item && directDownloadUrl(item.playback_url);
+    if (!item || !playbackUrl) return;
+    const title = titleOf(item);
+    const year = yearOf(item);
+    const overview = item.overview || item.synopsis || "";
+    const rightsUrl = safeExternalLink(item.rights_url);
+    const downloadUrl = authorizedMovieDownload(item);
+    const downloadMarkup = downloadUrl ? `<a class="button button--primary download-button" data-dj-upload-dialog-download href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer" download>DOWNLOAD ↓</a>` : "";
+    const savedToList = watchlist().some(saved => watchlistKey(saved) === watchlistKey(item));
+    const watchlistMarkup = `<button class="button button--ghost dj-upload-mylist" type="button" data-dj-upload-mylist aria-pressed="${savedToList}">${savedToList ? "♥ IN MY LIST" : "♡ ADD TO MY LIST"}</button>`;
+    const rightsMarkup = rightsUrl ? `<section class="dj-upload-rights"><p><a href="${escapeHtml(rightsUrl)}" target="_blank" rel="noopener noreferrer">RIGHTS SOURCE ↗</a></p><p>${escapeHtml(item.rights_notes || "")}</p><p class="open-film-download-note">Your browser controls where the file is saved. On Android it usually goes to Downloads; Gallery visibility depends on the device.</p></section>` : "";
+    const dialog = $("#movie-dialog");
+    const content = $("#dialog-content");
+    const key = `library:${item.id}`;
+    content.innerHTML = `<div class="dialog-backdrop"></div><div class="dialog-body dj-clip-dialog"><p class="dialog-kicker">DJ MACK · FULL MOVIE</p><h2 id="dialog-title">${escapeHtml(title)}</h2><div class="dialog-info"><span>${escapeHtml(item.creator || "DJ Mack")}</span>${year ? `<span>${escapeHtml(year)}</span>` : ""}</div>${overview ? `<p class="dialog-overview">${escapeHtml(overview)}</p>` : ""}<section class="inline-player" aria-label="Full movie player"><div id="dj-upload-player" class="inline-player__frame"></div></section><div class="dialog-actions">${downloadMarkup}${watchlistMarkup}</div>${rightsMarkup}${commentsMarkup(key)}</div>`;
+    const video = document.createElement("video");
+    video.controls = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.src = playbackUrl;
+    video.addEventListener("error", () => {
+      const note = document.createElement("p");
+      note.className = "inline-player-note";
+      note.textContent = "This MP4 could not play. Check the file or try another browser.";
+      $("#dj-upload-player", content).append(note);
+    }, { once: true });
+    $("#dj-upload-player", content).append(video);
+    const downloadLink = $("[data-dj-upload-dialog-download]", content);
+    const watchlistButton = $("[data-dj-upload-mylist]", content);
+    const updateWatchlistButton = saved => {
+      if (!watchlistButton) return;
+      watchlistButton.textContent = saved ? "♥ IN MY LIST" : "♡ ADD TO MY LIST";
+      watchlistButton.setAttribute("aria-pressed", String(saved));
+    };
+    if (watchlistButton) watchlistButton.addEventListener("click", () => {
+      if (toggleWatchlist(item)) updateWatchlistButton(watchlist().some(saved => watchlistKey(saved) === watchlistKey(item)));
+    });
+    if (downloadLink) downloadLink.addEventListener("click", event => {
+      const alreadySaved = watchlist().some(saved => watchlistKey(saved) === watchlistKey(item));
+      if (!alreadySaved && !toggleWatchlist(item)) event.preventDefault();
+      else updateWatchlistButton(true);
+    });
+    setupMovieComments($(".movie-comments", content), key, title);
+    if (!dialog.open) dialog.showModal();
+    if (autoplay) video.play().catch(() => {});
+  }
   function toggleWatchlist(movie) {
     const list = watchlist();
     const key = watchlistKey(movie);
@@ -639,9 +730,9 @@
       media_type: movie.media_type === "tv" || movie.type === "tv" ? "tv" : "movie",
       title: movie.title || "",
       name: movie.name || "",
-      overview: movie.overview || "",
-      release_date: movie.release_date || movie.first_air_date || "",
-      poster_path: movie.poster_path || movie.poster || "",
+      overview: movie.overview || movie.synopsis || "",
+      release_date: movie.release_date || movie.first_air_date || (movie.year ? `${movie.year}-01-01` : ""),
+      poster_path: movie.poster_path || movie.poster || movie.poster_url || "",
       backdrop_path: movie.backdrop_path || movie.backdrop || "",
       vote_average: Number(movie.vote_average) || null,
       genre_ids: Array.isArray(movie.genre_ids) ? movie.genre_ids : [],
@@ -662,6 +753,17 @@
         download_authorized: movie.download_authorized === true,
         rights_verified: movie.rights_verified === true,
         download_size_label: movie.download_size_label || ""
+      } : {}),
+      ...((movie.dj_upload_movie === true || (movie.full_movie === true && movie.creator === "DJ Mack")) ? {
+        dj_upload_movie: true,
+        creator: "DJ Mack",
+        playback_type: "file",
+        playback_url: movie.playback_url || "",
+        download_url: movie.download_url || "",
+        rights_url: movie.rights_url || "",
+        rights_notes: movie.rights_notes || "",
+        rights_verified: movie.rights_verified === true,
+        download_authorized: movie.download_authorized === true
       } : {})
     };
     const next = (exists ? list.filter(saved => watchlistKey(saved) !== key) : [...list, item]).slice(-150);
