@@ -31,3 +31,10 @@
 - [x] Dashboard ieleze kuwa video iliyochapishwa inaweza kuonekana hadharani na kuhifadhiwa kwenye storage ya Supabase; ukubwa wa file na gharama/kvota hutegemea mipango na settings za Supabase. *Imekamilika: notice ya public bucket, quota na limits ipo; bucket hujaribu 5 GiB na hutumia limit ndogo inayoruhusiwa na project.*
 
 **Hali ya upload halisi:** Hakukuwa na MP4 ya kutumia kwenye session hii, kwa hiyo upload halisi haikuanza. Admin anaweza kuchagua faili na uthibitisho wa haki kwenye `/admin`; kikomo halisi kinategemea Supabase project.
+
+
+## Ombi jipya — vitufe vya kuhariri na kufuta rekodi
+
+- [x] Kila movie/series iliyopo kwenye Admin Dashboard iwe na vitufe vinavyoonekana wazi vya **HARIRI** na **FUTA**; vitufe viwe vikubwa vya kugusa kwenye simu na viwe na label inayosaidia screen reader. *Imekamilika: vitufe vina labels wazi na aria-labels; kwenye simu vina touch target ya 48px.*
+- [x] HARIRI ifungue fomu ya rekodi iliyochaguliwa, ijaze taarifa zilizopo, na ihifadhi mabadiliko bila kupoteza alama ya shelf ya DJ Mack au maelezo ya haki. *Imekamilika: kitufe kinajaza fomu iliyopo na kuhifadhi mabadiliko huku marker ya DJ Mack na haki vikihifadhiwa.*
+- [x] FUTA ithibitishe kwa admin kabla ya kuendelea; kwa video iliyopakiwa ifiche rekodi kwa wageni kwanza, ifute faili ya Supabase Storage kisha rekodi, na ionyeshe kosa linaloweza kurekebishwa ikiwa usafi haujakamilika. *Imekamilika: FUTA huomba confirmation; video ya DJ Mack hufichwa kwanza, file hufutwa kisha row, na kosa la Storage huacha rekodi ikiwa unpublished ili admin ajaribu tena.*

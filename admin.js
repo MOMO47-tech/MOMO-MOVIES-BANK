@@ -72,7 +72,8 @@
       const djMack = String(item.synopsis || "").startsWith(`${DJ_MACK_MARKER}\n`);
       const kind = djMack ? "DJ MACK" : item.media_type === "series" ? "SERIES" : "FILAMU";
       const synopsis = djMack ? String(item.synopsis || "").slice(DJ_MACK_MARKER.length).trim() : item.synopsis;
-      return `<article class="entry-card"><div class="entry-copy"><p class="eyebrow">${kind} · ${status}</p><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(synopsis || "Hakuna maelezo.")}</p><small>${item.rights_verified ? "✓ Haki zimethibitishwa" : "Haki hazijathibitishwa"}${item.updated_at ? ` · Imesasishwa ${escapeHtml(new Date(item.updated_at).toLocaleDateString("sw-TZ"))}` : ""}</small></div><div class="entry-actions"><button class="text-button" type="button" data-edit="${escapeHtml(item.id)}">Hariri</button><button class="text-button text-button--danger" type="button" data-delete="${escapeHtml(item.id)}">Futa</button></div></article>`;
+      const recordType = item.media_type === "series" ? "SERIES" : "FILAMU";
+      return `<article class="entry-card"><div class="entry-copy"><p class="eyebrow">${kind} · ${status}</p><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(synopsis || "Hakuna maelezo.")}</p><small>${item.rights_verified ? "✓ Haki zimethibitishwa" : "Haki hazijathibitishwa"}${item.updated_at ? ` · Imesasishwa ${escapeHtml(new Date(item.updated_at).toLocaleDateString("sw-TZ"))}` : ""}</small></div><div class="entry-actions" aria-label="Vitendo vya ${escapeHtml(item.title)}"><button class="entry-action entry-action--edit" type="button" data-edit="${escapeHtml(item.id)}" aria-label="Hariri ${escapeHtml(item.title)}">HARIRI ${recordType}</button><button class="entry-action entry-action--delete" type="button" data-delete="${escapeHtml(item.id)}" aria-label="Futa ${escapeHtml(item.title)}">FUTA ${recordType}</button></div></article>`;
     }).join("");
   }
   async function loadItems() {
