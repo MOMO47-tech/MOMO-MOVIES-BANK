@@ -493,7 +493,8 @@
     const file = $("#dj-upload-file").files?.[0];
     if (!file) return;
     $("#dj-upload-progress").hidden = true;
-    setMessage("#dj-upload-message", `Selected MP4 · ${formatBytes(file.size)}. The original filename will not be published.`);
+    const privateName = String(file.name || "video.mp4").replace(/[\r\n]+/g, " ").slice(0, 120);
+    setMessage("#dj-upload-message", `Umechagua: ${privateName} · ${formatBytes(file.size)}. Jina linaonekana hapa kwa admin pekee; halitachapishwa.`);
   });
   $("#reset-form").addEventListener("click", resetForm);
   $("#refresh-list").addEventListener("click", loadItems);

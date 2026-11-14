@@ -59,7 +59,8 @@
           <form id="dj-upload-form" class="admin-form upload-form" novalidate>
             <div class="field-row"><div><label for="dj-upload-title">Movie title <span>*</span></label><input id="dj-upload-title" name="title" required maxlength="160" value="On The Hunt" autocomplete="off"></div><div><label for="dj-upload-year">Release year <span>*</span></label><input id="dj-upload-year" name="release_year" type="number" min="1888" max="2100" inputmode="numeric" required value="2026"></div></div>
             <label for="dj-upload-file">MP4 video file <span>*</span></label><input id="dj-upload-file" name="file" type="file" accept="video/mp4,.mp4" required>
-            <p class="field-help">Phone picker: select the video in Files/Downloads. Supabase plan limits apply; keep this page open until the upload and publishing step finish.</p>
+            <p class="field-help file-search-tip">Kidokezo cha Android: baada ya Choose File kufungua Files, gusa Search (alama ya magnifying glass) kama inaonekana, kisha utafute “On The Hunt” au “.mp4”. Search hiyo ni ya Android; website haiwezi kuweka search bar ndani ya picker.</p>
+            <p class="field-help">Jina na ukubwa wa faili vitaonekana kwenye dashboard hii kwa admin pekee; havitachapishwa. Supabase plan limits apply—acha ukurasa wazi hadi upload ikamilike.</p>
             <label for="dj-upload-synopsis">Short description</label><textarea id="dj-upload-synopsis" name="synopsis" rows="3" maxlength="3900" placeholder="Optional movie description"></textarea>
             <label for="dj-upload-poster">Poster URL (optional, HTTPS)</label><input id="dj-upload-poster" name="poster_url" type="url" inputmode="url" placeholder="https://...">
             <label for="dj-upload-rights-url">Rights proof/source URL <span>*</span></label><input id="dj-upload-rights-url" name="rights_url" type="url" inputmode="url" required placeholder="https://official-rights-source...">

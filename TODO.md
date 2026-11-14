@@ -45,3 +45,9 @@
 - [x] Ongeza sehemu ya utafutaji inayolinganishwa bila kujali herufi kubwa/ndogo na inayotafuta jina, mwaka na maelezo ya rekodi. *Imekamilika: search inatafuta jina, mwaka, maelezo/ruhusa na hali ya rekodi bila kujali herufi kubwa au ndogo.*
 - [x] Ongeza kichujio cha haraka cha rekodi zote, DJ Mack, filamu nyingine zisizo za DJ Mack, na series ili kupata haraka aina ya rekodi inayohitajika. *Imekamilika: dropdown ina Rekodi zote, DJ Mack, Filamu nyingine na Series.*
 - [x] Search/filter zisasishwe mara moja bila kupakia upya data au kuathiri vitufe vya HARIRI/FUTA; onyesha idadi ya matokeo na ujumbe ikiwa hakuna rekodi inayolingana. *Imekamilika: filters hutumia data iliyopakiwa, zina-count results/total na empty state; event delegation ya HARIRI/FUTA imebaki.*
+
+
+## Ombi jipya — kutafuta faili kwenye simu
+
+- [x] Karibu na Choose File, elekeza admin atumie alama ya magnifying-glass/search ndani ya Android Files picker kutafuta jina la movie; eleza kuwa website haiwezi kuingiza search bar ndani ya system picker wala kuchunguza faili za simu bila user kuzichagua. *Imekamilika: Kidokezo cha Android kiko karibu na kitufe na kinaeleza kuwa Search inatolewa na picker ya simu, si website.*
+- [x] Baada ya kuchagua faili, onyesha jina na ukubwa kwenye Admin Dashboard kwa uthibitisho wa admin pekee; jina la ndani lisiwekwe kwenye public title au kutumwa kama metadata ya video. *Imekamilika: jina/ukubwa vinawekwa kwenye status text ya dashboard ya admin tu; TUS metadata hutumia UUID path na MIME type, si filename.*
