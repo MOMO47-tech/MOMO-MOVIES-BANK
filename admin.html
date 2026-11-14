@@ -102,8 +102,12 @@
           </section>
           <section class="panel list-panel" aria-labelledby="list-title">
             <div class="panel-heading"><div><p class="eyebrow">MOMO MOVIE LIBRARY</p><h2 id="list-title">Rekodi</h2></div><button id="refresh-list" class="text-button" type="button">Sasisha</button></div>
-            <p class="panel-note">Kila rekodi ina vitufe vya HARIRI na FUTA. FUTA huomba uthibitisho kabla ya kuondoa movie.</p>
+            <p class="panel-note">Tafuta kwa jina, mwaka au maelezo; chuja DJ Mack, filamu nyingine au series. Kila rekodi ina vitufe vya HARIRI na FUTA.</p>
             <p id="list-message" class="form-message" role="status" aria-live="polite"></p>
+            <div class="entry-filters" role="search" aria-label="Tafuta au chuja rekodi za movie library">
+              <div><label class="sr-only" for="library-search">Tafuta kwa jina, mwaka au maelezo</label><input id="library-search" type="search" autocomplete="off" placeholder="Jina, mwaka au maelezo…"></div>
+              <div><label class="sr-only" for="library-filter">Chuja rekodi za library</label><select id="library-filter"><option value="all">Rekodi zote</option><option value="dj-mack">DJ Mack</option><option value="other-movies">Filamu nyingine</option><option value="series">Series</option></select></div>
+            </div>
             <div id="entry-list" class="entry-list"><div class="empty-state">Inapakia rekodi...</div></div>
           </section>
         </div>

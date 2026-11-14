@@ -63,11 +63,31 @@
   }
   function renderItems() {
     const list = $("#entry-list");
+    const search = $("#library-search").value.trim().toLocaleLowerCase();
+    const category = $("#library-filter").value;
+    const filtered = state.items.filter(item => {
+      const synopsis = String(item.synopsis || "").replace(`${DJ_MACK_MARKER}\n`, "").trim();
+      const isDjMack = String(item.synopsis || "").startsWith(`${DJ_MACK_MARKER}\n`);
+      const isSeries = item.media_type === "series";
+      const status = item.is_published && item.rights_verified ? "imechapishwa" : "rasimu";
+      const matchesCategory = category === "dj-mack" ? isDjMack
+        : category === "other-movies" ? !isDjMack && !isSeries
+          : category === "series" ? isSeries
+            : true;
+      const searchable = [item.title, item.release_date, synopsis, item.rights_notes, status, isSeries ? "series" : "filamu", isDjMack ? "dj mack" : ""]
+        .join(" ").toLocaleLowerCase();
+      return matchesCategory && (!search || searchable.includes(search));
+    });
+    setMessage("#list-message", `${filtered.length} / ${state.items.length} rekodi`, true);
     if (!state.items.length) {
       list.innerHTML = '<div class="empty-state">Bado hakuna rekodi. Tumia fomu kuongeza maudhui yenye ruhusa.</div>';
       return;
     }
-    list.innerHTML = state.items.map(item => {
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state">Hakuna rekodi inayolingana. Badilisha utafutaji au kichujio.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(item => {
       const status = item.is_published && item.rights_verified ? "IMECHAPISHWA" : "RASIMU";
       const djMack = String(item.synopsis || "").startsWith(`${DJ_MACK_MARKER}\n`);
       const kind = djMack ? "DJ MACK" : item.media_type === "series" ? "SERIES" : "FILAMU";
@@ -467,6 +487,8 @@
   });
   form.addEventListener("submit", submitItem);
   djUploadForm.addEventListener("submit", submitDjUpload);
+  $("#library-search").addEventListener("input", renderItems);
+  $("#library-filter").addEventListener("change", renderItems);
   $("#dj-upload-file").addEventListener("change", () => {
     const file = $("#dj-upload-file").files?.[0];
     if (!file) return;

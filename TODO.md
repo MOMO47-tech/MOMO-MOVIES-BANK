@@ -38,3 +38,10 @@
 - [x] Kila movie/series iliyopo kwenye Admin Dashboard iwe na vitufe vinavyoonekana wazi vya **HARIRI** na **FUTA**; vitufe viwe vikubwa vya kugusa kwenye simu na viwe na label inayosaidia screen reader. *Imekamilika: vitufe vina labels wazi na aria-labels; kwenye simu vina touch target ya 48px.*
 - [x] HARIRI ifungue fomu ya rekodi iliyochaguliwa, ijaze taarifa zilizopo, na ihifadhi mabadiliko bila kupoteza alama ya shelf ya DJ Mack au maelezo ya haki. *Imekamilika: kitufe kinajaza fomu iliyopo na kuhifadhi mabadiliko huku marker ya DJ Mack na haki vikihifadhiwa.*
 - [x] FUTA ithibitishe kwa admin kabla ya kuendelea; kwa video iliyopakiwa ifiche rekodi kwa wageni kwanza, ifute faili ya Supabase Storage kisha rekodi, na ionyeshe kosa linaloweza kurekebishwa ikiwa usafi haujakamilika. *Imekamilika: FUTA huomba confirmation; video ya DJ Mack hufichwa kwanza, file hufutwa kisha row, na kosa la Storage huacha rekodi ikiwa unpublished ili admin ajaribu tena.*
+
+
+## Ombi jipya — kutafuta na kuchuja rekodi za Admin
+
+- [x] Ongeza sehemu ya utafutaji inayolinganishwa bila kujali herufi kubwa/ndogo na inayotafuta jina, mwaka na maelezo ya rekodi. *Imekamilika: search inatafuta jina, mwaka, maelezo/ruhusa na hali ya rekodi bila kujali herufi kubwa au ndogo.*
+- [x] Ongeza kichujio cha haraka cha rekodi zote, DJ Mack, filamu nyingine zisizo za DJ Mack, na series ili kupata haraka aina ya rekodi inayohitajika. *Imekamilika: dropdown ina Rekodi zote, DJ Mack, Filamu nyingine na Series.*
+- [x] Search/filter zisasishwe mara moja bila kupakia upya data au kuathiri vitufe vya HARIRI/FUTA; onyesha idadi ya matokeo na ujumbe ikiwa hakuna rekodi inayolingana. *Imekamilika: filters hutumia data iliyopakiwa, zina-count results/total na empty state; event delegation ya HARIRI/FUTA imebaki.*
